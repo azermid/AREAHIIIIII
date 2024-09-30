@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+env:
+  MIRROR_URL: "git@github.com:EpitechPromo2027/B-DEV-500-MPL-5-1-area-ewan.massonet.git"
 
 jobs:
   build:
@@ -29,30 +31,8 @@ jobs:
         run: |
           docker build -t my-client-app-image:latest -f client_mobile/Dockerfile .
 
-      - name: Configure SSH for GitHub
-        if: success()
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Configure Git
-        if: success()
-        run: |
-          git config --global user.email "amir.madaoui@epitech.eu"
-          git config --global user.name "Amir Madaoui"
-
-      - name: Push to Mirror Repo
-        if: success()
-        run: |
-          git remote add mirror git@github.com:EpitechPromo2027/B-DEV-500-MPL-5-1-area-ewan.massonet.git
-          
-          echo "Fetching latest changes from mirror repository..."
-          git fetch
-
-          echo "Merging changes from mirror repository..."
-          git merge main --strategy-option theirs
-
-          echo "Pushing to mirror repository..."
-          git push
+      - name: Push to Mirror
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
+        with:
+          target_repo_url: ${{ env.MIRROR_URL }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
