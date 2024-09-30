@@ -40,7 +40,7 @@ jobs:
       - name: Configure Git
         if: success()
         run: |
-          git config --global user.email "amir.madaoui@epitche.eu"
+          git config --global user.email "amir.madaoui@epitech.eu"
           git config --global user.name "Amir Madaoui"
 
       - name: Push to Mirror Repo
