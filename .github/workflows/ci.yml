@@ -41,7 +41,7 @@ jobs:
         if: success()
         run: |
           git config --global user.email "amir.madaoui@epitech.eu"
-          git config --global user.name "Amir Madaoui"
+          git config --global user.name "amir madaoui"
 
       - name: Push to Mirror Repo
         if: success()
@@ -49,10 +49,10 @@ jobs:
           git remote add mirror git@github.com:EpitechPromo2027/B-DEV-500-MPL-5-1-area-ewan.massonet.git
           
           echo "Fetching latest changes from mirror repository..."
-          git fetch || { echo "Failed to fetch from mirror repository."; exit 1; }
+          git fetch
 
           echo "Merging changes from mirror repository..."
-          git merge main --strategy-option theirs || { echo "Merge failed. Resolve conflicts and try again."; exit 1; }
+          git merge main --strategy-option theirs
 
           echo "Pushing to mirror repository..."
-          git push HEAD:main || { echo "Push to mirror repository failed."; exit 1; }
+          git push HEAD:main
