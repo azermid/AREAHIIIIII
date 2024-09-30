@@ -1,0 +1,35 @@
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+const retryConnection = async (retries = 5) => {
+  const attemptConnection = async (retriesLeft) => {
+    try {
+      const pool = mysql.createPool({
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+      });
+      console.log('Connected to MySQL database using connection pool');
+      return pool;
+    } catch (err) {
+      console.error('Error connecting to the database.');
+      if (retriesLeft > 0) {
+        console.log(`Retrying in 5 seconds... (${retriesLeft} retries left)`);
+        await new Promise((res) => setTimeout(res, 5000));
+        return attemptConnection(retriesLeft - 1);
+      } else {
+        console.error('Could not connect to the database after multiple attempts.');
+        throw err;
+      }
+    }
+  };
+
+  return attemptConnection(retries);
+};
+
+module.exports = retryConnection;

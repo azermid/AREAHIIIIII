@@ -1,0 +1,15 @@
+services:
+  server:
+      volumes:
+      - ./server:/usr/src/app
+      -  /usr/src/app/node_modules
+
+  client_web:
+    volumes:
+      - ./client/area:/usr/src/app
+      -  /usr/src/app/node_modules
+
+  client_mobile:
+    volumes:
+      - ./client/area:/usr/src/app
+      -  /usr/src/app/node_modules
