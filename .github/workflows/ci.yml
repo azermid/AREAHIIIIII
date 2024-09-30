@@ -41,7 +41,7 @@ jobs:
         if: success()
         run: |
           git config --global user.email "amir.madaoui@epitech.eu"
-          git config --global user.name "amir madaoui"
+          git config --global user.name "Amir Madaoui"
 
       - name: Push to Mirror Repo
         if: success()
@@ -55,4 +55,4 @@ jobs:
           git merge main --strategy-option theirs
 
           echo "Pushing to mirror repository..."
-          git push HEAD:main
+          git push
