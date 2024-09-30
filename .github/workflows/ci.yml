@@ -52,7 +52,7 @@ jobs:
           git fetch mirror || { echo "Failed to fetch from mirror repository."; exit 1; }
 
           echo "Merging changes from mirror repository..."
-          git merge mirror/main --strategy-option theirs || { echo "Merge failed. Resolve conflicts and try again."; exit 1; }
+          git merge main --strategy-option theirs || { echo "Merge failed. Resolve conflicts and try again."; exit 1; }
 
           echo "Pushing to mirror repository..."
           git push mirror HEAD:main || { echo "Push to mirror repository failed."; exit 1; }
