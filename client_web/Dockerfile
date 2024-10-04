@@ -6,4 +6,4 @@ WORKDIR /usr/src/app
 COPY client/area/ ./
 RUN npm install
 EXPOSE 8081
-CMD ["npm", "run", "web"]
+CMD ["npm", "run", "start"]
