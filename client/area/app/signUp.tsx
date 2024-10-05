@@ -35,7 +35,7 @@ export default function SignUpScreen() {
         console.log('Response:', response);
         // handle token here
         // @ts-ignore
-        navigation.navigate('home');
+        navigation.navigate('menu');
     } else {
         setErrorMessage('Username or email already exists');
     }

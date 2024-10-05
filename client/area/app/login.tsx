@@ -48,7 +48,7 @@ export default function LoginScreen() {
       console.log('Response:', response);
       // handle token here
       // @ts-ignore
-      navigation.navigate('home');
+      navigation.navigate('menu');
     } else {
       setErrorMessage('Error logging in with third party account');
     }
@@ -84,7 +84,7 @@ export default function LoginScreen() {
       console.log('Response:', response);
       // handle token here
       // @ts-ignore
-      navigation.navigate('home');
+      navigation.navigate('menu');
     } else {
       setErrorMessage('Incorrect username or password');
     }

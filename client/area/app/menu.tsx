@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useNavigation } from '@react-navigation/native';
 
 //test page for home, will need token to access
-export default function HomeScreen() {
+export default function MenuScreen() {
   const navigation = useNavigation();
 
   const handleLogin = () => {
