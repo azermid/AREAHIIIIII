@@ -24,8 +24,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, 'tint');
 
   const navigation = useNavigation();
 
@@ -102,6 +101,20 @@ export default function LoginScreen() {
     navigation.navigate('signUp');
   }
 
+  const buttonStyles = {
+    activeColor: {
+      Button: {
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        paddingVertical: 0
+      },
+      Text: {
+        color: textColor,
+        fontWeight: 'normal',
+      }
+    }
+  }
+
   return (
     <ThemedBackground>
       <ThemedContainer border={true} dropShadow={true}>
@@ -127,14 +140,16 @@ export default function LoginScreen() {
         />
         <ThemedButton title="-->" onPress={handleLogin} />
         <ThemedView style={styles.textContainer}>
-          <TouchableOpacity onPress={() => handleLoginHelperNavigation()}>
-            <Text style={{ color: tintColor }}>Trouble logging in?</Text>
-          </TouchableOpacity>
+          <ThemedButton title={"Trouble logging in?"} onPress={handleLoginHelperNavigation}
+            //@ts-ignore
+            style={buttonStyles}
+          />
         </ThemedView>
         <ThemedView style={styles.textContainer}>
-          <TouchableOpacity onPress={() => handleSignUpNavigation()}>
-            <Text style={{ color: tintColor }}>Sign up for an account</Text>
-          </TouchableOpacity>
+          <ThemedButton title={"Sign up for an account"} onPress={handleSignUpNavigation}
+            //@ts-ignore
+            style={buttonStyles}
+          />
         </ThemedView>
       </ThemedContainer>
     </ThemedBackground>
