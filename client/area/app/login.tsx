@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Button } from 'react-native';
+import { View, StyleSheet, Text, Button, TouchableOpacity } from 'react-native';
 import { ThemedBackground } from '@/components/ThemedBackground';
 import { ThemedContainer } from '@/components/ThemedContainer';
 import { ThemedFields } from '@/components/ThemedFields';
 import { ThemedButton } from '@/components/ThemedButton';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from '@/components/ThemedView';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { userLogin, userThirdPartyLogin } from '@/utils/user';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
+import Constants from 'expo-constants';
+
+const machineIp = Constants.expoConfig.extra.MACHINE_IP;
+const envAndroidId = Constants.expoConfig.extra.ANDROID_CLIENT_ID;
+const envIosId = Constants.expoConfig.extra.IOS_CLIENT_ID;
+const envWebId = Constants.expoConfig.extra.WEB_CLIENT_ID;
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -25,12 +30,9 @@ export default function LoginScreen() {
   const navigation = useNavigation();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      "821820123303-5rpm4sdr84vm0rlnvcc40fpinmlrhbf4.apps.googleusercontent.com",
-    iosClientId:
-      "821820123303-0ijjqnhhrgjr1ptrgutuhjg87ekc11o5.apps.googleusercontent.com",
-    webClientId:
-      "821820123303-1so1fjti9d97i5jgptn5664t530s14dn.apps.googleusercontent.com",
+    androidClientId: envAndroidId,
+    iosClientId: envIosId,
+    webClientId: envWebId,
   });
 
   const loginThirdParty = async ( accessToken: string) => {

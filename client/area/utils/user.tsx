@@ -1,6 +1,10 @@
+import Constants from 'expo-constants';
+
+const machineIp = Constants.expoConfig.extra.MACHINE_IP;
+
 export async function userLogin(username: string, password: string) {
     try {
-        const response = await fetch(`http://localhost:8080/user/login`, {
+        const response = await fetch(`http://${machineIp}:8080/user/login`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -21,7 +25,7 @@ export async function userLogin(username: string, password: string) {
 
 export async function userRegister(username: string, email: string, password: string) {
     try {
-        const response = await fetch(`http://localhost:8080/user/register`, {
+        const response = await fetch(`http://${machineIp}:8080/user/register`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -43,7 +47,7 @@ export async function userRegister(username: string, email: string, password: st
 
 export async function userThirdPartyLogin(userInfo: any) {
     try {
-        const response = await fetch(`http://localhost:8080/user/third-party-login`, {
+        const response = await fetch(`http://${machineIp}:8080/user/third-party-login`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
