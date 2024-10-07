@@ -18,7 +18,7 @@ export default function PresentationScreen() {
   return (
     <ThemedBackground>
       <ThemedContainer border={true} dropShadow={true}>
-        <ThemedView>
+        <ThemedView style={{gap: 7}}>
           <ThemedText>Welcome to area !</ThemedText>
           <ThemedButton title="Log In" onPress={() => handleLogin()} />
         </ThemedView>

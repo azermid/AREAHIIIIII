@@ -37,12 +37,13 @@ export function ThemedField({ style, lightColor, darkColor, field, value, onChan
     transition: 'top 0.1s, left 0.1s',
     fontSize: isFocused || value ? 10 : 16,
     fontWeight: 'bold',
+    zIndex: 1,
   };
 
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'column',
-      width: '100%',
+      alignSelf: 'stretch',
       backgroundColor: backgroundColor + '80',
       position: 'relative',
       borderRadius: 5,
