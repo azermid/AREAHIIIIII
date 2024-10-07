@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const machineIp = Constants.expoConfig.extra.MACHINE_IP;
+const machineIp = Constants.expoConfig?.extra?.MACHINE_IP;
 
 export async function userLogin(username: string, password: string) {
     try {
@@ -57,6 +57,26 @@ export async function userThirdPartyLogin(userInfo: any) {
         });
         const data = await response.json();
         return data;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+}
+
+export async function userVerifyToken(token: string) {
+    try {
+        const response = await fetch(`http://${machineIp}:8080/user/verify-token`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        });
+        const data = await response.json();
+        return data.valid;
     } catch (error) {
         console.error('Fetch error:', error);
         return null;

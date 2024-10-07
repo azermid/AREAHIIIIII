@@ -14,6 +14,14 @@ class AuthService {
         const payload = { id: user.id, username: user.username, provider: user.provider };
         return jwt.sign(payload, 'secret_key', { expiresIn: '1h' });
     }
+
+    verifyToken(token) {
+        const decoded = jwt.verify(token, 'secret_key');
+        if (!decoded) {
+            return { valid: false };
+        }
+        return { valid: true };
+    }
 }
 
 module.exports = AuthService;
