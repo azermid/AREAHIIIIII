@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     const dbConnection = await retryConnection();
     console.log('Database connection established');
 
-    // Import routes after database connection is ready
+    //user routes
     const userRoutes = require('./routes/UserRoutes')(dbConnection);
     app.use('/user', userRoutes);
 
