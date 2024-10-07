@@ -5,11 +5,11 @@ const retryConnection = async (retries = 5) => {
   const attemptConnection = async (retriesLeft) => {
     try {
       const pool = mysql.createPool({
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT || 3306,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
+        host: process.env.CI_ENV === 'true' ? process.env.CI_TEST_DB_HOST : process.env.DB_HOST,
+        port: process.env.CI_ENV === 'true' ? process.env.CI_TEST_DB_PORT || 3306 : process.env.DB_PORT || 3306,
+        user: process.env.CI_ENV === 'true' ? process.env.CI_TEST_DB_USER : process.env.DB_USER,
+        password: process.env.CI_ENV === 'true' ? process.env.CI_TEST_DB_PASSWORD : process.env.DB_PASSWORD,
+        database: process.env.CI_ENV === 'true' ? process.env.CI_TEST_DB_NAME : process.env.DB_NAME,
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0
