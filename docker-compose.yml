@@ -17,8 +17,6 @@ services:
       dockerfile: client_web/Dockerfile
     ports:
       - "8081:8081"
-    env_file:
-      - .env
     networks:
       - app-network
     depends_on:
@@ -46,6 +44,7 @@ services:
       - app-network
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./SQL/Database_create:/docker-entrypoint-initdb.d
 
 volumes:
   mysql-data:
