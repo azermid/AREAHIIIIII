@@ -53,7 +53,11 @@ jobs:
 
       - name: Build server image
         run: |
-          docker build -t my-server-image:latest -f server/DockerfileTest server
+          docker build -t my-server-image:latest -f server/Dockerfile server
+
+      - name: Run tests server
+        run: |
+          docker run --rm my-server-image:latest npm test
 
       - name: Build client_web image
         run: |

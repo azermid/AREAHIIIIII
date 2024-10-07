@@ -4,7 +4,7 @@
   "main": "source/index.js",
   "scripts": {
     "start": "node source/index.js",
-    "test": "npm run start & jest --runInBand --detectOpenHandles"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
