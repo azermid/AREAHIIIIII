@@ -25,11 +25,10 @@ export function ThemedButton({ style, lightColor, darkColor, title, ...otherProp
     const styles = StyleSheet.create({
         button: {
             display: 'flex',
-            width: '100%',
-            flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 7.5,
+            alignSelf: 'stretch',
+            padding: 4.5,
             borderRadius: 10,
             color,
             backgroundColor: isPressed ? backgroundColor : tintColor, // Change background on hover

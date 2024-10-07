@@ -13,9 +13,10 @@ export type ThemedFieldsProps = ViewProps & {
 export function ThemedFields({ fields, style, ...otherProps }: ThemedFieldsProps) {
   const styles = StyleSheet.create({
     container: {
-      width: '100%',
+      alignSelf: 'stretch',
       flexDirection: 'column',
       gap: 10,
+      zIndex: 0
     },
   });
 
