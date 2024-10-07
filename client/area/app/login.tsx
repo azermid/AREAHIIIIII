@@ -7,15 +7,15 @@ import { ThemedButton } from '@/components/ThemedButton';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from '@/components/ThemedView';
 import { useNavigation } from '@react-navigation/native';
-import { userLogin, userThirdPartyLogin } from '@/utils/user';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userLogin, userThirdPartyLogin, userVerifyToken } from '@/utils/user';
 
-const machineIp = Constants.expoConfig.extra.MACHINE_IP;
-const envAndroidId = Constants.expoConfig.extra.ANDROID_CLIENT_ID;
-const envIosId = Constants.expoConfig.extra.IOS_CLIENT_ID;
-const envWebId = Constants.expoConfig.extra.WEB_CLIENT_ID;
+const envAndroidId = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID;
+const envIosId = Constants.expoConfig?.extra?.IOS_CLIENT_ID;
+const envWebId = Constants.expoConfig?.extra?.WEB_CLIENT_ID;
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -34,6 +34,21 @@ export default function LoginScreen() {
     webClientId: envWebId,
   });
 
+  useEffect(() => {
+    const checkForToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token && await userVerifyToken(token)) {
+          // @ts-ignore
+          navigation.navigate('menu');
+        }
+      } catch (error) {
+        console.log('Error checking for token:', error);
+      }
+    };
+    checkForToken();
+  }, []);
+
   const loginThirdParty = async ( accessToken: string) => {
     const userInfo = await getGoogleUserInfo(accessToken);
     const user = {
@@ -43,11 +58,15 @@ export default function LoginScreen() {
       oauth_provider: 'google',
       password: Math.random().toString(36).slice(-12),
     };
-    // console.log('User:', user);
     const response = await userThirdPartyLogin(user);
     if (response) {
-      console.log('Response:', response);
-      // handle token here
+      // console.log('Response:', response);
+      if (response.token) {
+        await AsyncStorage.setItem('token', response.token);
+      } else {
+        setErrorMessage(response.error);
+        return;
+      }
       // @ts-ignore
       navigation.navigate('menu');
     } else {
@@ -80,10 +99,14 @@ export default function LoginScreen() {
       return;
     }
     const response = await userLogin(username, password);
+    console.log('Response:', response);
     if (response) {
-      //response can be "Incorrect username or password" or "User not found", so we need to handle this
-      console.log('Response:', response);
-      // handle token here
+      if (response.token) {
+        await AsyncStorage.setItem('token', response.token);
+      } else {
+        setErrorMessage(response.error);
+        return;
+      }
       // @ts-ignore
       navigation.navigate('menu');
     } else {

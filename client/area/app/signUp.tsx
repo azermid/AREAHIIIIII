@@ -8,6 +8,7 @@ import { ThemedButton } from '@/components/ThemedButton';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from '@/components/ThemedView';
 import { userRegister } from '@/utils/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -32,8 +33,13 @@ export default function SignUpScreen() {
     }
     const response = await userRegister(username, email, password);
     if (response) {
-        console.log('Response:', response);
-        // handle token here
+        // console.log('Response:', response);
+        if (response.token) {
+            await AsyncStorage.setItem('token', response.token);
+        } else {
+            setErrorMessage('Error signing up');
+            return;
+        }
         // @ts-ignore
         navigation.navigate('menu');
     } else {

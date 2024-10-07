@@ -1,8 +1,9 @@
 class UserController {
-    constructor(authenticateUser, registerUser, thirdPartyLogin) {
+    constructor(authenticateUser, registerUser, thirdPartyLogin, verifyToken) {
         this.authenticateUser = authenticateUser;
         this.registerUser = registerUser;
         this.thirdPartyLogin = thirdPartyLogin;
+        this.verifyToken = verifyToken;
     }
 
     async login(req, res) {
@@ -30,6 +31,16 @@ class UserController {
             const { username, email, oauth_id, oauth_provider, password } = req.body;
             const token = await this.thirdPartyLogin.execute({ username, email, oauth_id, oauth_provider, password });
             res.json({ token });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
+
+    async verify(req, res) {
+        try {
+            const { token } = req.body;
+            const response = await this.verifyToken.execute(token);
+            res.json(response);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
