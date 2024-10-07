@@ -1,7 +1,7 @@
 const express = require('express');
 const request = require('supertest');
 const retryConnection = require('../source/database');
-const routes = require('../source/routes/userRoutes');
+const routes = require('../source/routes/UserRoutes');
 
 describe('User Authentication Integration Tests', () => {
     let app;
