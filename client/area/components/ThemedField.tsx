@@ -30,7 +30,7 @@ export function ThemedField({ style, lightColor, darkColor, field, value, onChan
   };
 
   const labelStyle = {
-    top: isFocused || value ? 0 : 18,
+    top: isFocused || value ? 8 : 15,
     left: 10,
     color: tintColor + '80',
     position: 'absolute',
@@ -53,6 +53,7 @@ export function ThemedField({ style, lightColor, darkColor, field, value, onChan
       color,
       backgroundColor: fieldBackgroundColor,
       borderRadius: 5,
+      outlineStyle: 'none'
     },
   });
 
