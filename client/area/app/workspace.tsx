@@ -2,6 +2,7 @@ import { ThemedBackground } from '@/components/ThemedBackground';
 import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { WorkspaceContainer } from '@/components/WorkspaceContainer';
+import { ThemedContainer } from '@/components/ThemedContainer';
 
 export default function WorkspaceScreen() {
     const navigation = useNavigation();
@@ -9,7 +10,9 @@ export default function WorkspaceScreen() {
     return (
         <ThemedBackground style={{padding: 0}}>
             <WorkspaceContainer>
-                <ThemedText style={{fontSize: 24, fontWeight: 'bold', textAlign: 'center', padding: 15}}>Workspace</ThemedText>
+                <ThemedContainer border={true} dropShadow={true}>
+                    <ThemedText>Welcome to your workspace !</ThemedText>
+                </ThemedContainer>
             </WorkspaceContainer>
         </ThemedBackground>
     );
