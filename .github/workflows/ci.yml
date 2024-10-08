@@ -25,6 +25,10 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+        volumes:
+          - mysql-data:/var/lib/mysql
+           - ./SQL/Database_create:/docker-entrypoint-initdb.d
+
 
     steps:
       - name: Checkout
