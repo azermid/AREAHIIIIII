@@ -33,6 +33,7 @@ describe('User Authentication Integration Tests', () => {
                 .send({ username: 'testuser', password: 'password' });
 
             expect(response.statusCode).toBe(200);
+            console.log(response)
             expect(response.body.token).toBeDefined();
         });
 
