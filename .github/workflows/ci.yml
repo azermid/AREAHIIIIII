@@ -17,6 +17,7 @@ jobs:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+    
         ports:
           - 3306:3306
         options: >-
@@ -27,13 +28,9 @@ jobs:
         volumes:
           - mysql-data:/var/lib/mysql
           - ./SQL/Database_create:/docker-entrypoint-initdb.d
-  
+
+
     steps:
-      - name: Example step
-        run: |
-          echo "Database root password is $MYSQL_ROOT_PASSWORD"
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
