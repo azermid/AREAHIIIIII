@@ -4,8 +4,6 @@ require('dotenv').config();
 const retryConnection = async (retries = 5) => {
   const attemptConnection = async (retriesLeft) => {
     try {
-      if (process.env.CI_ENV === "true")
-        console.log("true")
       const pool = mysql.createPool({
         host: process.env.CI_ENV == "true" ? "db" : process.env.DB_HOST,
         port: process.env.CI_ENV === 'true' ? 3306 : process.env.DB_PORT || 3306,
