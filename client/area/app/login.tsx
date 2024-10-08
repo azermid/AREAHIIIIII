@@ -10,12 +10,16 @@ import { useNavigation } from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import Constants from 'expo-constants';
+import * as AuthSession from 'expo-auth-session';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userLogin, userThirdPartyLogin, userVerifyToken } from '@/utils/user';
 
 const envAndroidId = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID;
 const envIosId = Constants.expoConfig?.extra?.IOS_CLIENT_ID;
 const envWebId = Constants.expoConfig?.extra?.WEB_CLIENT_ID;
+// const envMachineIp = Constants.expoConfig?.extra?.MACHINE_IP;
+
+// const Uri = 'http://' + envMachineIp + ':8081';
 
 WebBrowser.maybeCompleteAuthSession();
 

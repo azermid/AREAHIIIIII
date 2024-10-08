@@ -16,11 +16,12 @@ class AuthService {
     }
 
     verifyToken(token) {
-        const decoded = jwt.verify(token, 'secret_key');
-        if (!decoded) {
-            return { valid: false };
+        try {
+            const decoded = jwt.verify(token, 'secret_key');
+            return { valid: true, decoded };
+        } catch (error) {
+            return { valid: false, error: error.message };
         }
-        return { valid: true };
     }
 }
 
