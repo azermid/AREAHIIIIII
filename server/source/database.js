@@ -5,7 +5,7 @@ const retryConnection = async (retries = 5) => {
   const attemptConnection = async (retriesLeft) => {
     try {
       const pool = mysql.createPool({
-        host: process.env.CI_ENV == "true" ? "db" : process.env.DB_HOST,
+        host: process.env.CI_ENV === "true" ? "db" : process.env.DB_HOST,
         port: process.env.CI_ENV === 'true' ? 3306 : process.env.DB_PORT || 3306,
         user: process.env.CI_ENV === 'true' ? "user" : process.env.DB_USER,
         password: process.env.CI_ENV === 'true' ? "pass" : process.env.DB_PASSWORD,
@@ -14,8 +14,13 @@ const retryConnection = async (retries = 5) => {
         connectionLimit: 10,
         queueLimit: 0
       });
-      console.log(process.env.DB_HOST)
-      console.log(process.env.CI_ENV)
+      if (process.env.CI_ENV === "true")
+        console.log(process.env.DB_HOST)
+      if (process.env.CI_ENV === 'true')
+        console.log(process.env.CI_ENV)
+      if (process.env.CI_ENV == true)
+        console.log("aaaa")
+
       console.log('Connected to MySQL database using connection pool');
       return pool;
     } catch (err) {
