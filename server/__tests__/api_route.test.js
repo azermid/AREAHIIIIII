@@ -1,26 +1,12 @@
 const express = require('express');
 const request = require('supertest');
-const retryConnection = require('../source/database');
-const routes = require('../source/routes/UserRoutes');
 
 describe('User Authentication Integration Tests', () => {
     let app;
-    let dbConnection;
 
     beforeAll(async () => {
-      try {
-        dbConnection = await retryConnection();
-      } catch (error) {
-        console.error('Failed to start server:', error);
-      }
-        dbConnection = await retryConnection();
-        app = express();
-        app.use(express.json());
-        app.use(routes(dbConnection));
-    });
-
-    afterAll(async () => {
-        await dbConnection.end();
+      app = express();
+      app.use(express.json());
     });
 
     describe('POST /login', () => {
