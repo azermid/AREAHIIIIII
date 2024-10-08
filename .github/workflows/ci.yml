@@ -47,16 +47,10 @@ jobs:
       - name: Setup environment variables
         run: |
           echo "CI_ENV=true" >> $GITHUB_ENV
-          # echo "CI_TEST_DB_HOST=db" >> $GITHUB_ENV
-          # echo "CI_TEST_DB_PORT=3306" >> $GITHUB_ENV
-          # echo "CI_TEST_DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          # echo "CI_TEST_DB_PASSWORD=${{ secrets.TEST_DB_PASSWORD }}" >> $GITHUB_ENV
-          # echo "CI_TEST_DB_NAME=${{ secrets.TEST_DB_NAME }}" >> $GITHUB_ENV
-
 
       - name: Build server image
         run: |
-          docker build -t my-server-image:latest -f server/Dockerfile server
+          docker build -t my-server-image:latest -f server/DockerfileTest server
 
       - name: Run tests server
         run: |
