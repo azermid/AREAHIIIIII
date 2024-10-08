@@ -8,7 +8,12 @@ describe('User Authentication Integration Tests', () => {
     let dbConnection;
 
     beforeAll(async () => {
+      try {
         dbConnection = await retryConnection();
+      } catch (error) {
+        console.error('Failed to start server:', error);
+      }
+    
     });
 
     beforeEach(() => {
