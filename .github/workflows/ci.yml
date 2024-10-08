@@ -12,12 +12,11 @@ jobs:
     services:
       db:
         image: mysql:latest
-        env:
+        environment:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-    
         ports:
           - 3306:3306
         options: >-
@@ -27,9 +26,8 @@ jobs:
           --health-retries=5
         volumes:
           - mysql-data:/var/lib/mysql
-           - ./SQL/Database_create:/docker-entrypoint-initdb.d
-
-
+          - ./SQL/Database_create:/docker-entrypoint-initdb.d
+  
     steps:
       - name: Checkout
         uses: actions/checkout@v3
