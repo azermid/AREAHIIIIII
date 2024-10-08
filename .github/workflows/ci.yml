@@ -30,12 +30,6 @@ jobs:
           - ./SQL:/docker-entrypoint-initdb.d
   
     steps:
-      - name: Example step
-        run: |
-          echo "Database root password is $MYSQL_USER"
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_USER }}
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -48,7 +42,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h 127.0.0.1 --silent; do
+          until mysqladmin ping -h 127.0.0.1 -u user --silent; do
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done 
