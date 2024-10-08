@@ -13,10 +13,7 @@ describe('User Authentication Integration Tests', () => {
       } catch (error) {
         console.error('Failed to start server:', error);
       }
-    
-    });
-
-    beforeEach(() => {
+        dbConnection = await retryConnection();
         app = express();
         app.use(express.json());
         app.use(routes(dbConnection));
@@ -33,7 +30,6 @@ describe('User Authentication Integration Tests', () => {
                 .send({ username: 'testuser', password: 'password' });
 
             expect(response.statusCode).toBe(200);
-            console.log(response)
             expect(response.body.token).toBeDefined();
         });
 
