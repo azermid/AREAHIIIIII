@@ -15,6 +15,9 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+    
         ports:
           - 3306:3306
         options: >-
@@ -44,16 +47,14 @@ jobs:
       - name: Setup environment variables
         run: |
           echo "CI_ENV=true" >> $GITHUB_ENV
-          echo "CI_TEST_DB_HOST=localhost" >> $GITHUB_ENV
-          echo "CI_TEST_DB_PORT=3306" >> $GITHUB_ENV
-          echo "CI_TEST_DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "CI_TEST_DB_PASSWORD=${{ secrets.TEST_DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "CI_TEST_DB_NAME=${{ secrets.TEST_DB_NAME }}" >> $GITHUB_ENV
-
 
       - name: Build server image
         run: |
-          docker build -t my-server-image:latest -f server/Dockerfile server
+          docker build -t my-server-image:latest -f server/DockerfileTest server
+
+      - name: Run tests server
+        run: |
+          docker run --rm my-server-image:latest npm test
 
       - name: Build client_web image
         run: |

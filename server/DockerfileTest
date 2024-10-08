@@ -5,4 +5,5 @@ RUN npm install
 COPY ./source ./source
 COPY ./__tests__ ./__tests__
 EXPOSE 8080
+ENV CI_ENV=true
 CMD [ "npm", "run", "start" ]
