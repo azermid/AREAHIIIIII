@@ -30,13 +30,12 @@ jobs:
           - ./SQL:/docker-entrypoint-initdb.d
   
     steps:
-    - name: Example step
-      run: |
-        echo "Database root password is $MYSQL_USER"
-      env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_USER }}
+      - name: Example step
+        run: |
+          echo "Database root password is $MYSQL_USER"
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_USER }}
 
-    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
