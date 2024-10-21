@@ -55,6 +55,17 @@ jobs:
         run: |
           docker build -t my-server-image:latest -f server/DockerfileTest server
 
+      - name: Run server container
+        run: |
+          docker run -d --name my-server-container -p 3000:3000 my-server-image:latest
+
+      - name: Wait for server to be ready
+        run: |
+          until curl -s http://localhost:3000/health; do
+            echo "Waiting for server to be ready..."
+            sleep 5
+          done
+
       - name: Run tests server
         run: |
           docker run --rm my-server-image:latest npm test
@@ -62,6 +73,11 @@ jobs:
       - name: Build client_web image
         run: |
           docker build -t my-client-web-image:latest -f client_web/Dockerfile .
+
+      - name: Stop and remove server container
+        run: |
+          docker stop my-server-container
+          docker rm my-server-container
 
       - name: Build client_app image
         run: |

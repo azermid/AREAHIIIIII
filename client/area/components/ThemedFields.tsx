@@ -29,6 +29,7 @@ export function ThemedFields({ fields, style, ...otherProps }: ThemedFieldsProps
           value={field.value}
           onChange={field.onChange}
           secure={field.secure || false} // Pass secure prop to ThemedField
+          testID={`input-${field.label.toLowerCase()}`}
         />
       ))}
     </View>
