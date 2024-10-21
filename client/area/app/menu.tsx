@@ -67,7 +67,7 @@ export default function MenuScreen() {
         {workspaces.map((workspace, index) => {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} value={workspace.name} onChangeText={(text) => {
+              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} defaultValue={workspace.name} onChangeText={(text) => {
               }}/>
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
                 <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={() => {
