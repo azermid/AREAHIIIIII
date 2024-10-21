@@ -7,11 +7,13 @@ import { ThemedText } from '@/components/ThemedText';
 import { useNavigation } from '@react-navigation/native';
 import { ThemedButton } from '@/components/ThemedButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userVerifyToken } from '@/utils/user';
+import { userGetId, userVerifyToken } from '@/utils/user';
+import { workspaceGetByUserId } from '@/utils/workspace';
 // import { userVerifyToken } from '@/utils/user';
 
 //test page for home, will need token to access
 export default function MenuScreen() {
+  const [worspaces, setWorkspaces] = useState([]);
   const navigation = useNavigation();
 
   const handleNavigation = () => {
@@ -30,6 +32,15 @@ export default function MenuScreen() {
           // @ts-ignore
           navigation.navigate('index');
         }
+        const id = await userGetId(token);
+        console.log('ID:', id);
+        if (!id) {
+          // @ts-ignore
+          navigation.navigate('index');
+        }
+        const workspaces = await workspaceGetByUserId(id);
+        console.log('Workspaces:', workspaces);
+        setWorkspaces(workspaces);
       } catch (error) {
         console.log('Error checking for token:', error);
       }

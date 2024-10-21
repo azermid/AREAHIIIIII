@@ -22,6 +22,7 @@ module.exports = (dbConnection) => {
     router.post('/register', (req, res) => userController.register(req, res));
     router.post('/third-party-login', (req, res) => userController.thirdPartyLoginOrRegister(req, res));
     router.post('/verify-token', (req, res) => userController.verify(req, res));
+    router.post('/get-id', (req, res) => userController.getId(req, res));
 
     return router;
 };

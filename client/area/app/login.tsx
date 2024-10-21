@@ -10,7 +10,6 @@ import { useNavigation } from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import Constants from 'expo-constants';
-import * as AuthSession from 'expo-auth-session';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userLogin, userThirdPartyLogin, userVerifyToken } from '@/utils/user';
 
@@ -32,11 +31,11 @@ export default function LoginScreen() {
 
   const navigation = useNavigation();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: envAndroidId,
-    iosClientId: envIosId,
-    webClientId: envWebId,
-  });
+  // const [request, response, promptAsync] = Google.useAuthRequest({
+  //   androidClientId: envAndroidId,
+  //   iosClientId: envIosId,
+  //   webClientId: envWebId,
+  // });
 
   useEffect(() => {
     const checkForToken = async () => {
@@ -53,49 +52,49 @@ export default function LoginScreen() {
     checkForToken();
   }, []);
 
-  const loginThirdParty = async ( accessToken: string) => {
-    const userInfo = await getGoogleUserInfo(accessToken);
-    const user = {
-      username: userInfo.given_name,
-      email: userInfo.email,
-      oauth_id: userInfo.sub,
-      oauth_provider: 'google',
-      password: Math.random().toString(36).slice(-12),
-    };
-    const response = await userThirdPartyLogin(user);
-    if (response) {
-      // console.log('Response:', response);
-      if (response.token) {
-        await AsyncStorage.setItem('token', response.token);
-      } else {
-        setErrorMessage(response.error);
-        return;
-      }
-      // @ts-ignore
-      navigation.navigate('menu');
-    } else {
-      setErrorMessage('Error logging in with third party account');
-    }
-  }
+  // const loginThirdParty = async ( accessToken: string) => {
+  //   const userInfo = await getGoogleUserInfo(accessToken);
+  //   const user = {
+  //     username: userInfo.given_name,
+  //     email: userInfo.email,
+  //     oauth_id: userInfo.sub,
+  //     oauth_provider: 'google',
+  //     password: Math.random().toString(36).slice(-12),
+  //   };
+  //   const response = await userThirdPartyLogin(user);
+  //   if (response) {
+  //     // console.log('Response:', response);
+  //     if (response.token) {
+  //       await AsyncStorage.setItem('token', response.token);
+  //     } else {
+  //       setErrorMessage(response.error);
+  //       return;
+  //     }
+  //     // @ts-ignore
+  //     navigation.navigate('menu');
+  //   } else {
+  //     setErrorMessage('Error logging in with third party account');
+  //   }
+  // }
 
-  const getGoogleUserInfo = async (accessToken: string) => {
-    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const userInfo = await userInfoResponse.json();
-    // console.log('Google User Info:', userInfo);
-    return userInfo;
-  };
+  // const getGoogleUserInfo = async (accessToken: string) => {
+  //   const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+  //     headers: { Authorization: `Bearer ${accessToken}` },
+  //   });
+  //   const userInfo = await userInfoResponse.json();
+  //   // console.log('Google User Info:', userInfo);
+  //   return userInfo;
+  // };
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      if (authentication?.accessToken) {
-        // const userInfo = getGoogleUserInfo(authentication.accessToken);
-        loginThirdParty(authentication.accessToken);
-      }
-    }
-  }, [response]);
+  // useEffect(() => {
+  //   if (response?.type === 'success') {
+  //     const { authentication } = response;
+  //     if (authentication?.accessToken) {
+  //       // const userInfo = getGoogleUserInfo(authentication.accessToken);
+  //       loginThirdParty(authentication.accessToken);
+  //     }
+  //   }
+  // }, [response]);
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -160,11 +159,11 @@ export default function LoginScreen() {
         />
         {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
         {/* third paties buttons here */} 
-        <Button
+        {/* <Button
           title="Login with Google"
           disabled={!request}
           onPress={() => promptAsync()}
-        />
+        /> */}
         <ThemedButton title="-->" onPress={handleLogin} />
         <ThemedView style={styles.textContainer}>
           <ThemedButton title={"Trouble logging in?"} onPress={handleLoginHelperNavigation}

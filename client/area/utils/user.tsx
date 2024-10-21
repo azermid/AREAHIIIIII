@@ -82,3 +82,23 @@ export async function userVerifyToken(token: string) {
         return null;
     }
 }
+
+export async function userGetId(token: string) {
+    try {
+        const response = await fetch(`http://${machineIp}:8080/user/get-id`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+}

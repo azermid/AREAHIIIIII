@@ -45,6 +45,16 @@ class UserController {
             res.status(400).json({ error: error.message });
         }
     }
+
+    async getId(req, res) {
+        try {
+            const { token } = req.body;
+            const response = await this.verifyToken.execute(token);
+            res.json(response.decoded.id);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = UserController;

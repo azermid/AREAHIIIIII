@@ -19,3 +19,15 @@ VALUES ('testuser', 'testuser@example.com', 'password', 'area', '0');
 -- need to hash pass
 
 -- SELECT * FROM users;
+
+-- DROP TABLE IF EXISTS workspaces;
+CREATE TABLE workspaces (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+	creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	user_id INT,
+    action_id INT,
+    reaction_id INT, -- might have many reaction for an action
+    trigger_id INT,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
