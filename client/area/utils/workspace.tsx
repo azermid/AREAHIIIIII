@@ -4,7 +4,7 @@ import { getToken } from './asyncStorage';
 
 const machineIp = Constants.expoConfig?.extra?.MACHINE_IP;
 
-export async function workspaceCreate(name: string, user_id: string) {
+export async function workspaceCreate(name: string, userId: string) {
     try {
         const token = await getToken();
         const response = await fetch(`http://${machineIp}:8080/workspace/create`, {
@@ -16,7 +16,7 @@ export async function workspaceCreate(name: string, user_id: string) {
             },
             body: JSON.stringify({
                 name: name,
-                user_id: user_id
+                userId: userId
             })
         });
         const data = await response.json();

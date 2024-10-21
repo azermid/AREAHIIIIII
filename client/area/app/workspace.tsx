@@ -14,9 +14,8 @@ const envAndroidId = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID;
 const envIosId = Constants.expoConfig?.extra?.IOS_CLIENT_ID;
 const envWebId = Constants.expoConfig?.extra?.WEB_CLIENT_ID;
 
-export default function WorkspaceScreen({ route }) {
+export default function WorkspaceScreen() {
     const navigation = useNavigation();
-    const workspaceId = route.params?.workspaceId;
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: envAndroidId,

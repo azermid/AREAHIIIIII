@@ -12,18 +12,14 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedButton } from '@/components/ThemedButton';
 
 import { userGetId, userVerifyToken } from '@/utils/user';
-import { workspaceGetByUserId } from '@/utils/workspace';
+import { workspaceGetByUserId, workspaceCreate } from '@/utils/workspace';
 // import { userVerifyToken } from '@/utils/user';
 
 //test page for home, will need token to access
 export default function MenuScreen() {
+  const [id, setId] = useState('');
   const [workspaces, setWorkspaces] = useState([]);
   const navigation = useNavigation();
-
-  const handleNavigation = () => {
-    // @ts-ignore
-    navigation.navigate('workspace');
-  }
 
   useEffect(() => {
     const checkForToken = async () => {
@@ -37,11 +33,11 @@ export default function MenuScreen() {
           navigation.navigate('index');
         }
         const id = await userGetId(token);
-        console.log('ID:', id);
         if (!id) {
           // @ts-ignore
           navigation.navigate('index');
         }
+        setId(id);
         const workspaces = await workspaceGetByUserId(id);
         if (!workspaces) {
           return;
@@ -54,19 +50,29 @@ export default function MenuScreen() {
     checkForToken();
   }, []);
 
+  async function createWorkspace() {
+    workspaceCreate('Test Workspace', id).then(
+      // @ts-ignore
+      (data) => setWorkspaces([...workspaces, data])
+    );
+  }
+
   return (
     <ThemedBackground>
       <ThemedContainer border={true} style={styles.container}>
         <ThemedView style={styles.containerLabelContainer}>
           <ThemedText style={styles.containerLabel}>Workspaces</ThemedText>
-          <MaterialCommunityIcons name='plus-box' style={styles.containerLabelPlus}></MaterialCommunityIcons>
+          <MaterialCommunityIcons name='plus-box' style={styles.containerLabelPlus} onPress={createWorkspace}></MaterialCommunityIcons>
         </ThemedView>
         <ThemedContainer border={true} style={{width: '100%', height: 1, padding: 0, margin: 0}}></ThemedContainer>
         {workspaces.map((workspace, index) => {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
               <ThemedText>{workspace.name}</ThemedText>
-              <ThemedButton title={'Enter'} onPress={handleNavigation}></ThemedButton>
+              <ThemedButton title={'Enter'} onPress={() => {
+                // @ts-ignore
+                navigation.navigate('workspace', {id: workspace._id, name: workspace.name, userId: id});
+              }}></ThemedButton>
             </ThemedView>
           );
         })}
@@ -77,9 +83,14 @@ export default function MenuScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    borderRadius: 0,
     width: '55%',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: '90%',
+    overflow: 'auto'
   },
   containerLabelContainer: {
     width: '100%',
@@ -97,5 +108,14 @@ const styles = StyleSheet.create({
   containerLabelPlus: {
     fontSize: 34,
     color: 'white',
+    cursor: 'pointer'
+  },
+  containerWorkspace: {
+    width: '100%',
+    padding: 10,
+    margin: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });

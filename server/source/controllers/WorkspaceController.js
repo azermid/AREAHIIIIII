@@ -5,8 +5,8 @@ class WorkspaceController {
 
     async create(req, res) {
         try {
-            const { name, user_id } = req.body;
-            const workspace = await this.crudWorkspace.create({ name, user_id });
+            const { name, userId } = req.body;
+            const workspace = await this.crudWorkspace.create({ name, userId });
             res.json(workspace);
         } catch (error) {
             res.status(400).json({ error: error.message });
