@@ -3,13 +3,12 @@ import { StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInput } from 'react-native-gesture-handler';
 
 import { ThemedBackground } from '@/components/ThemedBackground';
 import { ThemedContainer } from '@/components/ThemedContainer';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-
-import { ThemedButton } from '@/components/ThemedButton';
 
 import { userGetId, userVerifyToken } from '@/utils/user';
 import { workspaceGetByUserId, workspaceCreate, workspaceDelete } from '@/utils/workspace';
@@ -68,7 +67,8 @@ export default function MenuScreen() {
         {workspaces.map((workspace, index) => {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <ThemedText>{workspace.name}</ThemedText>
+              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} value={workspace.name} onChangeText={(text) => {
+              }}/>
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
                 <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={() => {
                     // @ts-ignore
