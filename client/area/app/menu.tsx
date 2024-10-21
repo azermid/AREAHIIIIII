@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedButton } from '@/components/ThemedButton';
 
 import { userGetId, userVerifyToken } from '@/utils/user';
-import { workspaceGetByUserId, workspaceCreate } from '@/utils/workspace';
+import { workspaceGetByUserId, workspaceCreate, workspaceDelete } from '@/utils/workspace';
 // import { userVerifyToken } from '@/utils/user';
 
 //test page for home, will need token to access
@@ -69,10 +69,18 @@ export default function MenuScreen() {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
               <ThemedText>{workspace.name}</ThemedText>
-              <ThemedButton title={'Enter'} onPress={() => {
-                // @ts-ignore
-                navigation.navigate('workspace', {id: workspace._id, name: workspace.name, userId: id});
-              }}></ThemedButton>
+              <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
+                <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={() => {
+                    // @ts-ignore
+                    navigation.navigate('workspace', {id: workspace._id, name: workspace.name, userId: id});
+                }}/>
+                <MaterialCommunityIcons name='delete' style={{fontSize: 30, color: 'red', cursor: 'pointer'}} onPress={() => {
+                  workspaceDelete(workspace.id);
+                    // @ts-ignore
+                    const newWorkspaces = workspaces.filter((value) => value.id !== workspace.id);
+                    setWorkspaces(newWorkspaces);
+                }}/>
+              </ThemedView>
             </ThemedView>
           );
         })}
