@@ -25,7 +25,10 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
+        volumes:
+          - mysql-data:/var/lib/mysql
+          - ./SQL:/docker-entrypoint-initdb.d
+  
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,7 +42,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h 127.0.0.1 --silent; do
+          until mysqladmin ping -h 127.0.0.1 -u user -ppass --silent; do
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done 
