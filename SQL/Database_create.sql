@@ -15,7 +15,8 @@ CREATE TABLE users (
 
 -- Insert a test user
 INSERT INTO users (username, email, password, oauth_provider, oauth_id)
-VALUES ('testuser', 'testuser@example.com', 'password', 'area', '0');
+-- password is 'password'
+VALUES ('testuser', 'testuser@example.com', '$2b$10$YF/ICGpxB7dFDRYkVoQjnusEXrm6heovwKDOqDtOaKF0uEwHKiJ0K', 'area', '0');
 -- need to hash pass
 
 -- SELECT * FROM users;
