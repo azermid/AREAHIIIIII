@@ -39,10 +39,10 @@ export default {
       eas: {
         projectId: "74a41a5e-50cb-4431-a7b8-b9c91f7ebf00",
       },
-      MACHINE_IP: process.env.MACHINE_IP,
-      ANDROID_CLIENT_ID: process.env.ANDROID_CLIENT_ID,
-      IOS_CLIENT_ID: process.env.IOS_CLIENT_ID,
-      WEB_CLIENT_ID: process.env.WEB_CLIENT_ID,
+      BACKEND_URI: process.env.BACKEND_URI,
+      GOOGLE_ANDROID_CLIENT_ID: process.env.GOOGLE_ANDROID_CLIENT_ID,
+      GOOGLE_IOS_CLIENT_ID: process.env.GOOGLE_IOS_CLIENT_ID,
+      GOOGLE_WEB_CLIENT_ID: process.env.GOOGLE_WEB_CLIENT_ID,
     },
   },
 };
