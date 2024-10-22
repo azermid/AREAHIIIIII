@@ -64,7 +64,7 @@ CREATE TABLE `services` (
 CREATE TABLE `actions_list` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
 );
 
 -- DROP TABLE IF EXISTS reactions_list;
