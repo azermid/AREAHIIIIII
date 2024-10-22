@@ -23,7 +23,7 @@ VALUES ('testuser', 'testuser@example.com', '$2b$10$YF/ICGpxB7dFDRYkVoQjnusEXrm6
 
 -- DROP TABLE IF EXISTS workspaces;
 CREATE TABLE workspaces (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
 	creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	user_id INT,
@@ -31,4 +31,45 @@ CREATE TABLE workspaces (
     reaction_id INT, -- might have many reaction for an action
     trigger_id INT,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- DROP TABLE IF EXISTS services_list;
+CREATE TABLE `services_list` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
+);
+
+-- DROP TABLE IF EXISTS services;
+CREATE TABLE `Area`.`services` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `services_list_id` INT UNSIGNED NOT NULL,
+    `workspaces_id` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_services_services_list_idx` (`services_list_id` ASC) VISIBLE,
+    INDEX `fk_services_workspaces_idx` (`workspaces_id` ASC) VISIBLE,
+    CONSTRAINT `fk_services_services_list`
+        FOREIGN KEY (`services_list_id`)
+        REFERENCES `Area`.`services_list` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_services_workspaces`
+        FOREIGN KEY (`workspaces_id`)
+        REFERENCES `Area`.`workspaces` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+-- DROP TABLE IF EXISTS actions_list;
+CREATE TABLE `actions_list` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL,
+);
+
+-- DROP TABLE IF EXISTS reactions_list;
+CREATE TABLE `reactions_list` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
 );
