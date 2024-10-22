@@ -1,10 +1,10 @@
 import Constants from 'expo-constants';
 
-const machineIp = Constants.expoConfig?.extra?.MACHINE_IP;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
 export async function userLogin(username: string, password: string) {
     try {
-        const response = await fetch(`http://${machineIp}:8080/user/login`, {
+        const response = await fetch(`${backendUri}/user/login`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export async function userLogin(username: string, password: string) {
 
 export async function userRegister(username: string, email: string, password: string) {
     try {
-        const response = await fetch(`http://${machineIp}:8080/user/register`, {
+        const response = await fetch(`${backendUri}/user/register`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export async function userRegister(username: string, email: string, password: st
 
 export async function userThirdPartyLogin(userInfo: any) {
     try {
-        const response = await fetch(`http://${machineIp}:8080/user/third-party-login`, {
+        const response = await fetch(`${backendUri}/user/third-party-login`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export async function userThirdPartyLogin(userInfo: any) {
 
 export async function userVerifyToken(token: string) {
     try {
-        const response = await fetch(`http://${machineIp}:8080/user/verify-token`, {
+        const response = await fetch(`${backendUri}/user/verify-token`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export async function userVerifyToken(token: string) {
 
 export async function userGetId(token: string) {
     try {
-        const response = await fetch(`http://${machineIp}:8080/user/get-id`, {
+        const response = await fetch(`${backendUri}/user/get-id`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',

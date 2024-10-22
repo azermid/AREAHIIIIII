@@ -7,20 +7,23 @@ import { ThemedButton } from '@/components/ThemedButton';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from '@/components/ThemedView';
 import { useNavigation } from '@react-navigation/native';
+import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
+import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userLogin, userThirdPartyLogin, userVerifyToken } from '@/utils/user';
-
-const envAndroidId = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID;
-const envIosId = Constants.expoConfig?.extra?.IOS_CLIENT_ID;
-const envWebId = Constants.expoConfig?.extra?.WEB_CLIENT_ID;
-// const envMachineIp = Constants.expoConfig?.extra?.MACHINE_IP;
-
-// const Uri = 'http://' + envMachineIp + ':8081';
+import { userLogin, userVerifyToken } from '@/utils/user';
+import { Platform } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
+
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+
+const redirectUri = AuthSession.makeRedirectUri({
+  // @ts-ignore
+  useProxy: Platform.select({ web: false, default: true }),
+  native: 'myapp://redirect',
+});
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -31,16 +34,23 @@ export default function LoginScreen() {
 
   const navigation = useNavigation();
 
-  // const [request, response, promptAsync] = Google.useAuthRequest({
-  //   androidClientId: envAndroidId,
-  //   iosClientId: envIosId,
-  //   webClientId: envWebId,
-  // });
-
   useEffect(() => {
     const checkForToken = async () => {
       try {
-        const token = await AsyncStorage.getItem('token');
+        let token;
+  
+        if (Platform.OS === 'web') {
+          const urlParams = new URLSearchParams(window.location.search);
+          token = urlParams.get('token');
+          window.history.replaceState({}, document.title, window.location.pathname); // Clears token from URL
+          if (token) {
+            await AsyncStorage.setItem('token', token);
+          }
+        } else {
+          token = await AsyncStorage.getItem('token');
+        }
+
+        // console.log('Token:', token);
         if (token && await userVerifyToken(token)) {
           // @ts-ignore
           navigation.navigate('menu');
@@ -51,50 +61,7 @@ export default function LoginScreen() {
     };
     checkForToken();
   }, []);
-
-  // const loginThirdParty = async ( accessToken: string) => {
-  //   const userInfo = await getGoogleUserInfo(accessToken);
-  //   const user = {
-  //     username: userInfo.given_name,
-  //     email: userInfo.email,
-  //     oauth_id: userInfo.sub,
-  //     oauth_provider: 'google',
-  //     password: Math.random().toString(36).slice(-12),
-  //   };
-  //   const response = await userThirdPartyLogin(user);
-  //   if (response) {
-  //     // console.log('Response:', response);
-  //     if (response.token) {
-  //       await AsyncStorage.setItem('token', response.token);
-  //     } else {
-  //       setErrorMessage(response.error);
-  //       return;
-  //     }
-  //     // @ts-ignore
-  //     navigation.navigate('menu');
-  //   } else {
-  //     setErrorMessage('Error logging in with third party account');
-  //   }
-  // }
-
-  // const getGoogleUserInfo = async (accessToken: string) => {
-  //   const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-  //     headers: { Authorization: `Bearer ${accessToken}` },
-  //   });
-  //   const userInfo = await userInfoResponse.json();
-  //   // console.log('Google User Info:', userInfo);
-  //   return userInfo;
-  // };
-
-  // useEffect(() => {
-  //   if (response?.type === 'success') {
-  //     const { authentication } = response;
-  //     if (authentication?.accessToken) {
-  //       // const userInfo = getGoogleUserInfo(authentication.accessToken);
-  //       loginThirdParty(authentication.accessToken);
-  //     }
-  //   }
-  // }, [response]);
+  
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -125,6 +92,27 @@ export default function LoginScreen() {
   const handleSignUpNavigation = () => {
     // @ts-ignore
     navigation.navigate('signUp');
+  }
+
+  const handleGoogleLogin = async () => {
+    if (Platform.OS === 'web') {
+      console.log('redirectUri:', redirectUri);
+      window.location.href = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri + '/login')}`;
+    } else {
+      const backendAuthUrl = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
+      const result = await WebBrowser.openAuthSessionAsync(backendAuthUrl, redirectUri);
+      if (result.type === 'success' && result.url) {
+        const token = Linking.parse(result.url).queryParams?.token;
+        if (token) {
+          // @ts-ignore
+          // console.log('mobile Token:', token);
+          // @ts-ignore
+          await AsyncStorage.setItem('token', token);
+          // @ts-ignore
+          navigation.navigate('menu');
+        }
+      }
+    }
   }
 
   const buttonStyles = {
@@ -159,11 +147,7 @@ export default function LoginScreen() {
         />
         {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
         {/* third paties buttons here */} 
-        {/* <Button
-          title="Login with Google"
-          disabled={!request}
-          onPress={() => promptAsync()}
-        /> */}
+        <ThemedButton title="Login with Google" onPress={handleGoogleLogin} />
         <ThemedButton title="-->" onPress={handleLogin} />
         <ThemedView style={styles.textContainer}>
           <ThemedButton title={"Trouble logging in?"} onPress={handleLoginHelperNavigation}
