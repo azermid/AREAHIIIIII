@@ -33,43 +33,50 @@ CREATE TABLE workspaces (
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- DROP TABLE IF EXISTS services_list;
-CREATE TABLE `services_list` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
-);
-
 -- DROP TABLE IF EXISTS services;
 CREATE TABLE `services` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
+);
+
+-- DROP TABLE IF EXISTS actions;
+CREATE TABLE `actions` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
+);
+
+-- DROP TABLE IF EXISTS reactions;
+CREATE TABLE `reactions` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(45) NOT NULL,
+    `description` VARCHAR(455) NULL DEFAULT NULL
+);
+
+CREATE TABLE `triggers` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `services_list_id` INT UNSIGNED NOT NULL,
-    `workspaces_id` INT UNSIGNED NOT NULL,
+    `services_id` INT UNSIGNED NOT NULL,
+    `actions_id` INT UNSIGNED NOT NULL,
+    `reactions_id` INT UNSIGNED NOT NULL,
+    `args` JSON NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_services_services_list_idx` (`services_list_id` ASC) VISIBLE,
-    INDEX `fk_services_workspaces_idx` (`workspaces_id` ASC) VISIBLE,
-    CONSTRAINT `fk_services_services_list`
-        FOREIGN KEY (`services_list_id`)
-        REFERENCES `Area`.`services_list` (`id`)
+    INDEX `fk_triggers_services_idx` (`services_id` ASC) VISIBLE,
+    INDEX `fk_triggers_actions_idx` (`actions_id` ASC) VISIBLE,
+    INDEX `fk_triggers_reactions_idx` (`reactions_id` ASC) VISIBLE,
+    CONSTRAINT `fk_triggers_services`
+        FOREIGN KEY (`services_id`)
+        REFERENCES `Area`.`services` (`id`)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-    CONSTRAINT `fk_services_workspaces`
-        FOREIGN KEY (`workspaces_id`)
-        REFERENCES `Area`.`workspaces` (`id`)
+    CONSTRAINT `fk_triggers_actions`
+        FOREIGN KEY (`actions_id`)
+        REFERENCES `Area`.`actions` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    CONSTRAINT `fk_triggers_reactions`
+        FOREIGN KEY (`reactions_id`)
+        REFERENCES `Area`.`reactions` (`id`)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
-);
-
--- DROP TABLE IF EXISTS actions_list;
-CREATE TABLE `actions_list` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
-);
-
--- DROP TABLE IF EXISTS reactions_list;
-CREATE TABLE `reactions_list` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
 );
