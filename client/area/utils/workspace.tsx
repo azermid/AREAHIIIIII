@@ -2,12 +2,12 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getToken } from './asyncStorage';
 
-const machineIp = Constants.expoConfig?.extra?.MACHINE_IP;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
 export async function workspaceCreate(name: string, userId: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/create`, {
+        const response = await fetch(`${backendUri}/workspace/create`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export async function workspaceCreate(name: string, userId: string) {
 export async function workspaceGetAll() {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/get`, {
+        const response = await fetch(`${backendUri}/workspace/get`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ export async function workspaceGetAll() {
 export async function workspaceGetById(id: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/get/${id}`, {
+        const response = await fetch(`${backendUri}/workspace/get/${id}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export async function workspaceGetById(id: string) {
 export async function workspaceGetByUserId(user_id: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/get/user/${user_id}`, {
+        const response = await fetch(`${backendUri}/workspace/get/user/${user_id}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export async function workspaceGetByUserId(user_id: string) {
 export async function workspaceUpdate(id: string, name: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/update`, {
+        const response = await fetch(`${backendUri}/workspace/update`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export async function workspaceUpdate(id: string, name: string) {
 export async function workspaceDelete(id: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`http://${machineIp}:8080/workspace/delete`, {
+        const response = await fetch(`${backendUri}/workspace/delete`, {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
