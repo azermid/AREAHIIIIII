@@ -41,7 +41,7 @@ CREATE TABLE `services_list` (
 );
 
 -- DROP TABLE IF EXISTS services;
-CREATE TABLE `Area`.`services` (
+CREATE TABLE `services` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `services_list_id` INT UNSIGNED NOT NULL,
     `workspaces_id` INT UNSIGNED NOT NULL,
