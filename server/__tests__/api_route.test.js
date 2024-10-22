@@ -4,6 +4,12 @@ describe('User Authentication Integration Tests', () => {
     const serverUrl = 'http://localhost:8080';
 
     describe('POST /login', () => {
+        it('should start in successfully with valid credentials', async () => {
+            const response = await request(serverUrl)
+                .post('/health');
+            expect(response.statusCode).toBe(200);
+        });
+
         it('should log in successfully with valid credentials', async () => {
             const response = await request(serverUrl)
                 .post('/login')
