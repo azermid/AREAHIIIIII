@@ -11,7 +11,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
 import { userGetId, userVerifyToken } from '@/utils/user';
-import { workspaceGetByUserId, workspaceCreate, workspaceDelete } from '@/utils/workspace';
+import { workspaceGetByUserId, workspaceCreate, workspaceDelete, workspaceUpdate } from '@/utils/workspace';
 // import { userVerifyToken } from '@/utils/user';
 
 //test page for home, will need token to access
@@ -67,8 +67,16 @@ export default function MenuScreen() {
         {workspaces.map((workspace, index) => {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} defaultValue={workspace.name} onChangeText={(text) => {
-              }}/>
+              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} defaultValue={workspace.name} onChangeText={
+                (text) => {
+                  workspace.name = text;
+              }} onBlur={async () => {
+                  try {
+                    const updatedWorkspace = await workspaceUpdate(workspace.id, workspace.name);
+                  } catch (error) {
+                    console.error("Failed to update workspace", error);
+                  }
+                }}/>
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
                 <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={() => {
                     // @ts-ignore
