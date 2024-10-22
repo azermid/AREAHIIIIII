@@ -5,11 +5,11 @@ class CrudWorkspace {
         this.workspaceRepository = workspaceRepository;
     }
 
-    async create({ name, user_id }) {
-        if (!name || !user_id) {
-            throw new Error('Name and user_id are required');
+    async create({ name, userId }) {
+        if (!name || !userId) {
+            throw new Error('Name and userId are required');
         }
-        const workspace = new Workspace({ name, user_id });
+        const workspace = new Workspace({ name, userId });
         const response = await this.workspaceRepository.create(workspace);
         workspace.id = response[0].insertId;
         return workspace;

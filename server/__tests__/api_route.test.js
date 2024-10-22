@@ -1,17 +1,11 @@
-const express = require('express');
 const request = require('supertest');
 
 describe('User Authentication Integration Tests', () => {
-    let app;
-
-    beforeAll(async () => {
-      app = express();
-      app.use(express.json());
-    });
+    const serverUrl = 'http://localhost:8080';
 
     describe('POST /login', () => {
         it('should log in successfully with valid credentials', async () => {
-            const response = await request(app)
+            const response = await request(serverUrl)
                 .post('/login')
                 .send({ username: 'testuser', password: 'password' });
 
@@ -20,7 +14,7 @@ describe('User Authentication Integration Tests', () => {
         });
 
         it('should return 400 for invalid password', async () => {
-            const response = await request(app)
+            const response = await request(serverUrl)
                 .post('/login')
                 .send({ username: 'testuser', password: 'wrongpassword' });
 
@@ -29,7 +23,7 @@ describe('User Authentication Integration Tests', () => {
         });
 
         it('should return 400 if user does not exist', async () => {
-            const response = await request(app)
+            const response = await request(serverUrl)
                 .post('/login')
                 .send({ username: 'nonexistentuser', password: 'password' });
 

@@ -4,7 +4,7 @@ import { getToken } from './asyncStorage';
 
 const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
-export async function workspaceCreate(name: string, user_id: string) {
+export async function workspaceCreate(name: string, userId: string) {
     try {
         const token = await getToken();
         const response = await fetch(`${backendUri}/workspace/create`, {
@@ -16,7 +16,7 @@ export async function workspaceCreate(name: string, user_id: string) {
             },
             body: JSON.stringify({
                 name: name,
-                user_id: user_id
+                userId: userId
             })
         });
         const data = await response.json();
