@@ -14,6 +14,35 @@ const envAndroidId = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID;
 const envIosId = Constants.expoConfig?.extra?.IOS_CLIENT_ID;
 const envWebId = Constants.expoConfig?.extra?.WEB_CLIENT_ID;
 
+// Mock data for services, actions, and reactions
+const mockServices = [
+    { id: 1, title: 'Google Calendar' },
+    { id: 2, title: 'Twitter' },
+    { id: 3, title: 'Slack' },
+];
+
+const mockActions = {
+    1: [
+        { id: 1, title: 'Create Event' },
+        { id: 2, title: 'Event Time Trigger' },
+    ],
+    2: [
+        { id: 1, title: 'Send Tweet' },
+        { id: 2, title: 'Receive Mention' },
+    ],
+};
+
+const mockReactions = {
+    1: [
+        { id: 1, title: 'Send Email' },
+        { id: 2, title: 'Post on Slack' },
+    ],
+    2: [
+        { id: 1, title: 'Like Tweet' },
+        { id: 2, title: 'Retweet' },
+    ],
+};
+
 export default function WorkspaceScreen() {
     const navigation = useNavigation();
 
@@ -33,16 +62,71 @@ export default function WorkspaceScreen() {
         }
       }, [response]);
 
-    return (
-        <ThemedBackground style={{padding: 0}}>
-            <WorkspaceContainer>
-                <ThemedContainer border={true} dropShadow={true}>
-                    <ThemedText>Welcome to your workspace !</ThemedText>
-                    <ThemedButton title={'Login to Gmail'} onPress={() => promptAsync()}></ThemedButton>
-                    <ThemedDropdown options={[{label: "test", value: "idk", onChange: null}, {label: "lol", value: "lem", onChange: null}, {label: "tetfygst", value: "hbjidk", onChange: null}]}></ThemedDropdown>
-                    <ThemedDropdown options={[{label: "test", value: "idk", onChange: null}, {label: "test", value: "idk", onChange: null}, {label: "test", value: "idk", onChange: null}]}></ThemedDropdown>
-                </ThemedContainer>
-            </WorkspaceContainer>
-        </ThemedBackground>
-    );
-}
+      const [selectedService, setSelectedService] = useState(null);
+      const [selectedAction, setSelectedAction] = useState(null);
+      const [selectedReaction, setSelectedReaction] = useState(null);
+
+      // Draggable containers for actions and reactions
+      const [actionContainerVisible, setActionContainerVisible] = useState(false);
+      const [reactionContainerVisible, setReactionContainerVisible] = useState(false);
+
+      const handleServiceChange = (serviceId) => {
+          setSelectedService(serviceId);
+          setActionContainerVisible(true);
+          setReactionContainerVisible(false);
+      };
+
+      const handleActionChange = (actionId) => {
+          setSelectedAction(actionId);
+          setReactionContainerVisible(true);
+      };
+  
+      const handleReactionChange = (reactionId) => {
+          setSelectedReaction(reactionId);
+          // Display save trigger button
+      };
+  
+      return (
+          <ThemedBackground style={{ padding: 0 }}>
+              {/* Service Container */}
+              <WorkspaceContainer>
+                  <ThemedContainer border={true} dropShadow={true}>
+                      <ThemedText>Select a Service</ThemedText>
+                      <ThemedDropdown
+                          options={mockServices.map(service => ({ label: service.title, value: service.id }))}
+                          onChange={handleServiceChange}
+                          placeholder="Select a service"
+                      />
+                  </ThemedContainer>
+              </WorkspaceContainer>
+  
+              {/* Action Container */}
+              {actionContainerVisible && selectedService && (
+                  <WorkspaceContainer>
+                      <ThemedContainer border={true} dropShadow={true}>
+                          <ThemedText>Select an Action</ThemedText>
+                          <ThemedDropdown
+                              options={mockActions[selectedService]?.map(action => ({ label: action.title, value: action.id }))}
+                              onChange={handleActionChange}
+                              placeholder="Select an action"
+                          />
+                      </ThemedContainer>
+                  </WorkspaceContainer>
+              )}
+  
+              {/* Reaction Container */}
+              {reactionContainerVisible && selectedAction && (
+                  <WorkspaceContainer>
+                      <ThemedContainer border={true} dropShadow={true}>
+                          <ThemedText>Select a Reaction</ThemedText>
+                          <ThemedDropdown
+                              options={mockReactions[selectedAction]?.map(reaction => ({ label: reaction.title, value: reaction.id }))}
+                              onChange={handleReactionChange}
+                              placeholder="Select a reaction"
+                          />
+                      </ThemedContainer>
+                  </WorkspaceContainer>
+              )}
+          </ThemedBackground>
+      );
+  }

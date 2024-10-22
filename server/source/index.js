@@ -25,6 +25,9 @@ app.use((req, res, next) => {
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);
 
+    const ServiceRoutes = require('./routes/ServiceRoutes')(dbConnection);
+    app.use('/services', ServiceRoutes);
+
     app.listen(8080, () => {
       // console.log('Server running on http://localhost:8080');
       console.log('Server running on http://' + machineIp + ':8080');

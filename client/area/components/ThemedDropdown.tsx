@@ -12,19 +12,18 @@ export type ThemedDropdownProps = ViewProps & {
     options: Array<{
         label: string;
         value: string;
-        onChange: ((value: any) => void) | null;
     }>;
+    onChange: (value: any) => void;
 };
 
-export function ThemedDropdown({ options, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
-    if (options.length < 1)
-        return null;
+export function ThemedDropdown({ options, style, lightColor, darkColor, onChange, ...otherProps }: ThemedDropdownProps) {
+    if (options.length < 1) return null;
 
     const fieldBackgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'fieldBackground');
     const tintColor = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
     const [selected, setSelected] = useState(0);
-    const [opened, setOpened] = useState(true);
+    const [opened, setOpened] = useState(false);
 
     const styles = StyleSheet.create({
         container: {
@@ -44,23 +43,26 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
         },
         arrow: {
             color: tintColor,
-        }
+        },
     });
 
     return (
         <ThemedView style={styles.container}>
-            <Pressable style={styles.mainButton} onPress={() => {setOpened(!opened)}}>
+            <Pressable style={styles.mainButton} onPress={() => setOpened(!opened)}>
                 <ThemedText style={styles.label}>{options[selected].label}</ThemedText>
                 <MaterialCommunityIcons name={opened ? "chevron-up" : "chevron-down"} size={24} style={styles.arrow} />
             </Pressable>
             {opened && options.map((option, index) => {
                 return (
-                    <Pressable style={{backgroundColor: fieldBackgroundColor}} key={index} onPress={() => {
-                        if (option.onChange)
-                            option.onChange(option.value);
-                        setSelected(index);
-                        setOpened(false);
-                    }}>
+                    <Pressable
+                        style={{ backgroundColor: fieldBackgroundColor }}
+                        key={index}
+                        onPress={() => {
+                            setSelected(index);
+                            setOpened(false);
+                            onChange(option.value);
+                        }}
+                    >
                         <ThemedText style={styles.label}>{option.label}</ThemedText>
                     </Pressable>
                 );
