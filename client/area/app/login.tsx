@@ -46,12 +46,16 @@ export default function LoginScreen() {
           if (token) {
             await AsyncStorage.setItem('token', token);
           }
-        } else {
-          token = await AsyncStorage.getItem('token');
         }
-
-        // console.log('Token:', token);
-        if (token && await userVerifyToken(token)) {
+        if (!token) {
+          token = await AsyncStorage.getItem('token');
+          if (!token) {
+            return;
+          }
+        }
+        // @ts-ignore
+        const token_validity = await userVerifyToken(token);
+        if (token && token_validity.valid) {
           // @ts-ignore
           navigation.navigate('menu');
         }
@@ -69,7 +73,7 @@ export default function LoginScreen() {
       return;
     }
     const response = await userLogin(username, password);
-    console.log('Response:', response);
+    // console.log('Response:', response);
     if (response) {
       if (response.token) {
         await AsyncStorage.setItem('token', response.token);
@@ -96,7 +100,7 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async () => {
     if (Platform.OS === 'web') {
-      console.log('redirectUri:', redirectUri);
+      // console.log('redirectUri:', redirectUri);
       window.location.href = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri + '/login')}`;
     } else {
       const backendAuthUrl = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;

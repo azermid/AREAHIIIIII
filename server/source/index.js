@@ -2,14 +2,27 @@ require('dotenv').config();
 const express = require('express');
 const retryConnection = require('./database');
 const app = express();
+
 const backendUri = process.env.BACKEND_URI || 'http://localhost:8080';
 
 app.use(express.json());
 
+// app.use((req, res, next) => {
+//   console.log('Incoming Request:', req.method, req.url, req.headers);
+//   next();
+// });
+
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const allowedOrigin = 'http://localhost:8081';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, ngrok-skip-browser-warning');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
   next();
 });
 
@@ -18,7 +31,12 @@ app.use((req, res, next) => {
     const dbConnection = await retryConnection();
     console.log('Database connection established');
 
-    //user routes
+    // app.use((req, res, next) => {
+    //   console.log('Headers:', req.headers);
+    //   console.log('Body:', req.body);
+    //   next();
+    // });
+    
     const userRoutes = require('./routes/UserRoutes')(dbConnection);
     app.use('/user', userRoutes);
 
