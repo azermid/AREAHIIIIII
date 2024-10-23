@@ -66,9 +66,9 @@ jobs:
             sleep 5
           done
 
-      - name: Run tests server
+      - name: Run tests on the server
         run: |
-          docker run --rm my-server-image:latest npm test
+          docker exec my-server-container npm test
 
       - name: Build client_web image
         run: |
