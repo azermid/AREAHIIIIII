@@ -76,7 +76,7 @@ export async function userVerifyToken(token: string) {
             })
         });
         const data = await response.json();
-        return data.valid;
+        return data;
     } catch (error) {
         console.error('Fetch error:', error);
         return null;

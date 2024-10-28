@@ -10,11 +10,9 @@ import { ThemedContainer } from '@/components/ThemedContainer';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
-import { userGetId, userVerifyToken } from '@/utils/user';
+import { userVerifyToken } from '@/utils/user';
 import { workspaceGetByUserId, workspaceCreate, workspaceDelete } from '@/utils/workspace';
-// import { userVerifyToken } from '@/utils/user';
 
-//test page for home, will need token to access
 export default function MenuScreen() {
   const [id, setId] = useState('');
   const [workspaces, setWorkspaces] = useState([]);
@@ -27,17 +25,29 @@ export default function MenuScreen() {
         if (!token) {
           // @ts-ignore
           navigation.navigate('index');
-        } else if (!userVerifyToken(token)) {
+          return;
+        }
+        // @ts-ignore
+        const token_validity = await userVerifyToken(token);
+        if (!token_validity.valid) {
+          AsyncStorage.removeItem('token');
           // @ts-ignore
           navigation.navigate('index');
+          return;
         }
-        const id = await userGetId(token);
+        // @ts-ignore
+        // const id = await userGetId(token);
+        const id = token_validity.decoded.id;
+        console.log('Id', id);
         if (!id) {
           // @ts-ignore
           navigation.navigate('index');
+          return;
         }
         setId(id);
+
         const workspaces = await workspaceGetByUserId(id);
+        console.log('Workspaces', workspaces);
         if (!workspaces) {
           return;
         }

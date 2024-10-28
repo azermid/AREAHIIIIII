@@ -68,13 +68,15 @@ export async function workspaceGetById(id: string) {
 export async function workspaceGetByUserId(user_id: string) {
     try {
         const token = await getToken();
-        const response = await fetch(`${backendUri}/workspace/get/user/${user_id}`, {
+        const response = await fetch(`${backendUri}/workspace/get/user/${encodeURIComponent(user_id)}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
-            }
+                'Authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
+            },
+            credentials: 'include'
         });
         const data = await response.json();
         return data;
