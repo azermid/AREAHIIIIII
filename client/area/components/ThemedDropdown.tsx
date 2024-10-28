@@ -24,7 +24,7 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
     const tintColor = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
     const [selected, setSelected] = useState(0);
-    const [opened, setOpened] = useState(true);
+    const [opened, setOpened] = useState(false);
 
     const styles = StyleSheet.create({
         container: {

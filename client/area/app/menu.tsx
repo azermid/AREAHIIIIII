@@ -77,18 +77,29 @@ export default function MenuScreen() {
         {workspaces.map((workspace, index) => {
           return (
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <TextInput style={{width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}} defaultValue={workspace.name} onChangeText={(text) => {
-              }}/>
+              <TextInput
+                style={
+                  {width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}
+                }
+                defaultValue={
+                  // @ts-ignore
+                  workspace.name
+                }
+                onChangeText={(text) => {}
+                }
+              />
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
-                <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={() => {
+                <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={async () => {
+                    await AsyncStorage.setItem('workspace', JSON.stringify(workspace));
                     // @ts-ignore
-                    navigation.navigate('workspace', {id: workspace._id, name: workspace.name, userId: id});
+                    navigation.navigate('workspace');
                 }}/>
                 <MaterialCommunityIcons name='delete' style={{fontSize: 30, color: 'red', cursor: 'pointer'}} onPress={() => {
+                  // @ts-ignore
                   workspaceDelete(workspace.id);
-                    // @ts-ignore
-                    const newWorkspaces = workspaces.filter((value) => value.id !== workspace.id);
-                    setWorkspaces(newWorkspaces);
+                  // @ts-ignore
+                  const newWorkspaces = workspaces.filter((value) => value.id !== workspace.id);
+                  setWorkspaces(newWorkspaces);
                 }}/>
               </ThemedView>
             </ThemedView>
@@ -108,6 +119,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '90%',
+    // @ts-ignore
     overflow: 'auto'
   },
   containerLabelContainer: {

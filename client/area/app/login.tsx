@@ -100,8 +100,9 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async () => {
     if (Platform.OS === 'web') {
-      // console.log('redirectUri:', redirectUri);
+      console.log('redirectUri:', redirectUri);
       window.location.href = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri + '/login')}`;
+      // window.open(`${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri + '/login')}`, '_self'); //same
     } else {
       const backendAuthUrl = `${backendUri}/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
       const result = await WebBrowser.openAuthSessionAsync(backendAuthUrl, redirectUri);
