@@ -30,6 +30,9 @@ jobs:
           - ./SQL:/docker-entrypoint-initdb.d
   
     steps:
+      - name: Check MySQL Logs
+        run: docker logs ${{ job.services.db.id }}
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
