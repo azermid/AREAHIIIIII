@@ -10,12 +10,28 @@ class GoogleAuthService {
         );
         this.redirectURI = null;
         this.thirdPartyLogin = thirdPartyLogin;
+        this.serviceName = null;
+        this.serviceType = null;
+        // this.action_token = null;
+        // this.action_refresh_token = null;
+        // this.reaction_token = null;
+        // this.reaction_refresh_token = null;
     }
 
     getAuthUrl() {
         return this.oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+            prompt: 'consent',
+        });
+    }
+
+    // scopes: ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.send', 'openid', 'profile', 'email'],
+    getGmailAuthUrl() {
+        return this.oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.send', 'openid', 'profile', 'email'],
+            // scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
             prompt: 'consent',
         });
     }
@@ -29,6 +45,11 @@ class GoogleAuthService {
         });
         const { data } = await oauth2.userinfo.get();
         return data;
+    }
+
+    async getGmailTokens(code) {
+        const { tokens } = await this.oauth2Client.getToken(code);
+        return tokens;
     }
 
     async googleLoginOrRegister(user) {
