@@ -55,8 +55,7 @@ jobs:
 
       - name: Ping Database Service
         run: |
-            docker-compose -f docker-compose-ci.yml exec server ping -c 4 db
-        
+          docker-compose -f docker-compose-ci.yml exec -T server ping -c 4 db        
 
       - name: Run tests on the server
         run: |
