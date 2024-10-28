@@ -53,6 +53,11 @@ jobs:
         run: |
           docker-compose -f docker-compose-ci.yml logs db
 
+      - name: Ping Database Service
+        run: |
+            docker-compose -f docker-compose-ci.yml exec server ping -c 4 db
+        
+
       - name: Run tests on the server
         run: |
             docker-compose -f docker-compose-ci.yml exec -T server npm test
