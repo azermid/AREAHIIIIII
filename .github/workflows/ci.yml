@@ -7,31 +7,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    services:
-      db:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        volumes:
-          - mysql-data:/var/lib/mysql
-          - ./SQL:/docker-entrypoint-initdb.d
-  
+    runs-on: ubuntu-latest  
     steps:
-      - name: Check MySQL Logs
-        run: docker logs ${{ job.services.db.id }}
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -42,13 +19,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Wait for MySQL to be ready
-        run: |
-          until mysqladmin ping -h db -u user -ppass --silent; do
-            echo "Waiting for MySQL to be ready..."
-            sleep 5
-          done 
-
       - name: Setup environment variables
         run: |
           echo "CI_ENV=true" >> $GITHUB_ENV
@@ -57,9 +27,24 @@ jobs:
         run: |
           docker build -t my-server-image:latest -f server/DockerfileTest server
 
-      - name: Run server container
+      - name: Build client_app image
         run: |
-          docker run -d --name my-server-container -p 8080:8080 my-server-image:latest
+          docker build -t my-client-app-image:latest -f client_mobile/Dockerfile .
+
+      - name: Build client_web image
+        run: |
+          docker build -t my-client-web-image:latest -f client_web/Dockerfile .
+
+      - name: Run docker compose
+        run: |
+          docker-composeup
+  
+      - name: Wait for MySQL to be ready
+        run: |
+            until mysqladmin ping -h db -u user -ppass --silent; do
+              echo "Waiting for MySQL to be ready..."
+              sleep 5
+            done 
 
       - name: Wait for server to be ready
         run: |
@@ -71,19 +56,6 @@ jobs:
       - name: Run tests on the server
         run: |
           docker exec my-server-container npm test
-
-      - name: Build client_web image
-        run: |
-          docker build -t my-client-web-image:latest -f client_web/Dockerfile .
-
-      - name: Stop and remove server container
-        run: |
-          docker stop my-server-container
-          docker rm my-server-container
-
-      - name: Build client_app image
-        run: |
-          docker build -t my-client-app-image:latest -f client_mobile/Dockerfile .
 
       - name: Push to Mirror
         uses: pixta-dev/repository-mirroring-action@v1.1.1
