@@ -1,17 +1,16 @@
-version: '3.8'
-
 services:
   server:
     build:
       context: ./server
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
-      - MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-      - MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
-      - MYSQL_USER=${{ secrets.MYSQL_USER }}
-      - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-      - CI_ENV=true
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     networks:
       - app-network
     depends_on:
@@ -21,8 +20,8 @@ services:
     build:
       context: .
       dockerfile: client_web/Dockerfile
-    environment:
-      - CI_ENV=true
+    env_file:
+      - .env
     ports:
       - "8081:8081"
     networks:
@@ -34,8 +33,6 @@ services:
     build:
       context: .
       dockerfile: client_mobile/Dockerfile
-    environment:
-      - CI_ENV=true
     networks:
       - app-network
     depends_on:
@@ -44,10 +41,10 @@ services:
   db:
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-      MYSQL_USER: ${{ secrets.MYSQL_USER }}
-      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
     networks:

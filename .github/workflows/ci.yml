@@ -18,14 +18,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+      - name: Setup environment variables
+        run: |
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> $GITHUB_ENV
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> $GITHUB_ENV
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_ENV
+          echo "CI_ENV=true" >> $GITHUB_ENV
+
       - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-
-      - name: Setup environment variables
-        run: |
-          echo "CI_ENV=true" >> $GITHUB_ENV
 
       - name: Run docker compose
         run: |
