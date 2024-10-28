@@ -51,8 +51,8 @@ jobs:
 
       - name: Run tests on the server
         run: |
-            docker-compose -f docker-compose-ci.yml exec server npm test
-
+            docker-compose -f docker-compose-ci.yml exec -T server npm test
+  
       - name: Push to Mirror
         uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
