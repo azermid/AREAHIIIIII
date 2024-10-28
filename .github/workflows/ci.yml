@@ -33,6 +33,7 @@ jobs:
       - name: Check MySQL Logs
         run: docker logs ${{ job.services.db.id }}
 
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -60,8 +61,8 @@ jobs:
 
       - name: Run server container
         run: |
-          docker run -d --name my-server-container -p 8080:8080 my-server-image:latest
-
+          docker run -d --name my-server-container --network host -p 8080:8080 my-server-image:latest
+          
       - name: Wait for server to be ready
         run: |
           until curl -s http://localhost:8080/health; do
