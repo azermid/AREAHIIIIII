@@ -23,22 +23,10 @@ jobs:
         run: |
           echo "CI_ENV=true" >> $GITHUB_ENV
 
-      - name: Build server image
-        run: |
-          docker build -t my-server-image:latest -f server/DockerfileTest server
-
-      - name: Build client_app image
-        run: |
-          docker build -t my-client-app-image:latest -f client_mobile/Dockerfile .
-
-      - name: Build client_web image
-        run: |
-          docker build -t my-client-web-image:latest -f client_web/Dockerfile .
-
       - name: Run docker compose
         run: |
-          docker-composeup
-  
+          docker-compose -f docker-compose-ci.yml up -d
+
       - name: Wait for MySQL to be ready
         run: |
             until mysqladmin ping -h db -u user -ppass --silent; do
