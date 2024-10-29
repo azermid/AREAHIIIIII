@@ -26,9 +26,6 @@ jobs:
             echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
             echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
 
-      - name: Afficher les valeurs de l'environnement
-        run: cat .env
-
       - name: Install Docker Compose
         run: |
           sudo apt-get update
