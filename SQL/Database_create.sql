@@ -27,10 +27,16 @@ CREATE TABLE workspaces (
     name VARCHAR(255) NOT NULL,
 	creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	user_id INT,
-    action_id INT,
-    reaction_id INT, -- might have many reaction for an action
+    action_title VARCHAR(45),
+    reaction_title VARCHAR(45),
+    action_service_title VARCHAR(45),
+    reaction_service_title VARCHAR(45),
+    action_service_token VARCHAR(255),
+    reaction_service_token VARCHAR(255),
+    action_service_refresh_token VARCHAR(255),
+    reaction_service_refresh_token VARCHAR(255),
     trigger_id INT,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS services;

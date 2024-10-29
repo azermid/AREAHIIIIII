@@ -12,7 +12,8 @@ export async function workspaceCreate(name: string, userId: string) {
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
+                'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 name: name,
@@ -35,7 +36,8 @@ export async function workspaceGetAll() {
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
+                'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
             }
         });
         const data = await response.json();
@@ -54,7 +56,8 @@ export async function workspaceGetById(id: string) {
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
+                'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
             }
         });
         const data = await response.json();
@@ -86,19 +89,55 @@ export async function workspaceGetByUserId(user_id: string) {
     }
 }
 
-export async function workspaceUpdate(id: string, name: string) {
+// export async function workspaceUpdate(id: string, name: string) {
+//     try {
+//         const token = await getToken();
+//         const response = await fetch(`${backendUri}/workspace/update`, {
+//             method: "PUT",
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'accept': 'application/json',
+//                 'authorization': `${token}`
+//             },
+//             body: JSON.stringify({
+//                 id: id,
+//                 name: name
+//             })
+//         });
+//         const data = await response.json();
+//         return data;
+//     } catch (error) {
+//         console.error('Fetch error:', error);
+//         return null;
+//     }
+// }
+
+// @ts-ignore
+export async function workspaceUpdate({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId }) {
     try {
         const token = await getToken();
+        // console.log("params", id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId);
         const response = await fetch(`${backendUri}/workspace/update`, {
-            method: "PUT",
+            method: "PATCH",
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
+                'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 id: id,
-                name: name
+                name: name,
+                userId: userId,
+                actionTitle: actionTitle,
+                reactionTitle: reactionTitle,
+                actionServiceTitle: actionServiceTitle,
+                reactionServiceTitle: reactionServiceTitle,
+                actionServiceToken: actionServiceToken,
+                reactionServiceToken: reactionServiceToken,
+                actionServiceRefreshToken: actionServiceRefreshToken,
+                reactionServiceRefreshToken: reactionServiceRefreshToken,
+                triggerId: triggerId
             })
         });
         const data = await response.json();
@@ -117,7 +156,8 @@ export async function workspaceDelete(id: string) {
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
-                'authorization': `${token}`
+                'authorization': `${token}`,
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 id: id

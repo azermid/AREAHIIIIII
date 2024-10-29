@@ -29,12 +29,28 @@ class WorkspaceRepository {
         return rows;
     }
 
+    async camelCaseToSnakeCase(obj) {
+        const newObj = {};
+        for (const key in obj) {
+            const newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+            newObj[newKey] = obj[key];
+        }
+        return newObj;
+    }
+
     async update(workspace) {
-        // to update to be able to add action, reactions, trigger and other things
-        // can also create specific routes for those if needed
-        //TODO: all fields updatable
-        const sql = 'UPDATE workspaces SET name = ? WHERE id = ?';
-        const values = [workspace.name, workspace.id];
+        let sql = 'UPDATE workspaces SET ';
+        const values = [];
+        const workspaceSnakeCase = await this.camelCaseToSnakeCase(workspace);
+        for (const key in workspaceSnakeCase) {
+            if (workspaceSnakeCase[key]) {
+                sql += `${key} = ?, `;
+                values.push(workspaceSnakeCase[key]);
+            }
+        }
+        sql = sql.slice(0, -2);
+        sql += ' WHERE id = ?';
+        values.push(workspace.id);
         return await this.dbConnection.execute(sql, values);
     }
 

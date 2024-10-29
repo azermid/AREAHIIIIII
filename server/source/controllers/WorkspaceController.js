@@ -24,8 +24,12 @@ class WorkspaceController {
 
     async update(req, res) {
         try {
-            const { id, name } = req.body;
-            const workspace = await this.crudWorkspace.update({ id, name });
+            const { id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId } = req.body;
+            // const { id, name } = req.body;
+            // console.log({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId });
+            // console.log("updating workspace");
+            const workspace = await this.crudWorkspace.update({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId });
+            // const workspace = await this.crudWorkspace.update({ id, name });
             res.json(workspace);
         } catch (error) {
             res.status(400).json({ error: error.message });

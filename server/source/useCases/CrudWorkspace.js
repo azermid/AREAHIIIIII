@@ -19,12 +19,11 @@ class CrudWorkspace {
         return await this.workspaceRepository.get();
     }
 
-    async update({ id, name }) {
-        //TODO: all fields updatable, on pair with the repository
-        if (!id || !name) {
-            throw new Error('Id and name are required');// should not be required, you should be able to update only the fields you want
+    async update({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId }) {
+        if (!id) {
+            throw new Error('Id is required');
         }
-        const workspace = new Workspace({ id, name });
+        const workspace = new Workspace({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId });
         return await this.workspaceRepository.update(workspace);
     }
 

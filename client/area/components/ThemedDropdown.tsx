@@ -4,7 +4,7 @@ import { Pressable } from 'react-native';
 import { useState } from 'react';
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { IconButton } from 'react-native-paper';
 
 export type ThemedDropdownProps = ViewProps & {
     lightColor?: string;
@@ -42,16 +42,18 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
             fontWeight: 'bold',
             padding: 7.5,
         },
-        arrow: {
-            color: tintColor,
-        }
     });
 
     return (
         <ThemedView style={styles.container}>
             <Pressable style={styles.mainButton} onPress={() => {setOpened(!opened)}}>
                 <ThemedText style={styles.label}>{options[selected].label}</ThemedText>
-                <MaterialCommunityIcons name={opened ? "chevron-up" : "chevron-down"} size={24} style={styles.arrow} />
+                <IconButton
+                    icon={opened ? "chevron-up" : "chevron-down"}
+                    size={24}
+                    onPress={() => {setOpened(!opened)}}
+                    iconColor={tintColor}
+                />
             </Pressable>
             {opened && options.map((option, index) => {
                 return (

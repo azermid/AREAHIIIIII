@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-gesture-handler';
@@ -38,7 +38,7 @@ export default function MenuScreen() {
         // @ts-ignore
         // const id = await userGetId(token);
         const id = token_validity.decoded.id;
-        console.log('Id', id);
+        // console.log('Id', id);
         if (!id) {
           // @ts-ignore
           navigation.navigate('index');
@@ -47,7 +47,7 @@ export default function MenuScreen() {
         setId(id);
 
         const workspaces = await workspaceGetByUserId(id);
-        console.log('Workspaces', workspaces);
+        // console.log('Workspaces', workspaces);
         if (!workspaces) {
           return;
         }
@@ -71,7 +71,12 @@ export default function MenuScreen() {
       <ThemedContainer border={true} style={styles.container}>
         <ThemedView style={styles.containerLabelContainer}>
           <ThemedText style={styles.containerLabel}>Workspaces</ThemedText>
-          <MaterialCommunityIcons name='plus-box' style={styles.containerLabelPlus} onPress={createWorkspace}></MaterialCommunityIcons>
+          <IconButton
+            icon='plus-box'
+            size={30}
+            onPress={createWorkspace}
+            iconColor='white'
+          />
         </ThemedView>
         <ThemedContainer border={true} style={{width: '100%', height: 1, padding: 0, margin: 0}}></ThemedContainer>
         {workspaces.map((workspace, index) => {
@@ -79,7 +84,7 @@ export default function MenuScreen() {
             <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
               <TextInput
                 style={
-                  {width: '100%', padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '90%'}
+                  {padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '60%'}
                 }
                 defaultValue={
                   // @ts-ignore
@@ -89,18 +94,28 @@ export default function MenuScreen() {
                 }
               />
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
-                <MaterialCommunityIcons name='arrow-right-bold-box' style={{fontSize: 30, color: 'white', cursor: 'pointer'}} onPress={async () => {
+                <IconButton
+                  icon='arrow-right-bold-box'
+                  size={30}
+                  onPress={async () => {
                     await AsyncStorage.setItem('workspace', JSON.stringify(workspace));
                     // @ts-ignore
                     navigation.navigate('workspace');
-                }}/>
-                <MaterialCommunityIcons name='delete' style={{fontSize: 30, color: 'red', cursor: 'pointer'}} onPress={() => {
-                  // @ts-ignore
-                  workspaceDelete(workspace.id);
-                  // @ts-ignore
-                  const newWorkspaces = workspaces.filter((value) => value.id !== workspace.id);
-                  setWorkspaces(newWorkspaces);
-                }}/>
+                  }}
+                  iconColor='white'
+                />
+                <IconButton
+                  icon='delete'
+                  size={30}
+                  onPress={() => {
+                    // @ts-ignore
+                    workspaceDelete(workspace.id);
+                    // @ts-ignore
+                    const newWorkspaces = workspaces.filter((value) => value.id !== workspace.id);
+                    setWorkspaces(newWorkspaces);
+                  }}
+                  iconColor='red'
+                />
               </ThemedView>
             </ThemedView>
           );
@@ -113,7 +128,7 @@ export default function MenuScreen() {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 0,
-    width: '55%',
+    width: '80%',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     display: 'flex',
