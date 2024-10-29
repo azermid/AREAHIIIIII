@@ -38,6 +38,12 @@ app.use((req, res, next) => {
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);
 
+    const actionRoutes = require('./routes/ActionRoutes')(dbConnection);
+    app.use('/action', actionRoutes);
+
+    const reactionRoutes = require('./routes/ReactionRoutes')(dbConnection);
+    app.use('/reaction', reactionRoutes);
+
     app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });
