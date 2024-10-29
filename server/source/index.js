@@ -7,11 +7,6 @@ const backendUri = process.env.BACKEND_URI || 'http://localhost:8080';
 
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//   console.log('Incoming Request:', req.method, req.url, req.headers);
-//   next();
-// });
-
 app.use((req, res, next) => {
   const allowedOrigin = 'http://localhost:8081';
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);

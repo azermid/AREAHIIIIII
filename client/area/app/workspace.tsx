@@ -149,10 +149,10 @@ export default function WorkspaceScreen() {
 
     const handleConnectReactionService = async () => {
         if (Platform.OS === 'web') {
-            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace')}?service_type=reaction`;
             window.location.href = backendConnectionUri;
         } else {
-            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace')}?service_type=reaction`;
             const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
             if (result.type === 'success' && result.url) {
                 const params = Linking.parse(result.url).queryParams;
@@ -201,7 +201,7 @@ export default function WorkspaceScreen() {
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>Workspace name placeholder</ThemedText>
                     <ThemedText>Choose an action service, might be set put need chnage on dropdown</ThemedText>
-                    <ThemedDropdown 
+                    <ThemedDropdown
                         options={
                             // @ts-ignore
                             [{label: "choose a service", value: null, onChange: handleActionServiceChange}, {label: "Gmail", value: "gmail", onChange: handleActionServiceChange}]

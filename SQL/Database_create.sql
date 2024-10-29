@@ -43,14 +43,16 @@ CREATE TABLE workspaces (
 CREATE TABLE `services` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
+    `description` VARCHAR(455) NULL DEFAULT NULL,
+    `service_id` INT
 );
 
 -- DROP TABLE IF EXISTS actions;
 CREATE TABLE `actions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
+    `description` VARCHAR(455) NULL DEFAULT NULL,
+    `service_id` INT
 );
 
 -- DROP TABLE IF EXISTS reactions;
