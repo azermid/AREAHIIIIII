@@ -25,7 +25,10 @@ jobs:
             echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
             echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
             echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-        
+
+      - name: Afficher les valeurs de l'environnement
+        run: cat .env
+
       - name: Install Docker Compose
         run: |
           sudo apt-get update
@@ -52,10 +55,6 @@ jobs:
       - name: log db statue
         run: |
           docker-compose -f docker-compose-ci.yml logs db
-
-      - name: Ping Database Service
-        run: |
-          docker-compose -f docker-compose-ci.yml exec -T server ping -c 4 db        
 
       - name: Run tests on the server
         run: |
