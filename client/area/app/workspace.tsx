@@ -48,6 +48,9 @@ export default function WorkspaceScreen() {
 
     const [actionOptions, setActionOptions] = useState([]);
     const [reactionOptions, setReactionOptions] = useState([]);
+
+    const [actionData, setActionData] = useState(null);
+    const [reactionData, setReactionData] = useState(null);
     //TODO: all this should be get from db and setting them should edit db
 
     useEffect(() => {
@@ -70,6 +73,20 @@ export default function WorkspaceScreen() {
                 setReactionServiceToken(workspaceObj.reaction_service_token);
                 setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
                 setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
+                setActionData(
+                    {
+                        // @ts-ignore
+                        from: "yann.malaret@outlook.fr",
+                    }
+                );
+                setReactionData(
+                    {
+                        // @ts-ignore
+                        to: "yann.malaret@outlook.fr",
+                        subject: "test",
+                        text: "test",
+                    }
+                );
             }
             if (Platform.OS === 'web') {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -102,16 +119,22 @@ export default function WorkspaceScreen() {
     }, []);
 
     useEffect(() => {
-        const setOptions = async () => {
-            const actions = await getActions(actionService, setAction);
+        const setNewActionOptions = async () => {
+            console.log('setting new action options');
             // @ts-ignore
-            setActionOptions(actions);
-            const reactions = await getReactions(reactionService, setReaction);
-            // @ts-ignore
-            setReactionOptions(reactions);
+            setActionOptions(await getActions(actionService, setAction));
         }
-        setOptions();
-    }, [actionService, reactionService]);
+        setNewActionOptions();
+    }, [actionService]);
+
+    useEffect(() => {
+        const setNewReactionOptions = async () => {
+            console.log('setting new reaction options');
+            // @ts-ignore
+            setReactionOptions(await getReactions(reactionService, setReaction));
+        }
+        setNewReactionOptions();
+    }, [reactionService]);
 
     const handleCreate = async () => {
         if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken || !actionServiceRefreshToken || !reactionServiceRefreshToken) {
@@ -178,8 +201,6 @@ export default function WorkspaceScreen() {
         setActionService(service);
         // setAction(null); // reset action, commented for test
         // @ts-ignore
-        setActionOptions(await getActions(service, setAction));
-        // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
         console.log('changed to', service);
     }
@@ -188,8 +209,6 @@ export default function WorkspaceScreen() {
         // @ts-ignore
         setReactionService(service);
         // setReaction(null); // reset reaction, commented for test
-        // @ts-ignore
-        setReactionOptions(await getReactions(service, setReaction));
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
         console.log('changed to', service);
@@ -220,14 +239,16 @@ export default function WorkspaceScreen() {
                     <ThemedText>Connect to reaction service, u might already be connected</ThemedText>
                     <ThemedButton title={"Connect"} onPress={() => handleConnectReactionService()}></ThemedButton>
                     {/* <ThemedText>Choose an action</ThemedText> */}
-                    {/* <ThemedDropdown options={actionOptions}></ThemedDropdown> */}
                     <ThemedText>action set to new_email for test</ThemedText>
+                    <ThemedDropdown options={actionOptions}></ThemedDropdown>
+                    {/* add action data here */}
                     {/* <ThemedText>Choose a reaction</ThemedText> */}
-                    {/* <ThemedDropdown options={reactionOptions}></ThemedDropdown> */}
                     <ThemedText>reaction set to send_email for test</ThemedText>
+                    <ThemedDropdown options={reactionOptions}></ThemedDropdown>
+                    {/* add reaction data here */}
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>
-                <ThemedTrigger></ThemedTrigger>
+                {/* <ThemedTrigger></ThemedTrigger> */}
             </WorkspaceContainer>
         </ThemedBackground>
     );

@@ -5,11 +5,11 @@ class CrudReaction {
         this.reactionRepository = reactionRepository;
     }
 
-    async create({ title, description, service_id }) {
+    async create({ title, description, service_id, data }) {
         if (!title || !description || !service_id) {
             throw new Error('Title, description and service_id are required');
         }
-        const reaction = new Reaction({ title, description, service_id });
+        const reaction = new Reaction({ title, description, service_id, data });
         const response = await this.reactionRepository.create(reaction);
         reaction.id = response[0].insertId;
         return reaction;
@@ -19,11 +19,11 @@ class CrudReaction {
         return await this.reactionRepository.get();
     }
 
-    async update({ id, title, description, service_id }) {
+    async update({ id, title, description, service_id, data }) {
         if (!id) {
             throw new Error('Id is required');
         }
-        const reaction = new Reaction({ id, title, description, service_id });
+        const reaction = new Reaction({ id, title, description, service_id, data });
         return await this.reactionRepository.update(reaction);
     }
 

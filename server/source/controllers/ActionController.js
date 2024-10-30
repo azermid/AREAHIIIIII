@@ -5,8 +5,8 @@ class ActionController {
 
     async create(req, res) {
         try {
-            const { title, description, service_id } = req.body;
-            const action = await this.crudAction.create({ title, description, service_id });
+            const { title, description, service_id, data, type } = req.body;
+            const action = await this.crudAction.create({ title, description, service_id, data, type });
             res.json(action);
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -24,8 +24,8 @@ class ActionController {
 
     async update(req, res) {
         try {
-            const { id, title, description, service_id } = req.body;
-            const action = await this.crudAction.update({ id, title, description, service_id });
+            const { id, title, description, service_id, data, type } = req.body;
+            const action = await this.crudAction.update({ id, title, description, service_id, data, type });
             res.json(action);
         } catch (error) {
             res.status(400).json({ error: error.message });

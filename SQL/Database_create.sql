@@ -14,9 +14,9 @@ CREATE TABLE users (
 );
 
 -- Insert a test user
-INSERT INTO users (username, email, password, oauth_provider, oauth_id)
+-- INSERT INTO users (username, email, password, oauth_provider, oauth_id)
 -- password is 'password'
-VALUES ('testuser', 'testuser@example.com', '$2b$10$YF/ICGpxB7dFDRYkVoQjnusEXrm6heovwKDOqDtOaKF0uEwHKiJ0K', 'area', '0');
+-- VALUES ('testuser', 'testuser@example.com', '$2b$10$YF/ICGpxB7dFDRYkVoQjnusEXrm6heovwKDOqDtOaKF0uEwHKiJ0K', 'area', '0');
 -- need to hash pass
 
 -- SELECT * FROM users;
@@ -43,8 +43,7 @@ CREATE TABLE workspaces (
 CREATE TABLE `services` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL,
-    `service_id` INT
+    `description` VARCHAR(455) NULL DEFAULT NULL
 );
 
 -- DROP TABLE IF EXISTS actions;
@@ -52,39 +51,57 @@ CREATE TABLE `actions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
     `description` VARCHAR(455) NULL DEFAULT NULL,
-    `service_id` INT
+    `service_id` INT,
+    `type` enum('polling', 'webhook') NOT NULL,
+    `data` JSON NOT NULL
 );
 
 -- DROP TABLE IF EXISTS reactions;
 CREATE TABLE `reactions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
-    `description` VARCHAR(455) NULL DEFAULT NULL
+    `description` VARCHAR(455) NULL DEFAULT NULL,
+    `service_id` INT,
+    `data` JSON NOT NULL
 );
 
 CREATE TABLE `triggers` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `services_id` INT UNSIGNED NOT NULL,
-    `actions_id` INT UNSIGNED NOT NULL,
-    `reactions_id` INT UNSIGNED NOT NULL,
-    `args` JSON NOT NULL,
+    `workspace_id` INT UNSIGNED NOT NULL,
+    -- `services_id` INT UNSIGNED NOT NULL,
+    `type` enum('polling', 'webhook') NOT NULL,
+    `action_service_id` INT UNSIGNED NOT NULL, -- useless ?
+    `reaction_service_id` INT UNSIGNED NOT NULL, -- useless ?
+    `action_id` INT UNSIGNED NOT NULL,
+    `reaction_id` INT UNSIGNED NOT NULL,
+    `action_data` JSON NOT NULL,
+    `reaction_data` JSON NOT NULL,
+    `action_service_token` VARCHAR(255) NOT NULL,
+    `reaction_service_token` VARCHAR(255) NOT NULL,
+    `action_service_refresh_token` VARCHAR(255) NOT NULL,
+    `reaction_service_refresh_token` VARCHAR(255) NOT NULL,
+	`webhook_url` VARCHAR(255),
+    `webhook_secret` VARCHAR(255),
     PRIMARY KEY (`id`),
-    INDEX `fk_triggers_services_idx` (`services_id` ASC) VISIBLE,
-    INDEX `fk_triggers_actions_idx` (`actions_id` ASC) VISIBLE,
-    INDEX `fk_triggers_reactions_idx` (`reactions_id` ASC) VISIBLE,
-    CONSTRAINT `fk_triggers_services`
-        FOREIGN KEY (`services_id`)
-        REFERENCES `Area`.`services` (`id`)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
-    CONSTRAINT `fk_triggers_actions`
-        FOREIGN KEY (`actions_id`)
-        REFERENCES `Area`.`actions` (`id`)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
-    CONSTRAINT `fk_triggers_reactions`
-        FOREIGN KEY (`reactions_id`)
-        REFERENCES `Area`.`reactions` (`id`)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION
+    FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`action_id`) REFERENCES `actions` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`reaction_id`) REFERENCES `reactions` (`id`) ON DELETE CASCADE
+    -- INDEX `fk_triggers_services_idx` (`services_id` ASC) VISIBLE,
+    -- INDEX `fk_triggers_actions_idx` (`actions_id` ASC) VISIBLE,
+    -- INDEX `fk_triggers_reactions_idx` (`reactions_id` ASC) VISIBLE,
+    -- CONSTRAINT `fk_triggers_services`
+    --     FOREIGN KEY (`services_id`)
+    --     REFERENCES `Area`.`services` (`id`)
+    --     ON DELETE NO ACTION
+    --     ON UPDATE NO ACTION,
+    -- CONSTRAINT `fk_triggers_actions`
+    --     FOREIGN KEY (`actions_id`)
+    --     REFERENCES `Area`.`actions` (`id`)
+    --     ON DELETE NO ACTION
+    --     ON UPDATE NO ACTION,
+    -- CONSTRAINT `fk_triggers_reactions`
+    --     FOREIGN KEY (`reactions_id`)
+    --     REFERENCES `Area`.`reactions` (`id`)
+    --     ON DELETE NO ACTION
+    --     ON UPDATE NO ACTION
 );

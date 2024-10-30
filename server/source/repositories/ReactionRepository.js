@@ -6,8 +6,8 @@ class ReactionRepository {
     }
 
     async create(reaction) {
-        const sql = 'INSERT INTO reactions (title, description, service_id) VALUES (?, ?, ?)';
-        const values = [reaction.title, reaction.description, reaction.serviceId];
+        const sql = 'INSERT INTO reactions (title, description, service_id) VALUES (?, ?, ?, ?)';
+        const values = [reaction.title, reaction.description, reaction.serviceId, reaction.data];
         return await this.dbConnection.execute(sql, values);
     }
 

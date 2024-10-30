@@ -44,6 +44,9 @@ app.use((req, res, next) => {
     const reactionRoutes = require('./routes/ReactionRoutes')(dbConnection);
     app.use('/reaction', reactionRoutes);
 
+    const triggerRoutes = require('./routes/TriggerRoutes')(dbConnection);
+    app.use('/trigger', triggerRoutes);
+
     app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });

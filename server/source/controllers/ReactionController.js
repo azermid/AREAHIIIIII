@@ -5,8 +5,8 @@ class ReactionController {
 
     async create(req, res) {
         try {
-            const { title, description, service_id } = req.body;
-            const reaction = await this.crudReaction.create({ title, description, service_id });
+            const { title, description, service_id, data } = req.body;
+            const reaction = await this.crudReaction.create({ title, description, service_id, data });
             res.json(reaction);
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -24,8 +24,8 @@ class ReactionController {
 
     async update(req, res) {
         try {
-            const { id, title, description, service_id } = req.body;
-            const reaction = await this.crudReaction.update({ id, title, description, service_id });
+            const { id, title, description, service_id, data } = req.body;
+            const reaction = await this.crudReaction.update({ id, title, description, service_id, data });
             res.json(reaction);
         } catch (error) {
             res.status(400).json({ error: error.message });

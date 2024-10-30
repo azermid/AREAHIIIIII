@@ -6,8 +6,8 @@ class ActionRepository {
     }
 
     async create(action) {
-        const sql = 'INSERT INTO actions (title, description, service_id) VALUES (?, ?, ?)';
-        const values = [action.title, action.description, action.serviceId];
+        const sql = 'INSERT INTO actions (title, description, service_id) VALUES (?, ?, ?, ?, ?)';
+        const values = [action.title, action.description, action.serviceId, action.data, action.type];
         return await this.dbConnection.execute(sql, values);
     }
 
@@ -34,19 +34,9 @@ class ActionRepository {
         return rows;
     }
 
-    // async camelCaseToSnakeCase(obj) {
-    //     const newObj = {};
-    //     for (const key in obj) {
-    //         const newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    //         newObj[newKey] = obj[key];
-    //     }
-    //     return newObj;
-    // }
-
     async update(action) {
         let sql = 'UPDATE actions SET ';
         const values = [];
-        // const actionSnakeCase = await this.camelCaseToSnakeCase(action);
         const actionSnakeCase = await camelCaseToSnakeCase(action);
         for (const key in actionSnakeCase) {
             if (actionSnakeCase[key]) {
