@@ -12,10 +12,11 @@ import { getReactions } from '@/utils/reactions';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workspaceUpdate } from '@/utils/workspace';
 import { ThemedTrigger } from '@/components/ThemedTrigger';
+import { ThemedTabContainer } from '@/components/ThemedTabContainer';
 
 WebBrowser.maybeCompleteAuthSession(); 
 
@@ -249,6 +250,7 @@ export default function WorkspaceScreen() {
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>
                 {/* <ThemedTrigger></ThemedTrigger> */}
+                {/* <ThemedTabContainer tabs={['Actions', 'Reactions']} tabsScreen={[testNode(), null]}/> */}
             </WorkspaceContainer>
         </ThemedBackground>
     );
