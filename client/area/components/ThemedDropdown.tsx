@@ -17,9 +17,6 @@ export type ThemedDropdownProps = ViewProps & {
 };
 
 export function ThemedDropdown({ options, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
-    if (options.length < 1)
-        return null;
-
     const fieldBackgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'fieldBackground');
     const tintColor = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
@@ -43,6 +40,9 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
             padding: 7.5,
         },
     });
+
+    if (options.length < 1)
+        return null;
 
     return (
         <ThemedView style={styles.container}>
