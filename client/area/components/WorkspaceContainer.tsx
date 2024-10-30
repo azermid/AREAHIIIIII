@@ -46,6 +46,7 @@ export function WorkspaceContainer({ style, lightColor, darkColor, ...otherProps
             justifyContent: 'center',
             width: screenWidth + (position.x > 0 ? (+position.x*2) : (-position.x*2)),
             height: screenHeight + (position.y > 0 ? (+position.y*2) : (-position.y*2)),
+            gap: 25,
             userSelect: 'none',
             color,
             backgroundColor,

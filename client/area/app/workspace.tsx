@@ -15,6 +15,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workspaceUpdate } from '@/utils/workspace';
+import { ThemedTrigger } from '@/components/ThemedTrigger';
 
 WebBrowser.maybeCompleteAuthSession(); 
 
@@ -226,6 +227,7 @@ export default function WorkspaceScreen() {
                     <ThemedText>reaction set to send_email for test</ThemedText>
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>
+                <ThemedTrigger></ThemedTrigger>
             </WorkspaceContainer>
         </ThemedBackground>
     );
