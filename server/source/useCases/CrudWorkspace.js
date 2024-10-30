@@ -21,7 +21,7 @@ class CrudWorkspace {
 
     async update({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId }) {
         if (!id) {
-            throw new Error('Id is required');
+            throw new Error('id is required');
         }
         const workspace = new Workspace({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId });
         return await this.workspaceRepository.update(workspace);
