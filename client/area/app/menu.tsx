@@ -11,7 +11,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
 import { userVerifyToken } from '@/utils/user';
-import { workspaceGetByUserId, workspaceCreate, workspaceDelete } from '@/utils/workspace';
+import { workspaceGetByUserId, workspaceCreate, workspaceDelete, workspaceUpdate } from '@/utils/workspace';
 
 export default function MenuScreen() {
   const [id, setId] = useState('');
@@ -81,7 +81,7 @@ export default function MenuScreen() {
         <ThemedContainer border={true} style={{width: '100%', height: 1, padding: 0, margin: 0}}></ThemedContainer>
         {workspaces.map((workspace, index) => {
           return (
-            <ThemedView key={index} style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <ThemedView key={index}  style={{width: '100%', padding: 10, margin: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
               <TextInput
                 style={
                   {padding: 10, margin: 0, backgroundColor: 'transparent', color: 'white', fontWeight: '500', fontSize: 18, maxWidth: '60%'}
@@ -90,8 +90,13 @@ export default function MenuScreen() {
                   // @ts-ignore
                   workspace.name
                 }
-                onChangeText={(text) => {}
-                }
+                onChangeText={(text) => {
+                  // @ts-ignore
+                  workspace.name = text;
+                }}
+                onBlur={() => {
+                  workspaceUpdate({ id: workspace.id, name: workspace.name });
+                }}
               />
               <ThemedView style={{display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
                 <IconButton
