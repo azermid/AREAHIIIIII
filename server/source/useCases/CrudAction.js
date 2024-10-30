@@ -47,6 +47,20 @@ class CrudAction {
         }
         return await this.actionRepository.getByServiceName(name);
     }
+
+    async getIdByName({ name }) {
+        if (!name) {
+            throw new Error('Name is required');
+        }
+        return await this.actionRepository.getIdByName(name);
+    }
+
+    async getTypeByName({ name }) {
+        if (!name) {
+            throw new Error('Name is required');
+        }
+        return await this.actionRepository.getTypeByName(name);
+    }
 }
 
 module.exports = CrudAction;

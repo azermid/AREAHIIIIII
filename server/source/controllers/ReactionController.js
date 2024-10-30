@@ -61,6 +61,16 @@ class ReactionController {
             res.status(400).json({ error: error.message });
         }
     }
+
+    async getIdByName(req, res) {
+        try {
+            const { name } = req.params;
+            const reaction = await this.crudReaction.getIdByName({ name });
+            res.json(reaction);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = ReactionController;

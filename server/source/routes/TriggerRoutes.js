@@ -17,7 +17,7 @@ module.exports = (dbConnection) => {
     router.delete('/delete', checkToken, (req, res) => triggerController.delete(req, res));
     router.get('/get/:id', checkToken, (req, res) => triggerController.getById(req, res));
     router.get('/get/workspace/:workspace_id', checkToken, (req, res) => triggerController.getByWorkspaceId(req, res));
-    router.get('/add', checkToken, (req, res) => triggerController.add(req, res));
+    router.post('/add', checkToken, (req, res) => triggerController.add(req, res));
 
     return router;
 }

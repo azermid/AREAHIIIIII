@@ -54,6 +54,12 @@ class ReactionRepository {
         const sql = 'DELETE FROM reactions WHERE id = ?';
         return await this.dbConnection.execute(sql, [id]);
     }
+
+    async getIdByName(name) {
+        const sql = 'SELECT id FROM reactions WHERE title = ?';
+        const [rows] = await this.dbConnection.execute(sql, [name]);
+        return rows.length ? rows[0].id : null;
+    }
 }
 
 module.exports = ReactionRepository;

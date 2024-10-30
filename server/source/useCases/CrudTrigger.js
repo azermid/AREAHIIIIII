@@ -52,7 +52,7 @@ class CrudTrigger {
         if (!workspace_id || !type || !action_id || !reaction_id || !action_data || !reaction_data || !action_service_token || !reaction_service_token || !action_service_refresh_token || !reaction_service_refresh_token) {
             throw new Error('Workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token and reaction_service_refresh_token are required');
         }
-        const triggerExists = this.getByWorkspaceId(workspace_id);
+        const triggerExists = this.getByWorkspaceId({workspace_id});
         if (triggerExists.length > 0) {
             const trigger = new Trigger({ id: triggerExists[0].id, workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret });
             await this.update({ id: triggerExists[0].id, workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret });

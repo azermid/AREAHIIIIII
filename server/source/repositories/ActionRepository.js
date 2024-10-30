@@ -54,6 +54,18 @@ class ActionRepository {
         const sql = 'DELETE FROM actions WHERE id = ?';
         return await this.dbConnection.execute(sql, [id]);
     }
+
+    async getIdByName(name) {
+        const sql = 'SELECT id FROM actions WHERE title = ?';
+        const [rows] = await this.dbConnection.execute(sql, [name]);
+        return rows.length ? rows[0].id : null;
+    }
+
+    async getTypeByName(name) {
+        const sql = 'SELECT type FROM actions WHERE title = ?';
+        const [rows] = await this.dbConnection.execute(sql, [name]);
+        return rows.length ? rows[0].type : null;
+    }
 }
 
 module.exports = ActionRepository;

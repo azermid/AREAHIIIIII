@@ -17,6 +17,8 @@ module.exports = (dbConnection) => {
     router.delete('/delete', checkToken, (req, res) => actionController.delete(req, res));
     router.get('/get/:id', checkToken, (req, res) => actionController.getById(req, res));
     router.get('/get/service/:name', checkToken, (req, res) => actionController.getByServiceName(req, res));
+    router.get('/get/id/:name', checkToken, (req, res) => actionController.getIdByName(req, res));
+    router.get('/get/type/:name', checkToken, (req, res) => actionController.getTypeByName(req, res));
     // router.get('/get/service/:id', (req, res) => actionsController.getByServiceId(req, res));
 
     return router;

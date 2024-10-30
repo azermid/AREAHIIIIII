@@ -26,3 +26,18 @@ export async function getReactions(service: string | null, setReaction: any) {
         };
     });
 }
+
+export async function reactionGetId(reaction: any) {
+    const token = await getToken();
+    const response = await fetch(`${backendUri}/reaction/get/id/${reaction}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+            'authorization': `${token}`,
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    const data = await response.json();
+    return data;
+}

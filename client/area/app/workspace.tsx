@@ -7,8 +7,8 @@ import { ThemedDropdown } from '@/components/ThemedDropdown';
 import { ThemedButton } from '@/components/ThemedButton';
 import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
-import { getActions } from '@/utils/actions';
-import { getReactions } from '@/utils/reactions';
+import { actionGetId, actionGetType, getActions } from '@/utils/actions';
+import { getReactions, reactionGetId } from '@/utils/reactions';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workspaceUpdate } from '@/utils/workspace';
 import { ThemedTrigger } from '@/components/ThemedTrigger';
 import { ThemedTabContainer } from '@/components/ThemedTabContainer';
+import { triggerCreateOrUpdate } from '@/utils/triggers';
 
 WebBrowser.maybeCompleteAuthSession(); 
 
@@ -57,10 +58,11 @@ export default function WorkspaceScreen() {
     useEffect(() => {
         const getInfoFromURL = async () => {
             const workspace = await AsyncStorage.getItem('workspace');
+            let workspaceIdTemp = null;
             if (workspace) {
                 const workspaceObj = JSON.parse(workspace);
-                // console.log("workspaceObj", workspaceObj);
                 setWorkspaceId(workspaceObj.id);
+                workspaceIdTemp = workspaceObj.id;
                 setWorkspaceName(workspaceObj.name);
                 setActionService(workspaceObj.action_service_title);
                 setReactionService(workspaceObj.reaction_service_title);
@@ -98,22 +100,33 @@ export default function WorkspaceScreen() {
                 if (actionServiceTokenFromURL) {
                     // @ts-ignore
                     setActionServiceToken(actionServiceTokenFromURL);
+                    console.log('workspaceId', workspaceIdTemp);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
                 }
                 const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
                 if (actionServiceRefreshTokenFromURL) {
                     // @ts-ignore
                     setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
                 }
                 const reactionServiceTokenFromURL = urlParams.get('reaction_token');
                 if (reactionServiceTokenFromURL) {
                     // @ts-ignore
                     setReactionServiceToken(reactionServiceTokenFromURL);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
                 }    
                 const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
                 if (reactionServiceRefreshTokenFromURL) {
                     // @ts-ignore
                     setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
                 }
+                //clear url
+                window.history.pushState({}, document.title, "/");
             }
         }
         getInfoFromURL();
@@ -123,7 +136,6 @@ export default function WorkspaceScreen() {
         const setNewActionOptions = async () => {
             console.log('setting new action options');
             // @ts-ignore
-            // setActionOptions([{label: "new_email", value: "new_email", onChange: null}]);
             setActionOptions(await getActions(actionService, setAction));
         }
         setNewActionOptions();
@@ -145,7 +157,22 @@ export default function WorkspaceScreen() {
             return;
         }
         console.log('Creating AREA');
-        console.log(actionService, reactionService, action, reaction, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken);
+        const trigger = {
+            workspace_id: workspaceId,
+            type: await actionGetType(action), // get type from action title
+            action_id: await actionGetId(action), // get id from action title
+            reaction_id: await reactionGetId(reaction), // get id from reaction title
+            action_data: actionData,
+            reaction_data: reactionData,
+            action_service_token: actionServiceToken,
+            reaction_service_token: reactionServiceToken,
+            action_service_refresh_token: actionServiceRefreshToken,
+            reaction_service_refresh_token: reactionServiceRefreshToken,
+            webhook_url: null, // get from action, if type is webhook
+            webhook_secret: null, // get from action, if type is webhook
+        }
+        console.log('trigger', trigger);
+        await triggerCreateOrUpdate(trigger);
     }
 
     const handleConnectActionService = async () => {
@@ -175,10 +202,10 @@ export default function WorkspaceScreen() {
 
     const handleConnectReactionService = async () => {
         if (Platform.OS === 'web') {
-            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace')}?service_type=reaction`;
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
             window.location.href = backendConnectionUri;
         } else {
-            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace')}?service_type=reaction`;
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
             const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
             if (result.type === 'success' && result.url) {
                 const params = Linking.parse(result.url).queryParams;
@@ -201,7 +228,7 @@ export default function WorkspaceScreen() {
     const handleActionServiceChange = async (service: string) => {
         // @ts-ignore
         setActionService(service);
-        // setAction(null); // reset action, commented for test
+        setAction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
         console.log('changed to', service);
@@ -210,7 +237,7 @@ export default function WorkspaceScreen() {
     const handleReactionServiceChange = async (service: string) => {
         // @ts-ignore
         setReactionService(service);
-        // setReaction(null); // reset reaction, commented for test
+        setReaction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
         console.log('changed to', service);

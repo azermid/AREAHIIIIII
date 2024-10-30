@@ -7,7 +7,7 @@ class TriggerRepository {
 
     async create(trigger) {
         const sql = 'INSERT INTO triggers (workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        const values = [trigger.workspaceId, trigger.type, trigger.actionId, trigger.reactionId, trigger.actionData, trigger.reactionData, trigger.actionServiceToken, trigger.reactionServiceToken, trigger.actionServiceRefreshToken, trigger.reactionServiceRefreshToken, trigger.webhookUrl, trigger.webhookSecret];
+        const values = [trigger.workspace_id, trigger.type, trigger.action_id, trigger.reaction_id, trigger.action_data, trigger.reaction_data, trigger.action_service_token, trigger.reaction_service_token, trigger.action_service_refresh_token, trigger.reaction_service_refresh_token, trigger.webhook_url, trigger.webhook_secret];
         return await this.dbConnection.execute(sql, values);
     }
 

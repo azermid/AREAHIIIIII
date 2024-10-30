@@ -47,6 +47,13 @@ class CrudReaction {
         }
         return await this.reactionRepository.getByServiceName(name);
     }
+
+    async getIdByName({ name }) {
+        if (!name) {
+            throw new Error('Name is required');
+        }
+        return await this.reactionRepository.getIdByName(name);
+    }
 }
 
 module.exports = CrudReaction;

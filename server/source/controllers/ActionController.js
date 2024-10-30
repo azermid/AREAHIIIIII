@@ -61,6 +61,26 @@ class ActionController {
             res.status(400).json({ error: error.message });
         }
     }
+
+    async getIdByName(req, res) {
+        try {
+            const { name } = req.params;
+            const action = await this.crudAction.getIdByName({ name });
+            res.json(action);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
+
+    async getTypeByName(req, res) {
+        try {
+            const { name } = req.params;
+            const action = await this.crudAction.getTypeByName({ name });
+            res.json(action);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = ActionController;

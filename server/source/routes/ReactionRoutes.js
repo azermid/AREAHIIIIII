@@ -17,6 +17,7 @@ module.exports = (dbConnection) => {
     router.delete('/delete', checkToken, (req, res) => reactionController.delete(req, res));
     router.get('/get/:id', checkToken, (req, res) => reactionController.getById(req, res));
     router.get('/get/service/:name', checkToken, (req, res) => reactionController.getByServiceName(req, res));
+    router.get('/get/id/:name', checkToken, (req, res) => reactionController.getIdByName(req, res));
     // router.get('/get/service/:id', (req, res) => reactionController.getByServiceId(req, res));
 
     return router;

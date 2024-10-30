@@ -26,3 +26,33 @@ export async function getActions(service: string | null, setAction: any) {
         };
     });
 }
+
+export async function actionGetId(action: any) {
+    const token = await getToken();
+    const response = await fetch(`${backendUri}/action/get/id/${action}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+            'authorization': `${token}`,
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export async function actionGetType(action: any) {
+    const token = await getToken();
+    const response = await fetch(`${backendUri}/action/get/type/${action}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+            'authorization': `${token}`,
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    const data = await response.json();
+    return data;
+}

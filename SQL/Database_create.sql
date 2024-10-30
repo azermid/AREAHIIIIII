@@ -65,13 +65,11 @@ CREATE TABLE `reactions` (
     `data` JSON NOT NULL
 );
 
+-- DROP TABLE `triggers`;
 CREATE TABLE `triggers` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `workspace_id` INT UNSIGNED NOT NULL,
-    -- `services_id` INT UNSIGNED NOT NULL,
     `type` enum('polling', 'webhook') NOT NULL,
-    `action_service_id` INT UNSIGNED NOT NULL, -- useless ?
-    `reaction_service_id` INT UNSIGNED NOT NULL, -- useless ?
     `action_id` INT UNSIGNED NOT NULL,
     `reaction_id` INT UNSIGNED NOT NULL,
     `action_data` JSON NOT NULL,
@@ -86,22 +84,4 @@ CREATE TABLE `triggers` (
     FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`action_id`) REFERENCES `actions` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`reaction_id`) REFERENCES `reactions` (`id`) ON DELETE CASCADE
-    -- INDEX `fk_triggers_services_idx` (`services_id` ASC) VISIBLE,
-    -- INDEX `fk_triggers_actions_idx` (`actions_id` ASC) VISIBLE,
-    -- INDEX `fk_triggers_reactions_idx` (`reactions_id` ASC) VISIBLE,
-    -- CONSTRAINT `fk_triggers_services`
-    --     FOREIGN KEY (`services_id`)
-    --     REFERENCES `Area`.`services` (`id`)
-    --     ON DELETE NO ACTION
-    --     ON UPDATE NO ACTION,
-    -- CONSTRAINT `fk_triggers_actions`
-    --     FOREIGN KEY (`actions_id`)
-    --     REFERENCES `Area`.`actions` (`id`)
-    --     ON DELETE NO ACTION
-    --     ON UPDATE NO ACTION,
-    -- CONSTRAINT `fk_triggers_reactions`
-    --     FOREIGN KEY (`reactions_id`)
-    --     REFERENCES `Area`.`reactions` (`id`)
-    --     ON DELETE NO ACTION
-    --     ON UPDATE NO ACTION
 );
