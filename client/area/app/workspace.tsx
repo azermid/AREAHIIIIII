@@ -123,6 +123,7 @@ export default function WorkspaceScreen() {
         const setNewActionOptions = async () => {
             console.log('setting new action options');
             // @ts-ignore
+            // setActionOptions([{label: "new_email", value: "new_email", onChange: null}]);
             setActionOptions(await getActions(actionService, setAction));
         }
         setNewActionOptions();
