@@ -51,6 +51,9 @@ app.use((req, res, next) => {
       res.status(200).send('OK');
     });
 
+    const webhookRoutes = require('./routes/WebhookRoutes')(dbConnection);
+    app.use('/webhook', webhookRoutes);
+
     const authRoutes = require('./routes/AuthRoutes')(dbConnection);
     app.use('/auth', authRoutes);
 
