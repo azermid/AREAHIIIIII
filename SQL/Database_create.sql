@@ -31,13 +31,15 @@ CREATE TABLE workspaces (
     reaction_title VARCHAR(45),
     action_service_title VARCHAR(45),
     reaction_service_title VARCHAR(45),
-    action_service_token VARCHAR(255),
-    reaction_service_token VARCHAR(255),
+    action_service_token TEXT
+    reaction_service_token TEXT,
     action_service_refresh_token VARCHAR(255),
     reaction_service_refresh_token VARCHAR(255),
     trigger_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+-- ALTER TABLE workspaces MODIFY COLUMN action_service_token TEXT;
+-- ALTER TABLE workspaces MODIFY COLUMN reaction_service_token TEXT;
 
 -- DROP TABLE IF EXISTS services;
 CREATE TABLE `services` (
@@ -74,10 +76,10 @@ CREATE TABLE `triggers` (
     `reaction_id` INT UNSIGNED NOT NULL,
     `action_data` JSON NOT NULL,
     `reaction_data` JSON NOT NULL,
-    `action_service_token` VARCHAR(255) NOT NULL,
-    `reaction_service_token` VARCHAR(255) NOT NULL,
-    `action_service_refresh_token` VARCHAR(255) NOT NULL,
-    `reaction_service_refresh_token` VARCHAR(255) NOT NULL,
+    `action_service_token` TEXT NOT NULL,
+    `reaction_service_token` TEXT NOT NULL,
+    `action_service_refresh_token` VARCHAR(255),
+    `reaction_service_refresh_token` VARCHAR(255),
 	`webhook_url` VARCHAR(255),
     `webhook_secret` VARCHAR(255),
     PRIMARY KEY (`id`),
@@ -85,3 +87,7 @@ CREATE TABLE `triggers` (
     FOREIGN KEY (`action_id`) REFERENCES `actions` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`reaction_id`) REFERENCES `reactions` (`id`) ON DELETE CASCADE
 );
+-- ALTER TABLE `triggers` MODIFY COLUMN `action_service_token` TEXT;
+-- ALTER TABLE `triggers` MODIFY COLUMN `reaction_service_token` TEXT;
+-- ALTER TABLE `triggers` MODIFY COLUMN `action_service_refresh_token` VARCHAR(255);
+-- ALTER TABLE `triggers` MODIFY COLUMN `reaction_service_refresh_token` VARCHAR(255);

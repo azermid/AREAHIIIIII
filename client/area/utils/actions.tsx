@@ -18,6 +18,9 @@ export async function getActions(service: string | null, setAction: any) {
         }
     });
     const data = await response.json();
+    if (response.status !== 200) {
+        return [];
+    }
     return data.map((action: any) => {
         return {
             label: action.description,
