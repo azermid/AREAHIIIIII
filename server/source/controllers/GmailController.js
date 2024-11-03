@@ -1,5 +1,6 @@
 const { PubSub } = require('@google-cloud/pubsub');
 const fetch = require('node-fetch');
+const TriggerRepository = require('../repositories/TriggerRepository');
 
 class Message {
     constructor(data) {
@@ -9,9 +10,34 @@ class Message {
 }
 
 class GmailController {
-    constructor() {
-        this.pubsub = new PubSub();
-        this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
+    constructor(dbConnection) {
+        // this.pubsub = new PubSub();
+        // this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
+        this.triggerRepository = new TriggerRepository(dbConnection);
+        this.initialize();
+    }
+
+    async initialize() {
+        const triggers = await this.triggerRepository.get();
+        for (const trigger of triggers) {
+            if (trigger.action_id === 1) {
+                try {
+                    const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${trigger.action_service_token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            labelIds: ["INBOX"],
+                            topicName: "projects/area-436514/topics/new_email"
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error registering subscription:', error);
+                }
+            }
+        }
     }
 
     async watch(req, res) {
