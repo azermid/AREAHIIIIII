@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 
 const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
-export async function getReactions(service: string | null, setReaction: any) {
+export async function getReactions(service: string | null) {
     if (service == null) {
         return [];
     }
@@ -18,16 +18,7 @@ export async function getReactions(service: string | null, setReaction: any) {
         }
     });
     const data = await response.json();
-    if (response.status !== 200) {
-        return [];
-    }
-    return data.map((reaction: any) => {
-        return {
-            label: reaction.description,
-            value: reaction.name,
-            onchange: setReaction
-        };
-    });
+    return data;
 }
 
 export async function reactionGetId(reaction: any) {

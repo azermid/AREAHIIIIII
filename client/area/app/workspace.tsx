@@ -18,6 +18,7 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { ThemedTrigger } from '@/components/ThemedTrigger';
 import { ThemedTabContainer } from '@/components/ThemedTabContainer';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
+import { set } from 'cypress/types/lodash';
 
 WebBrowser.maybeCompleteAuthSession(); 
 
@@ -133,22 +134,6 @@ export default function WorkspaceScreen() {
         getInfoFromURL();
     }, []);
 
-    useEffect(() => {
-        const setNewActionOptions = async () => {
-            // @ts-ignore
-            setActionOptions(await getActions(actionService, setAction));
-        }
-        setNewActionOptions();
-    }, [actionService]);
-
-    useEffect(() => {
-        const setNewReactionOptions = async () => {
-            // @ts-ignore
-            setReactionOptions(await getReactions(reactionService, setReaction));
-        }
-        setNewReactionOptions();
-    }, [reactionService]);
-
     const handleCreate = async () => {
         if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken) {
             console.log('Missing fields');
@@ -230,7 +215,16 @@ export default function WorkspaceScreen() {
         setAction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
-        console.log('changed to', service);
+        const newActionOptions = await getActions(service);
+        setActionOptions(
+            newActionOptions.map((action: any) => {
+                return {
+                    label: action.description,
+                    value: action.title,
+                };
+            })
+        );
+        // console.log('changed to', service);
     }
 
     const handleReactionServiceChange = async (service: string) => {
@@ -239,7 +233,17 @@ export default function WorkspaceScreen() {
         setReaction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
-        console.log('changed to', service);
+        // setReactionOptions(await getReactions(service, setReaction));
+        const newReactionOptions = await getReactions(service);
+        setReactionOptions(
+            newReactionOptions.map((reaction: any) => {
+                return {
+                    label: reaction.description,
+                    value: reaction.title,
+                };
+            })
+        );
+        // console.log('changed to', service);
     }
 
     return (
@@ -253,22 +257,27 @@ export default function WorkspaceScreen() {
                         options={
                             [
                                 // @ts-ignore
-                                {label: "choose a service", value: null, onChange: handleActionServiceChange},
-                                {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
-                                {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                // {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
+                                // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                {label: "choose a service", value: null},
+                                {label: "Gmail", value: "gmail"},
+                                {label: "Outlook", value: "outlook"},
                             ]
                         }
+                        onChange={handleActionServiceChange}
                     />
                     <ThemedText>Choose a reaction service, might be set put need chnage on dropdown</ThemedText>
                     <ThemedDropdown
                         options={
                             [
                                 // @ts-ignore
-                                {label: "choose a service", value: null, onChange: handleReactionServiceChange},
-                                {label: "Gmail", value: "gmail", onChange: handleReactionServiceChange},
-                                {label: "Outlook", value: "outlook", onChange: handleReactionServiceChange},
+                                {label: "choose a service", value: null},
+                                {label: "Gmail", value: "gmail"},
+                                {label: "Outlook", value: "outlook"},
                             ]
                         }
+                        onChange={handleReactionServiceChange}
                     />
                     <ThemedText>Connect to action service, u might already be connected</ThemedText>
                     <ThemedButton title={"Connect"} onPress={() => handleConnectActionService()}></ThemedButton>
@@ -276,11 +285,11 @@ export default function WorkspaceScreen() {
                     <ThemedButton title={"Connect"} onPress={() => handleConnectReactionService()}></ThemedButton>
                     {/* <ThemedText>Choose an action</ThemedText> */}
                     <ThemedText>action set to new_email for test</ThemedText>
-                    <ThemedDropdown options={actionOptions}></ThemedDropdown>
+                    <ThemedDropdown options={actionOptions} onChange={setAction}></ThemedDropdown>
                     {/* add action data here */}
                     {/* <ThemedText>Choose a reaction</ThemedText> */}
                     <ThemedText>reaction set to send_email for test</ThemedText>
-                    <ThemedDropdown options={reactionOptions}></ThemedDropdown>
+                    <ThemedDropdown options={reactionOptions} onChange={setReaction}></ThemedDropdown>
                     {/* add reaction data here */}
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>
