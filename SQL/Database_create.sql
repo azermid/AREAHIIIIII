@@ -31,7 +31,7 @@ CREATE TABLE workspaces (
     reaction_title VARCHAR(45),
     action_service_title VARCHAR(45),
     reaction_service_title VARCHAR(45),
-    action_service_token TEXT
+    action_service_token TEXT,
     reaction_service_token TEXT,
     action_service_refresh_token VARCHAR(255),
     reaction_service_refresh_token VARCHAR(255),
