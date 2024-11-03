@@ -64,6 +64,7 @@ export default function WorkspaceScreen() {
                 setWorkspaceId(workspaceObj.id);
                 workspaceIdTemp = workspaceObj.id;
                 setWorkspaceName(workspaceObj.name);
+                console.log(workspaceObj.action_service_title);
                 setActionService(workspaceObj.action_service_title);
                 setReactionService(workspaceObj.reaction_service_title);
                 // setAction(workspaceObj.action_title);
@@ -134,7 +135,6 @@ export default function WorkspaceScreen() {
 
     useEffect(() => {
         const setNewActionOptions = async () => {
-            console.log('setting new action options');
             // @ts-ignore
             setActionOptions(await getActions(actionService, setAction));
         }
@@ -143,7 +143,6 @@ export default function WorkspaceScreen() {
 
     useEffect(() => {
         const setNewReactionOptions = async () => {
-            console.log('setting new reaction options');
             // @ts-ignore
             setReactionOptions(await getReactions(reactionService, setReaction));
         }
@@ -151,9 +150,9 @@ export default function WorkspaceScreen() {
     }, [reactionService]);
 
     const handleCreate = async () => {
-        if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken || !actionServiceRefreshToken || !reactionServiceRefreshToken) {
+        if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken) {
             console.log('Missing fields');
-            console.log(actionService, reactionService, action, reaction, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken);
+            console.log(actionService, reactionService, action, reaction, actionServiceToken, reactionServiceToken);
             return;
         }
         console.log('Creating AREA');
@@ -252,15 +251,23 @@ export default function WorkspaceScreen() {
                     <ThemedText>Choose an action service, might be set put need chnage on dropdown</ThemedText>
                     <ThemedDropdown
                         options={
-                            // @ts-ignore
-                            [{label: "choose a service", value: null, onChange: handleActionServiceChange}, {label: "Gmail", value: "gmail", onChange: handleActionServiceChange}]
+                            [
+                                // @ts-ignore
+                                {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
+                                {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                            ]
                         }
                     />
                     <ThemedText>Choose a reaction service, might be set put need chnage on dropdown</ThemedText>
                     <ThemedDropdown
                         options={
-                            // @ts-ignore
-                            [{label: "choose a service", value: null, onChange: handleReactionServiceChange}, {label: "Gmail", value: "gmail", onChange: handleReactionServiceChange}]
+                            [
+                                // @ts-ignore
+                                {label: "choose a service", value: null, onChange: handleReactionServiceChange},
+                                {label: "Gmail", value: "gmail", onChange: handleReactionServiceChange},
+                                {label: "Outlook", value: "outlook", onChange: handleReactionServiceChange},
+                            ]
                         }
                     />
                     <ThemedText>Connect to action service, u might already be connected</ThemedText>

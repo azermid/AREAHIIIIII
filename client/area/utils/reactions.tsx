@@ -18,6 +18,9 @@ export async function getReactions(service: string | null, setReaction: any) {
         }
     });
     const data = await response.json();
+    if (response.status !== 200) {
+        return [];
+    }
     return data.map((reaction: any) => {
         return {
             label: reaction.description,

@@ -12,10 +12,6 @@ class GoogleAuthService {
         this.thirdPartyLogin = thirdPartyLogin;
         this.serviceName = null;
         this.serviceType = null;
-        // this.action_token = null;
-        // this.action_refresh_token = null;
-        // this.reaction_token = null;
-        // this.reaction_refresh_token = null;
     }
 
     getAuthUrl() {
