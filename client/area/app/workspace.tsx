@@ -256,6 +256,7 @@ export default function WorkspaceScreen() {
                                 {label: "choose a service", value: null, onChange: handleActionServiceChange},
                                 {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
                                 {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                {label: "Spotify", value: "spotify", onChange: handleActionServiceChange},
                             ]
                         }
                     />
@@ -267,6 +268,7 @@ export default function WorkspaceScreen() {
                                 {label: "choose a service", value: null, onChange: handleReactionServiceChange},
                                 {label: "Gmail", value: "gmail", onChange: handleReactionServiceChange},
                                 {label: "Outlook", value: "outlook", onChange: handleReactionServiceChange},
+                                {label: "Spotify", value: "spotify", onChange: handleActionServiceChange},
                             ]
                         }
                     />
