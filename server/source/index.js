@@ -31,7 +31,10 @@ app.use((req, res, next) => {
     //   console.log('Body:', req.body);
     //   next();
     // });
-    
+
+    const aboutRoutes = require('./routes/AboutRoutes')(dbConnection);
+    app.use('/', aboutRoutes);
+
     const userRoutes = require('./routes/UserRoutes')(dbConnection);
     app.use('/user', userRoutes);
 
