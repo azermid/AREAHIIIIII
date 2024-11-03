@@ -29,6 +29,12 @@ class TriggerRepository {
         return rows;
     }
 
+    async getByActionId(actionId) {
+        const sql = 'SELECT * FROM triggers WHERE action_id = ?';
+        const [rows] = await this.dbConnection.execute(sql, [actionId]);
+        return rows;
+    }
+
     async update(trigger) {
         let sql = 'UPDATE triggers SET ';
         const values = [];
