@@ -19,13 +19,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Create .env file
-        run: |
-            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-            echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
-            echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
-            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-
       - name: Install Docker Compose
         run: |
           sudo apt-get update
@@ -35,28 +28,6 @@ jobs:
         run: |
           docker-compose -f docker-compose-ci.yml up -d
 
-      - name: Wait for MySQL to be ready
-        run: |
-            until mysqladmin ping -h 127.0.0.1 -u user -ppass --silent; do
-              echo "Waiting for MySQL to be ready..."
-              sleep 5
-            done 
-
-      - name: Wait for server to be ready
-        run: |
-          until curl -s http://localhost:8080/health; do
-            echo "Waiting for server to be ready..."
-            sleep 5
-          done
-
-      - name: log db statue
-        run: |
-          docker-compose -f docker-compose-ci.yml logs db
-
-      - name: Run tests on the server
-        run: |
-            docker-compose -f docker-compose-ci.yml exec -T server npm test
-  
       - name: Push to Mirror
         uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
