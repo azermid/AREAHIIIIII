@@ -3,6 +3,14 @@ class ServiceRepository {
         this.db = dbConnection;
     }
 
+    async get() {
+        try {
+            return await this.db.query('SELECT id, title, description FROM services');
+        } catch (error) {
+            throw new Error('Error fetching services from the database: ' + error.message);
+        }
+    }
+
     async getServicesWithActionsAndReactions() {
         try {
             const services = await this.db.query('SELECT id, title, description FROM services');

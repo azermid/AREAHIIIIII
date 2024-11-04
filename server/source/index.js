@@ -41,6 +41,9 @@ app.use((req, res, next) => {
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);
 
+    const serviceRoutes = require('./routes/ServiceRoutes')(dbConnection);
+    app.use('/service', serviceRoutes);
+
     const actionRoutes = require('./routes/ActionRoutes')(dbConnection);
     app.use('/action', actionRoutes);
 
