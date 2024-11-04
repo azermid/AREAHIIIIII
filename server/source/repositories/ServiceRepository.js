@@ -5,7 +5,8 @@ class ServiceRepository {
 
     async get() {
         try {
-            return await this.db.query('SELECT id, title, description FROM services');
+            const data = await this.db.query('SELECT id, title, description FROM services');
+            return data[0];
         } catch (error) {
             throw new Error('Error fetching services from the database: ' + error.message);
         }

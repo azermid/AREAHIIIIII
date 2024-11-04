@@ -5,8 +5,8 @@ class ServiceController {
 
     async get(req, res) {
         try {
-            const reactions = await this.crudService.get();
-            res.json(reactions);
+            const services = await this.crudService.get();
+            res.json(services);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }

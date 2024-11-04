@@ -8,6 +8,7 @@ import { ThemedButton } from '@/components/ThemedButton';
 import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import { actionGetId, actionGetType, getActions } from '@/utils/actions';
+import { getServices } from '@/utils/services';
 import { getReactions, reactionGetId } from '@/utils/reactions';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -49,6 +50,8 @@ export default function WorkspaceScreen() {
     const [actionServiceRefreshToken, setActionServiceRefreshToken] = useState(null);
     const [reactionServiceRefreshToken, setReactionServiceRefreshToken] = useState(null);
 
+    const [serviceOptions, setServiceOptions] = useState([]);
+
     const [actionOptions, setActionOptions] = useState([]);
     const [reactionOptions, setReactionOptions] = useState([]);
 
@@ -82,6 +85,7 @@ export default function WorkspaceScreen() {
                     {
                         // @ts-ignore
                         from: "yann.malaret@outlook.fr",
+                        user: "yann.malaret@outlook.fr"
                     }
                 );
                 setReactionData(
@@ -132,6 +136,12 @@ export default function WorkspaceScreen() {
             }
         }
         getInfoFromURL();
+        const getServicesFromBackend = async () => {
+            const services = await getServices();
+            console.log(services);
+            setServiceOptions(services);
+        }
+        getServicesFromBackend();
     }, []);
 
     const handleCreate = async () => {
@@ -271,9 +281,7 @@ export default function WorkspaceScreen() {
                                 // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
                                 // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
                                 {label: "choose a service", value: null},
-                                {label: "Gmail", value: "gmail"},
-                                {label: "Outlook", value: "outlook"},
-                                {label: "Spotify", value: "spotify"},
+                                ...serviceOptions
                             ]
                         }
                         onChange={handleActionServiceChange}
@@ -284,9 +292,7 @@ export default function WorkspaceScreen() {
                             [
                                 // @ts-ignore
                                 {label: "choose a service", value: null},
-                                {label: "Gmail", value: "gmail"},
-                                {label: "Outlook", value: "outlook"},
-                                {label: "Spotify", value: "spotify"},
+                                ...serviceOptions
                             ]
                         }
                         onChange={handleReactionServiceChange}
@@ -296,11 +302,9 @@ export default function WorkspaceScreen() {
                     <ThemedText>Connect to reaction service, u might already be connected</ThemedText>
                     <ThemedButton title={"Connect"} onPress={() => handleConnectReactionService()}></ThemedButton>
                     {/* <ThemedText>Choose an action</ThemedText> */}
-                    <ThemedText>action set to new_email for test</ThemedText>
                     <ThemedDropdown options={actionOptions} onChange={setAction}></ThemedDropdown>
                     {/* add action data here */}
                     {/* <ThemedText>Choose a reaction</ThemedText> */}
-                    <ThemedText>reaction set to send_email for test</ThemedText>
                     <ThemedDropdown options={reactionOptions} onChange={setReaction}></ThemedDropdown>
                     {/* add reaction data here */}
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
