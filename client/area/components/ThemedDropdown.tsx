@@ -27,7 +27,8 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
         container: {
             alignSelf: 'stretch',
             marginVertical: 8,
-            minHeight: 40
+            minHeight: 40,
+            minWidth: 500,
         },
         mainButton: {
             display: 'flex',
@@ -73,3 +74,4 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
         </ThemedView>
     );
 }
+

@@ -176,7 +176,7 @@ module.exports = (dbConnection) => {
     });
     
     router.get('/twitch', (req, res) => {
-        twitchAuthService.redirectURI = req.query.redirect_uri;
+        twitchAuthService.redirectURI = req.query.redirect_uri || 'http://localhost:8081';
         twitchAuthService.serviceName = 'twitch';
         twitchAuthService.serviceType = req.query.service_type;
     
@@ -188,24 +188,23 @@ module.exports = (dbConnection) => {
         console.log('Twitch callback');
         try {
             const code = req.query.code;
-            const redirectUri = twitchAuthService.redirectURI || 'http://localhost:8081';
-    
-            const response = await twitchAuthService.getTwitchTokens(code);
-            const accessToken = response.access_token;
-    
-            if (twitchAuthService.serviceType === 'action') {
-                twitchAuthService.action_token = accessToken;
-            } else if (twitchAuthService.serviceType === 'reaction') {
-                twitchAuthService.reaction_token = accessToken;
+            
+            if (!code) {
+                return res.status(400).send('Code d\'autorisation manquant');
             }
-    
-            const redirect = `${redirectUri}&action_token=${twitchAuthService.action_token}&reaction_token=${twitchAuthService.reaction_token}`;
+            const response = await twitchAuthService.getTwitchTokens(code, twitchAuthService.redirectURI);
+            const accessToken = response.access_token;
+            if (twitchAuthService.serviceType === 'action')
+                twitchAuthService.action_token = accessToken;
+            else if (twitchAuthService.serviceType === 'reaction')
+                twitchAuthService.reaction_token = accessToken;
+            const redirect = `${twitchAuthService.redirectURI}?action_token=${twitchAuthService.action_token || ''}&reaction_token=${twitchAuthService.reaction_token || ''}`;
             return res.redirect(redirect);
         } catch (error) {
             console.error('Error handling Twitch callback:', error);
             res.status(500).send('Authentication error');
         }
     });
-
+    
     return router;
 };

@@ -7,11 +7,10 @@ class GitHubAuth {
         this.thirdPartyLogin = thirdPartyLogin;
         this.clientId = process.env.GITHUB_CLIENT_ID;
         this.clientSecret = process.env.GITHUB_CLIENT_SECRET;
-        // this.redirectURI = process.env.GITHUB_REDIRECT_URI;
         this.redirectURI = null;
         this.privateKeyPath = process.env.GITHUB_PRIVATE_KEY_PATH;
         this.appId = process.env.GITHUB_APP_ID;
-        this.serviceName = 'AreahiiiiiEpitech';
+        this.serviceName = 'Area-F';
         this.serviceType = 'oauth';
     }
 
@@ -27,11 +26,8 @@ class GitHubAuth {
 
     getAuthUrl() {
         const scopes = [
-            'repo', 'repo:status', 'repo_deployment', 'public_repo', 'repo:invite',
-            'admin:org', 'read:org', 'write:org', 'user', 'user:email', 'user:follow',
-            'gist', 'notifications', 'workflow', 'admin:repo_hook', 'admin:org_hook',
-            'read:packages', 'write:packages', 'delete:packages', 'admin:public_key',
-            'admin:gpg_key', 'codespace'
+            'repo', // Full control of private repositories (or use 'public_repo' for public repos only)
+            'admin:repo_hook', // Admin access to repository hooks
         ].join(',');
 
         const authUrl = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(process.env.GITHUB_REDIRECT_URI)}&scope=${scopes}`;
