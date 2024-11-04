@@ -7,7 +7,7 @@ class TwitchAuth {
         this.clientSecret = process.env.TWITCH_CLIENT_SECRET;
         this.redirectURI = null;
         this.serviceName = 'AreaWebEpitech';
-        this.serviceType = 'oauth';
+        this.serviceType = 'OAuth';
     }
 
     getAuthUrl() {
@@ -21,7 +21,6 @@ class TwitchAuth {
             'channel:manage:polls',
             'channel:manage:predictions',
             'channel:manage:redemptions',
-            'channel:manage:scheduled_events',
             'channel:manage:videos',
             'channel:read:editors',
             'channel:read:goals',
@@ -73,7 +72,7 @@ class TwitchAuth {
             client_secret: this.clientSecret,
             code: code,
             grant_type: 'authorization_code',
-            redirect_uri: this.redirectURI
+            redirect_uri: process.env.TWITCH_REDIRECT_URI
         });
 
         try {

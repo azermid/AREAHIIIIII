@@ -7,11 +7,10 @@ class GitHubAuth {
         this.thirdPartyLogin = thirdPartyLogin;
         this.clientId = process.env.GITHUB_CLIENT_ID;
         this.clientSecret = process.env.GITHUB_CLIENT_SECRET;
-        // this.redirectURI = process.env.GITHUB_REDIRECT_URI;
         this.redirectURI = null;
         this.privateKeyPath = process.env.GITHUB_PRIVATE_KEY_PATH;
         this.appId = process.env.GITHUB_APP_ID;
-        this.serviceName = 'AreahiiiiiEpitech';
+        this.serviceName = 'Area-F';
         this.serviceType = 'oauth';
     }
 
