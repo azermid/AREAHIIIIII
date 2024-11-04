@@ -1,6 +1,50 @@
 const { PubSub } = require('@google-cloud/pubsub');
 const fetch = require('node-fetch');
 const TriggerRepository = require('../repositories/TriggerRepository');
+const ActionRepository = require('../repositories/ActionRepository');
+const {google} = require('googleapis');
+const gmail = google.gmail('v1');
+require('dotenv').config();
+
+const authClient = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET
+);
+
+async function getSendersOfRecentEmails(auth) {
+    try {
+        // Step 1: Get the list of recent messages from the inbox
+        const listResponse = await gmail.users.messages.list({
+            userId: 'me',
+            labelIds: ['INBOX'],
+            maxResults: 1,  // You can adjust this number
+            auth: auth,
+        });
+
+        // Extract message IDs from the list response
+        const messageIds = listResponse.data.messages.map(message => message.id);
+
+        // Step 2: Retrieve each message's metadata to find the "From" header
+        for (const messageId of messageIds) {
+            const messageResponse = await gmail.users.messages.get({
+                userId: 'me',
+                id: messageId,
+                format: 'metadata',
+                metadataHeaders: ['From'],
+                auth: authClient,
+            });
+
+            // Extract the "From" header to get sender information
+            const headers = messageResponse.data.payload.headers;
+            const fromHeader = headers.find(header => header.name === 'From');
+            const sender = fromHeader ? fromHeader.value : 'Unknown sender';
+
+            return sender;
+        }
+    } catch (error) {
+        console.error('Error fetching emails:', error);
+    }
+}
 
 class Message {
     constructor(data) {
@@ -9,34 +53,18 @@ class Message {
     }
 }
 
-async function getRecentHistory(accessToken, userId, historyId) {
-    const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/${userId}/history?startHistoryId=${historyId}&historyTypes=messageAdded`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-        }
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to retrieve history: ${errorData.error.message}`);
-    }
-
-    const data = await response.json();
-    return data.history || []; // Returns an array of history records
-}
-
 class GmailController {
     constructor(dbConnection) {
         // this.pubsub = new PubSub();
         // this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
         this.triggerRepository = new TriggerRepository(dbConnection);
+        this.actionRepository = new ActionRepository(dbConnection);
         this.initialize();
     }
 
     async initialize() {
-        const triggers = await this.triggerRepository.getByActionId(1);
+        const actionId = await this.actionRepository.getIdByName('new_email_gmail');
+        const triggers = await this.triggerRepository.getByActionId(actionId);
         for (const trigger of triggers) {
             try {
                 const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
@@ -56,6 +84,8 @@ class GmailController {
                 const data = await response.json();
                 console.log('Watch response:', data);
             } catch (error) {
+                // TODO:
+                // REFRESH TOKEN
                 console.error('Error registering subscription:', error);
             }
         }
@@ -63,16 +93,27 @@ class GmailController {
 
     async watch(req, res) {
         try {
-            
+            console.log('Received message:', req.body);
             const message = new Message(req.body.message.data);
+            const actionId = await this.actionRepository.getIdByName('new_email_gmail');
+            console.log(message.data.emailAddress);
+            console.log(actionId);
 
-            for (const trigger of await this.triggerRepository.getByActionId(1)) {
-                if (trigger.action_data.user != message.data.emailAddress) {
+            for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
+                if (trigger.action_data.user != message.data.emailAddress)
                     continue;
-                }
-                console.log('Trigger detected:', trigger.id);
+                authClient.setCredentials({
+                    access_token: trigger.action_service_token,
+                });
+                const sender = await getSendersOfRecentEmails(authClient);
+                const match = sender.match(/<([^>]+)>/);
+                const senderEmail = match ? match[1] : sender;
+                console.log(senderEmail)
+                if (trigger.action_data.from != senderEmail)
+                    continue;
+                //TODO call reaction
+                console.log("email matches trigger");
             }
-            console.log('Watch event: ', message.data);
             res.json({ message: 'Successfully acknowledged messages.' });
         } catch (error) {
             res.status(400).json({ error: error.message });

@@ -60,6 +60,12 @@ class ReactionRepository {
         const [rows] = await this.dbConnection.execute(sql, [name]);
         return rows.length ? rows[0].id : null;
     }
+
+    async getNameById(id) {
+        const sql = 'SELECT title FROM reactions WHERE id = ?';
+        const [rows] = await this.dbConnection.execute(sql, [id]);
+        return rows.length ? rows[0].title : null;
+    }
 }
 
 module.exports = ReactionRepository;

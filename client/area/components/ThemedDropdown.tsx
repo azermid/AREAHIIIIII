@@ -12,11 +12,11 @@ export type ThemedDropdownProps = ViewProps & {
     options: Array<{
         label: string;
         value: string;
-        onChange: ((value: any) => void) | null;
     }>;
+    onChange: ((value: any) => void) | null;
 };
 
-export function ThemedDropdown({ options, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
+export function ThemedDropdown({ options, onChange, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
     const fieldBackgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'fieldBackground');
     const tintColor = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
@@ -26,18 +26,21 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
     const styles = StyleSheet.create({
         container: {
             alignSelf: 'stretch',
+            marginVertical: 8,
+            minHeight: 40
         },
         mainButton: {
             display: 'flex',
             flexDirection: 'row',
-            alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: fieldBackgroundColor,
+            paddingHorizontal: 10,
+            paddingVertical: 12,
         },
         label: {
             color: tintColor,
             fontWeight: 'bold',
-            padding: 7.5,
+            padding: 10,
         },
     });
 
@@ -58,8 +61,8 @@ export function ThemedDropdown({ options, style, lightColor, darkColor, ...other
             {opened && options.map((option, index) => {
                 return (
                     <Pressable style={{backgroundColor: fieldBackgroundColor}} key={index} onPress={() => {
-                        if (option.onChange)
-                            option.onChange(option.value);
+                        if (onChange)
+                            onChange(option.value);
                         setSelected(index);
                         setOpened(false);
                     }}>

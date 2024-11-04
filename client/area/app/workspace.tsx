@@ -8,6 +8,7 @@ import { ThemedButton } from '@/components/ThemedButton';
 import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import { actionGetId, actionGetType, getActions } from '@/utils/actions';
+import { getServices } from '@/utils/services';
 import { getReactions, reactionGetId } from '@/utils/reactions';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -18,6 +19,8 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { ThemedTrigger } from '@/components/ThemedTrigger';
 import { ThemedTabContainer } from '@/components/ThemedTabContainer';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
+import { set } from 'cypress/types/lodash';
+import { IconButton } from 'react-native-paper';
 
 WebBrowser.maybeCompleteAuthSession(); 
 
@@ -47,6 +50,8 @@ export default function WorkspaceScreen() {
     const [reactionServiceToken, setReactionServiceToken] = useState(null);
     const [actionServiceRefreshToken, setActionServiceRefreshToken] = useState(null);
     const [reactionServiceRefreshToken, setReactionServiceRefreshToken] = useState(null);
+
+    const [serviceOptions, setServiceOptions] = useState([]);
 
     const [actionOptions, setActionOptions] = useState([]);
     const [reactionOptions, setReactionOptions] = useState([]);
@@ -81,6 +86,7 @@ export default function WorkspaceScreen() {
                     {
                         // @ts-ignore
                         from: "yann.malaret@outlook.fr",
+                        user: "yann.malaret@outlook.fr"
                     }
                 );
                 setReactionData(
@@ -131,23 +137,12 @@ export default function WorkspaceScreen() {
             }
         }
         getInfoFromURL();
+        const getServicesFromBackend = async () => {
+            const services = await getServices();
+            setServiceOptions(services);
+        }
+        getServicesFromBackend();
     }, []);
-
-    useEffect(() => {
-        const setNewActionOptions = async () => {
-            // @ts-ignore
-            setActionOptions(await getActions(actionService, setAction));
-        }
-        setNewActionOptions();
-    }, [actionService]);
-
-    useEffect(() => {
-        const setNewReactionOptions = async () => {
-            // @ts-ignore
-            setReactionOptions(await getReactions(reactionService, setReaction));
-        }
-        setNewReactionOptions();
-    }, [reactionService]);
 
     const handleCreate = async () => {
         if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken) {
@@ -230,7 +225,22 @@ export default function WorkspaceScreen() {
         setAction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
-        console.log('changed to', service);
+        const newActionOptions = await getActions(service);
+        if (newActionOptions.length === 0) {
+            console.log(service);
+            console.log(newActionOptions);
+            console.log('No actions available for this service');
+            return
+        }
+        setActionOptions(
+            newActionOptions.map((action: any) => {
+                return {
+                    label: action.description,
+                    value: action.title,
+                };
+            })
+        );
+        // console.log('changed to', service);
     }
 
     const handleReactionServiceChange = async (service: string) => {
@@ -239,7 +249,21 @@ export default function WorkspaceScreen() {
         setReaction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
-        console.log('changed to', service);
+        // setReactionOptions(await getReactions(service, setReaction));
+        const newReactionOptions = await getReactions(service);
+        if (newReactionOptions.length === 0) {
+            console.log('No reactions available for this service');
+            return
+        }
+        setReactionOptions(
+            newReactionOptions.map((reaction: any) => {
+                return {
+                    label: reaction.description,
+                    value: reaction.title,
+                };
+            })
+        );
+        // console.log('changed to', service);
     }
 
     return (
@@ -248,43 +272,58 @@ export default function WorkspaceScreen() {
             <WorkspaceContainer>
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>Workspace name placeholder</ThemedText>
-                    <ThemedText>Choose an action service, might be set put need chnage on dropdown</ThemedText>
-                    <ThemedDropdown
-                        options={
-                            [
-                                // @ts-ignore
-                                {label: "choose a service", value: null, onChange: handleActionServiceChange},
-                                {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
-                                {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
-                                {label: "Spotify", value: "spotify", onChange: handleActionServiceChange},
-                                {label: "GitHub", value: "github", onChange: handleActionServiceChange},
-                            ]
-                        }
-                    />
-                    <ThemedText>Choose a reaction service, might be set put need chnage on dropdown</ThemedText>
-                    <ThemedDropdown
-                        options={
-                            [
-                                // @ts-ignore
-                                {label: "choose a service", value: null, onChange: handleReactionServiceChange},
-                                {label: "Gmail", value: "gmail", onChange: handleReactionServiceChange},
-                                {label: "Outlook", value: "outlook", onChange: handleReactionServiceChange},
-                                {label: "Spotify", value: "spotify", onChange: handleReactionServiceChange},
-                                {label: "GitHub", value: "github", onChange: handleReactionServiceChange},
-                            ]
-                        }
-                    />
-                    <ThemedText>Connect to action service, u might already be connected</ThemedText>
-                    <ThemedButton title={"Connect"} onPress={() => handleConnectActionService()}></ThemedButton>
-                    <ThemedText>Connect to reaction service, u might already be connected</ThemedText>
-                    <ThemedButton title={"Connect"} onPress={() => handleConnectReactionService()}></ThemedButton>
+                    <ThemedText>Choose an action service and a reaction service to see the actions/reactions available.</ThemedText>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                        <View style={{ flex: 1 }}>
+                            <ThemedDropdown
+                                options={
+                                    [
+                                        // @ts-ignore
+                                        // {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                        // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
+                                        // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                        {label: "choose a service", value: null},
+                                        ...serviceOptions
+                                    ]
+                                }
+                                onChange={handleActionServiceChange}
+                            />
+                        </View>
+                        <IconButton
+                        icon={'login-variant'}
+                         iconColor='white'
+                        style={{cursor: 'pointer'}}
+                        onPress={() => handleConnectActionService()}
+                        ></IconButton>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                        <View style={{ flex: 1 }}>
+                            <ThemedDropdown
+                            options={
+                                [
+                                    // @ts-ignore
+                                    // {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                    // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
+                                    // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                    {label: "choose a service", value: null},
+                                    ...serviceOptions
+                                ]
+                            }
+                            onChange={handleReactionServiceChange}
+                            />
+                            </View>
+                        <IconButton
+                        icon={'login-variant'}
+                        iconColor='white'
+                        style={{cursor: 'pointer', marginRight: 0}}
+                        onPress={() => handleConnectReactionService()}
+                        ></IconButton>
+                    </View>
                     {/* <ThemedText>Choose an action</ThemedText> */}
-                    <ThemedText>action set to new_email for test</ThemedText>
-                    <ThemedDropdown options={actionOptions}></ThemedDropdown>
+                    <ThemedDropdown options={actionOptions} onChange={setAction}></ThemedDropdown>
                     {/* add action data here */}
                     {/* <ThemedText>Choose a reaction</ThemedText> */}
-                    <ThemedText>reaction set to send_email for test</ThemedText>
-                    <ThemedDropdown options={reactionOptions}></ThemedDropdown>
+                    <ThemedDropdown options={reactionOptions} onChange={setReaction}></ThemedDropdown>
                     {/* add reaction data here */}
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const retryConnection = require('./database');
+const { startOutlookPollingWorker } = require('./worker/OutlookWorker');
 const app = express();
 
 const backendUri = process.env.BACKEND_URI || 'http://localhost:8080';
@@ -26,6 +27,8 @@ app.use((req, res, next) => {
     const dbConnection = await retryConnection();
     console.log('Database connection established');
 
+    startOutlookPollingWorker(60000, dbConnection);
+
     // app.use((req, res, next) => {
     //   console.log('Headers:', req.headers);
     //   console.log('Body:', req.body);
@@ -40,6 +43,9 @@ app.use((req, res, next) => {
 
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);
+
+    const serviceRoutes = require('./routes/ServiceRoutes')(dbConnection);
+    app.use('/service', serviceRoutes);
 
     const actionRoutes = require('./routes/ActionRoutes')(dbConnection);
     app.use('/action', actionRoutes);
