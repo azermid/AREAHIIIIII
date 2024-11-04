@@ -5,7 +5,7 @@ class SpotifyAuthService {
         this.spotifyApi = new SpotifyWebApi({
             clientId: process.env.SPOTIFY_CLIENT_ID,
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-            redirectUri: null,
+            redirectUri: process.env.SPOTIFY_REDIRECT_URI,
         });
         this.thirdPartyLogin = thirdPartyLogin;
         this.redirectURI = null;

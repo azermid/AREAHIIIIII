@@ -3,6 +3,8 @@ const GoogleAuthService = require('../services/GoogleAuth');
 const MicrosoftAuthService = require('../services/MicrosoftAuth');
 const SpotifyAuthService = require('../services/SpotifyAuth');
 const UserRepository = require('../repositories/UserRepository');
+const GitHubAuthService = require('../services/GitHubAuth');
+const TwitchAuthService = require('../services/TwitchAuth');
 const AuthService = require('../services/AuthService');
 const ThirdPartyLogin = require('../useCases/ThirdPartyLogin');
 
@@ -15,6 +17,9 @@ module.exports = (dbConnection) => {
     const googleAuthService = new GoogleAuthService(thirdPartyLogin);
     const microsoftAuthService = new MicrosoftAuthService(thirdPartyLogin);
     const spotifyAuthService = new SpotifyAuthService(thirdPartyLogin);
+    const githubAuthService = new GitHubAuthService(thirdPartyLogin);
+    const twitchAuthService = new TwitchAuthService(thirdPartyLogin);
+
 
 
     router.get('/google', (req, res) => {
@@ -111,6 +116,7 @@ module.exports = (dbConnection) => {
         spotifyAuthService.serviceName = "spotify";
         spotifyAuthService.serviceType = req.query.service_type;
         const url = spotifyAuthService.getAuthUrl();
+        console.log(url)
         return res.redirect(url);
     });
     
@@ -137,7 +143,69 @@ module.exports = (dbConnection) => {
             res.status(500).send('Authentication error');
         }
     });
+
+    router.get('/github', (req, res) => {
+        githubAuthService.redirectURI = req.query.redirect_uri;
+        githubAuthService.serviceName = 'github';
+        githubAuthService.serviceType = req.query.service_type;
+        const url = githubAuthService.getAuthUrl();
+        return res.redirect(url);
+    });
     
+    router.get('/github/callback', async (req, res) => {
+        console.log('GitHub callback');
+        try {
+            const code = req.query.code;
+            const redirectUri = githubAuthService.redirectURI || 'http://localhost:8081';
+    
+            const response = await githubAuthService.getGitHubTokens(code);
+            const accessToken = response.access_token;
+    
+            if (githubAuthService.serviceType === 'action') {
+                githubAuthService.action_token = accessToken;
+            } else if (githubAuthService.serviceType === 'reaction') {
+                githubAuthService.reaction_token = accessToken;
+            }
+    
+            const redirect = `${redirectUri}&action_token=${githubAuthService.action_token}&reaction_token=${githubAuthService.reaction_token}`;
+            return res.redirect(redirect);
+        } catch (error) {
+            console.error('Error handling GitHub callback:', error);
+            res.status(500).send('Authentication error');
+        }
+    });
+    
+    router.get('/twitch', (req, res) => {
+        twitchAuthService.redirectURI = req.query.redirect_uri;
+        twitchAuthService.serviceName = 'twitch';
+        twitchAuthService.serviceType = req.query.service_type;
+    
+        const url = twitchAuthService.getAuthUrl();
+        return res.redirect(url);
+    });
+    
+    router.get('/twitch/callback', async (req, res) => {
+        console.log('Twitch callback');
+        try {
+            const code = req.query.code;
+            const redirectUri = twitchAuthService.redirectURI || 'http://localhost:8081';
+    
+            const response = await twitchAuthService.getTwitchTokens(code);
+            const accessToken = response.access_token;
+    
+            if (twitchAuthService.serviceType === 'action') {
+                twitchAuthService.action_token = accessToken;
+            } else if (twitchAuthService.serviceType === 'reaction') {
+                twitchAuthService.reaction_token = accessToken;
+            }
+    
+            const redirect = `${redirectUri}&action_token=${twitchAuthService.action_token}&reaction_token=${twitchAuthService.reaction_token}`;
+            return res.redirect(redirect);
+        } catch (error) {
+            console.error('Error handling Twitch callback:', error);
+            res.status(500).send('Authentication error');
+        }
+    });
 
     return router;
 };
