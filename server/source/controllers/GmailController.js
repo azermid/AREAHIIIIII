@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const TriggerRepository = require('../repositories/TriggerRepository');
 const ActionRepository = require('../repositories/ActionRepository');
+const ReactionRepository = require('../repositories/ReactionRepository');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 require('dotenv').config();
@@ -9,41 +10,6 @@ const authClient = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET
 );
-
-async function getSendersOfRecentEmails(auth) {
-    try {
-        // Step 1: Get the list of recent messages from the inbox
-        const listResponse = await gmail.users.messages.list({
-            userId: 'me',
-            labelIds: ['INBOX'],
-            maxResults: 1,  // You can adjust this number
-            auth: auth,
-        });
-
-        // Extract message IDs from the list response
-        const messageIds = listResponse.data.messages.map(message => message.id);
-
-        // Step 2: Retrieve each message's metadata to find the "From" header
-        for (const messageId of messageIds) {
-            const messageResponse = await gmail.users.messages.get({
-                userId: 'me',
-                id: messageId,
-                format: 'metadata',
-                metadataHeaders: ['From'],
-                auth: authClient,
-            });
-
-            // Extract the "From" header to get sender information
-            const headers = messageResponse.data.payload.headers;
-            const fromHeader = headers.find(header => header.name === 'From');
-            const sender = fromHeader ? fromHeader.value : 'Unknown sender';
-
-            return sender;
-        }
-    } catch (error) {
-        console.error('Error fetching emails:', error);
-    }
-}
 
 class Message {
     constructor(data) {
@@ -58,7 +24,49 @@ class GmailController {
         // this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
         this.triggerRepository = new TriggerRepository(dbConnection);
         this.actionRepository = new ActionRepository(dbConnection);
+        this.reactionRepository = new ReactionRepository(dbConnection);
+        this.lastProcessedEmail = null;
         this.initialize();
+    }
+
+    async getSendersOfRecentEmails(auth) {
+        try {
+            // Step 1: Get the list of recent messages from the inbox
+            const listResponse = await gmail.users.messages.list({
+                userId: 'me',
+                labelIds: ['INBOX'],
+                maxResults: 1,  // You can adjust this number
+                auth: auth,
+            });
+    
+            // Extract message IDs from the list response
+            const messageIds = listResponse.data.messages.map(message => message.id);
+    
+            // Step 2: Retrieve each message's metadata to find the "From" header
+            for (const messageId of messageIds) {
+                if (messageId === this.lastProcessedEmail) {
+                    console.log('Same email as before. doing nothing...');
+                    return 'Unknown sender';
+                }
+                this.lastProcessedEmail = messageId;
+                const messageResponse = await gmail.users.messages.get({
+                    userId: 'me',
+                    id: messageId,
+                    format: 'metadata',
+                    metadataHeaders: ['From'],
+                    auth: authClient,
+                });
+    
+                // Extract the "From" header to get sender information
+                const headers = messageResponse.data.payload.headers;
+                const fromHeader = headers.find(header => header.name === 'From');
+                const sender = fromHeader ? fromHeader.value : 'Unknown sender';
+    
+                return sender;
+            }
+        } catch (error) {
+            console.error('Error fetching emails:', error);
+        }
     }
 
     async initialize() {
@@ -83,8 +91,29 @@ class GmailController {
                 const data = await response.json();
                 console.log('Watch response:', data);
             } catch (error) {
-                // TODO:
-                // REFRESH TOKEN
+                console.log('Invalid credentials. Refreshing token...');
+                const refreshToken = trigger.action_service_refresh_token;
+                const response = await fetch('https://oauth2.googleapis.com/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        client_id: process.env.GOOGLE_CLIENT_ID,
+                        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                        refresh_token: refreshToken,
+                        grant_type: 'refresh_token'
+                    })
+                });
+                if (!response.ok) {
+                    console.error('Failed to refresh token:', response.statusText);
+                    continue;
+                }
+                const data = await response.json();
+                console.log('Refresh token response:', data);
+                trigger.action_service_token = data.access_token;
+                await this.triggerRepository.update(trigger);
+                // TODO: need to re-register the subscription then
                 console.error('Error registering subscription:', error);
             }
         }
@@ -102,16 +131,18 @@ class GmailController {
                 authClient.setCredentials({
                     access_token: trigger.action_service_token,
                 });
-                const sender = await getSendersOfRecentEmails(authClient);
+                const sender = await this.getSendersOfRecentEmails(authClient);
                 const match = sender.match(/<([^>]+)>/);
                 const senderEmail = match ? match[1] : sender;
-                console.log(senderEmail)
+                // console.log(senderEmail)
                 if (trigger.action_data.from != senderEmail)
                     continue;
                 //TODO call reaction
-                console.log("email matches trigger");
+                const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
+                const reaction = require(`../reactions/${reactionName}.js`);
+                await reaction(trigger.action_service_token, trigger.reaction_data);
             }
-            res.json({ message: 'Successfully acknowledged messages.' });
+            res.status(200).send('OK');
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
