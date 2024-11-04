@@ -1,4 +1,3 @@
-const { PubSub } = require('@google-cloud/pubsub');
 const fetch = require('node-fetch');
 const TriggerRepository = require('../repositories/TriggerRepository');
 const ActionRepository = require('../repositories/ActionRepository');
@@ -93,11 +92,9 @@ class GmailController {
 
     async watch(req, res) {
         try {
-            console.log('Received message:', req.body);
+            // console.log('Received request:', req);
             const message = new Message(req.body.message.data);
             const actionId = await this.actionRepository.getIdByName('new_email_gmail');
-            console.log(message.data.emailAddress);
-            console.log(actionId);
 
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
                 if (trigger.action_data.user != message.data.emailAddress)
