@@ -279,10 +279,7 @@ export default function WorkspaceScreen() {
                                 options={
                                     [
                                         // @ts-ignore
-                                        // {label: "choose a service", value: null, onChange: handleActionServiceChange},
-                                        // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
-                                        // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
-                                        {label: "choose a service", value: null},
+                                        {label: "choose a service", value: null, onChange: handleActionServiceChange},
                                         ...serviceOptions
                                     ]
                                 }
