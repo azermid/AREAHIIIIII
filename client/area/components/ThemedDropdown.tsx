@@ -26,6 +26,7 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
     const styles = StyleSheet.create({
         container: {
             alignSelf: 'stretch',
+            flex: 1
         },
         mainButton: {
             display: 'flex',
