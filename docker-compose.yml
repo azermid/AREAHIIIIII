@@ -9,7 +9,8 @@ services:
     networks:
       - app-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   client_web:
     build:
@@ -47,6 +48,11 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./SQL/Database_create:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql-data:

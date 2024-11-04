@@ -273,27 +273,32 @@ export default function WorkspaceScreen() {
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>Workspace name placeholder</ThemedText>
                     <ThemedText>Choose an action service and a reaction service to see the actions/reactions available.</ThemedText>
-                    <View style={{display: 'flex', alignSelf: 'stretch', flexDirection: 'row'}}>
-                        <ThemedDropdown
-                            options={
-                                [
-                                    // @ts-ignore
-                                    // {label: "choose a service", value: null, onChange: handleActionServiceChange},
-                                    // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
-                                    // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
-                                    {label: "choose a service", value: null},
-                                    ...serviceOptions
-                                ]
-                            }
-                            onChange={handleActionServiceChange}
-                        />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                        <View style={{ flex: 1 }}>
+                            <ThemedDropdown
+                                options={
+                                    [
+                                        // @ts-ignore
+                                        // {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                        // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
+                                        // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
+                                        {label: "choose a service", value: null},
+                                        ...serviceOptions
+                                    ]
+                                }
+                                onChange={handleActionServiceChange}
+                            />
+                        </View>
                         <IconButton
                         icon={'login-variant'}
-                        iconColor='white'
+                         iconColor='white'
                         style={{cursor: 'pointer'}}
                         onPress={() => handleConnectActionService()}
                         ></IconButton>
-                        <ThemedDropdown
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                        <View style={{ flex: 1 }}>
+                            <ThemedDropdown
                             options={
                                 [
                                     // @ts-ignore
@@ -305,7 +310,8 @@ export default function WorkspaceScreen() {
                                 ]
                             }
                             onChange={handleReactionServiceChange}
-                        />
+                            />
+                            </View>
                         <IconButton
                         icon={'login-variant'}
                         iconColor='white'

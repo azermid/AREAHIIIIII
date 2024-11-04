@@ -26,19 +26,21 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
     const styles = StyleSheet.create({
         container: {
             alignSelf: 'stretch',
-            flex: 1
+            marginVertical: 8,
+            minHeight: 40
         },
         mainButton: {
             display: 'flex',
             flexDirection: 'row',
-            alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: fieldBackgroundColor,
+            paddingHorizontal: 10,
+            paddingVertical: 12,
         },
         label: {
             color: tintColor,
             fontWeight: 'bold',
-            padding: 7.5,
+            padding: 10,
         },
     });
 
