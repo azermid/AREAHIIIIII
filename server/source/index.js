@@ -34,12 +34,18 @@ app.use((req, res, next) => {
     //   console.log('Body:', req.body);
     //   next();
     // });
-    
+
+    const aboutRoutes = require('./routes/AboutRoutes')(dbConnection);
+    app.use('/', aboutRoutes);
+
     const userRoutes = require('./routes/UserRoutes')(dbConnection);
     app.use('/user', userRoutes);
 
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);
+
+    const serviceRoutes = require('./routes/ServiceRoutes')(dbConnection);
+    app.use('/service', serviceRoutes);
 
     const actionRoutes = require('./routes/ActionRoutes')(dbConnection);
     app.use('/action', actionRoutes);
