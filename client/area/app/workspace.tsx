@@ -216,6 +216,12 @@ export default function WorkspaceScreen() {
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
         const newActionOptions = await getActions(service);
+        if (newActionOptions.length === 0) {
+            console.log(service);
+            console.log(newActionOptions);
+            console.log('No actions available for this service');
+            return
+        }
         setActionOptions(
             newActionOptions.map((action: any) => {
                 return {
@@ -235,6 +241,10 @@ export default function WorkspaceScreen() {
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
         // setReactionOptions(await getReactions(service, setReaction));
         const newReactionOptions = await getReactions(service);
+        if (newReactionOptions.length === 0) {
+            console.log('No reactions available for this service');
+            return
+        }
         setReactionOptions(
             newReactionOptions.map((reaction: any) => {
                 return {
@@ -263,6 +273,7 @@ export default function WorkspaceScreen() {
                                 {label: "choose a service", value: null},
                                 {label: "Gmail", value: "gmail"},
                                 {label: "Outlook", value: "outlook"},
+                                {label: "Spotify", value: "spotify"},
                             ]
                         }
                         onChange={handleActionServiceChange}
@@ -275,6 +286,7 @@ export default function WorkspaceScreen() {
                                 {label: "choose a service", value: null},
                                 {label: "Gmail", value: "gmail"},
                                 {label: "Outlook", value: "outlook"},
+                                {label: "Spotify", value: "spotify"},
                             ]
                         }
                         onChange={handleReactionServiceChange}

@@ -21,7 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.3",
-    "node-cron": "^3.0.3",
+    "spotify-web-api-node": "^5.0.2",
     "supertest": "^7.0.0"
   },
   "description": ""

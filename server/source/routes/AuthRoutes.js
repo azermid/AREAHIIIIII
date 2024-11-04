@@ -1,6 +1,7 @@
 const express = require('express');
 const GoogleAuthService = require('../services/GoogleAuth');
 const MicrosoftAuthService = require('../services/MicrosoftAuth');
+const SpotifyAuthService = require('../services/SpotifyAuth');
 const UserRepository = require('../repositories/UserRepository');
 const AuthService = require('../services/AuthService');
 const ThirdPartyLogin = require('../useCases/ThirdPartyLogin');
@@ -13,6 +14,8 @@ module.exports = (dbConnection) => {
     const thirdPartyLogin = new ThirdPartyLogin(userRepository, authService);
     const googleAuthService = new GoogleAuthService(thirdPartyLogin);
     const microsoftAuthService = new MicrosoftAuthService(thirdPartyLogin);
+    const spotifyAuthService = new SpotifyAuthService(thirdPartyLogin);
+
 
     router.get('/google', (req, res) => {
         googleAuthService.redirectURI = req.query.redirect_uri; // Save the redirect URI for later
@@ -102,6 +105,39 @@ module.exports = (dbConnection) => {
             res.status(500).send('Authentication error');
         }
     });
+
+    router.get('/spotify', async (req, res) => {
+        spotifyAuthService.redirectURI = req.query.redirect_uri;
+        spotifyAuthService.serviceName = "spotify";
+        spotifyAuthService.serviceType = req.query.service_type;
+        const url = spotifyAuthService.getAuthUrl();
+        return res.redirect(url);
+    });
+    
+    router.get('/spotify/callback', async (req, res) => {
+        console.log('Spotify callback');
+        try {
+            const code = req.query.code;
+            const redirectUri = spotifyAuthService.redirectURI || 'http://localhost:8081';
+    
+            const response = await spotifyAuthService.getSpotifyTokens(code);
+            const access_token = response.accessToken;
+            console.log('Access token:', access_token);
+    
+            if (spotifyAuthService.serviceType == 'action') {
+                spotifyAuthService.action_token = access_token;
+            } else if (spotifyAuthService.serviceType == 'reaction') {
+                spotifyAuthService.reaction_token = access_token;
+            }
+    
+            const redirect = `${redirectUri}&action_token=${spotifyAuthService.action_token}&reaction_token=${spotifyAuthService.reaction_token}`;
+            return res.redirect(redirect);
+        } catch (error) {
+            console.error('Error handling Spotify callback:', error);
+            res.status(500).send('Authentication error');
+        }
+    });
+    
 
     return router;
 };
