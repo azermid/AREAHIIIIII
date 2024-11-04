@@ -3,7 +3,7 @@ const ReactionRepository = require('../repositories/ReactionRepository')
 const TriggerRepository = require('../repositories/TriggerRepository')
 
 async function pollOutlookForNewEmails(db, interval) {
-    console.log('Polling Outlook for new emails...');
+    // console.log('Polling Outlook for new emails...');
     const actionRepository = new ActionRepository(db);
     const reactionRepository = new ReactionRepository(db);
     const triggerRepository = new TriggerRepository(db);
@@ -23,11 +23,11 @@ async function pollOutlookForNewEmails(db, interval) {
         );
         const data = await response.json();
         if (data.error) {
-            console.error('Error:', data.error);
+            // console.error('Error:', data.error);
             return;
         }
         const processFrom = new Date(Date.now() - interval);
-        console.log('Process from:', processFrom);
+        // console.log('Process from:', processFrom);
 
         for (const email of data.value) {
             if (email.receivedDateTime < processFrom.toISOString()) {
@@ -45,7 +45,7 @@ async function pollOutlookForNewEmails(db, interval) {
             console.log("reaction name", reactionName);
             //send_email_outlook
             const reaction = require(`../reactions/${reactionName}.js`);
-            await reaction(trigger.action_service_token, trigger.reaction_data, email);
+            await reaction(trigger.action_service_token, trigger.reaction_data);
             //do reaction
         }
     }

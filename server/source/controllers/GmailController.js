@@ -1,6 +1,7 @@
 const { PubSub } = require('@google-cloud/pubsub');
 const fetch = require('node-fetch');
 const TriggerRepository = require('../repositories/TriggerRepository');
+const ActionRepository = require('../repositories/ActionRepository');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
 require('dotenv').config();
@@ -57,11 +58,13 @@ class GmailController {
         // this.pubsub = new PubSub();
         // this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
         this.triggerRepository = new TriggerRepository(dbConnection);
+        this.actionRepository = new ActionRepository(dbConnection);
         this.initialize();
     }
 
     async initialize() {
-        const triggers = await this.triggerRepository.getByActionId(1);
+        const actionId = await this.actionRepository.getIdByName('new_email_gmail');
+        const triggers = await this.triggerRepository.getByActionId(actionId);
         for (const trigger of triggers) {
             try {
                 const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
@@ -90,9 +93,13 @@ class GmailController {
 
     async watch(req, res) {
         try {
+            console.log('Received message:', req.body);
             const message = new Message(req.body.message.data);
+            const actionId = await this.actionRepository.getIdByName('new_email_gmail');
+            console.log(message.data.emailAddress);
+            console.log(actionId);
 
-            for (const trigger of await this.triggerRepository.getByActionId(1)) {
+            for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
                 if (trigger.action_data.user != message.data.emailAddress)
                     continue;
                 authClient.setCredentials({
@@ -104,6 +111,8 @@ class GmailController {
                 console.log(senderEmail)
                 if (trigger.action_data.from != senderEmail)
                     continue;
+                //TODO call reaction
+                console.log("email matches trigger");
             }
             res.json({ message: 'Successfully acknowledged messages.' });
         } catch (error) {
