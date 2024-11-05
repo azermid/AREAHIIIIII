@@ -28,7 +28,7 @@ class MicrosoftAuth {
     async getOutlookTokens(code) {
         const tokenRequest = {
             code,
-            scopes: ['User.Read', 'Mail.Read', 'offline_access'],
+            scopes: ['User.Read', 'Mail.Read', 'Mail.Send', 'offline_access'],
             redirectUri: process.env.BACKEND_URI + '/auth/microsoft/callback',
         };
 

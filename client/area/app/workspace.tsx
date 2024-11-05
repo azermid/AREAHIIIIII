@@ -88,10 +88,27 @@ export default function WorkspaceScreen() {
                 setWorkspaceName(workspaceObj.name);
                 setActionService(workspaceObj.action_service_title);
                 setReactionService(workspaceObj.reaction_service_title);
+                setAction(workspaceObj.action_title);
+                setReaction(workspaceObj.reaction_title);
                 setActionServiceToken(workspaceObj.action_service_token);
                 setReactionServiceToken(workspaceObj.reaction_service_token);
                 setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
                 setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
+                setActionData(
+                    {
+                        // @ts-ignore
+                        from: "yann.malaret@outlook.fr",
+                        user: "webepitech@gmail.com",
+                    }
+                );
+                setReactionData(
+                    {
+                        // @ts-ignore
+                        to: "yann.malaret@outlook.fr",
+                        subject: "test",
+                        text: "test",
+                    }
+                );
             }
             if (Platform.OS === 'web') {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -99,26 +116,31 @@ export default function WorkspaceScreen() {
                     return;
                 }
                 const actionServiceTokenFromURL = urlParams.get('action_token');
-                if (actionServiceTokenFromURL) {
+                if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
+                    // @ts-ignore
                     setActionServiceToken(actionServiceTokenFromURL);
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
                 }
                 const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
-                if (actionServiceRefreshTokenFromURL) {
+                if (actionServiceRefreshTokenFromURL && actionServiceRefreshTokenFromURL != 'undefined') {
+                    // @ts-ignore
                     setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
                 }
                 const reactionServiceTokenFromURL = urlParams.get('reaction_token');
-                if (reactionServiceTokenFromURL) {
+                if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
+                    // @ts-ignore
                     setReactionServiceToken(reactionServiceTokenFromURL);
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
                 }
                 const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
-                if (reactionServiceRefreshTokenFromURL) {
+                if (reactionServiceRefreshTokenFromURL && reactionServiceRefreshTokenFromURL != 'undefined') {
+                    // @ts-ignore
                     setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
                 }
-                window.history.pushState({}, document.title, "/");
+                //clear url
+                window.history.pushState({}, document.title, "/workspace");
             }
         }
         getInfoFromURL();
@@ -154,7 +176,58 @@ export default function WorkspaceScreen() {
         await triggerCreateOrUpdate(trigger);
     };
 
-    const handleActionServiceChange = async (service) => {
+    const handleConnectActionService = async () => {
+        if (Platform.OS === 'web') {
+            const backendConnectionUri = `${backendUri}/auth/${actionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=action`;
+            window.location.href = backendConnectionUri;
+        } else {
+            const backendConnectionUri = `${backendUri}/auth/${actionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=action`;
+            const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
+            if (result.type === 'success' && result.url) {
+                const params = Linking.parse(result.url).queryParams;
+                if (!params) {
+                    console.log('No params, no token');
+                    return;
+                }
+                if (params.action_token && params.action_refresh_token) {
+                    // @ts-ignore
+                    setActionServiceToken(params.action_token);
+                    // @ts-ignore
+                    setActionServiceRefreshToken(params.action_refresh_token);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceId, actionServiceToken: params.action_token, actionServiceRefreshToken: params.action_refresh_token });
+                }
+            }
+        }
+    }
+
+    const handleConnectReactionService = async () => {
+        if (Platform.OS === 'web') {
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
+            window.location.href = backendConnectionUri;
+        } else {
+            const backendConnectionUri = `${backendUri}/auth/${reactionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=reaction`;
+            const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
+            if (result.type === 'success' && result.url) {
+                const params = Linking.parse(result.url).queryParams;
+                if (!params) {
+                    console.log('No params, no token');
+                    return;
+                }
+                if (params.reaction_token && params.reaction_refresh_token) {
+                    // @ts-ignore
+                    setReactionServiceToken(params.reaction_token);
+                    // @ts-ignore
+                    setReactionServiceRefreshToken(params.reaction_refresh_token);
+                    // @ts-ignore
+                    await workspaceUpdate({ id: workspaceId, reactionServiceToken: params.reaction_token, reactionServiceRefreshToken: params.reaction_refresh_token });
+                }
+            }
+        }
+    }
+
+    const handleActionServiceChange = async (service: string) => {
+        // @ts-ignore
         setActionService(service);
         setAction(null);
         setActionOptions([]);
@@ -249,6 +322,7 @@ export default function WorkspaceScreen() {
                         <View style={styles.dropdownContainer}>
                             <ThemedDropdown
                                 options={[
+                                        // @ts-ignore
                                     { label: "Choose an action service", value: null },
                                     ...serviceOptions
                                 ]}
@@ -297,6 +371,7 @@ export default function WorkspaceScreen() {
                         <View style={styles.dropdownContainer}>
                             <ThemedDropdown
                                 options={[
+                                        // @ts-ignore
                                     { label: "Choose a reaction service", value: null },
                                     ...serviceOptions
                                 ]}

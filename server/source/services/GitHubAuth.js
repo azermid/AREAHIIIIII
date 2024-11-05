@@ -1,82 +1,76 @@
 const fetch = require('node-fetch');
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
 
 class GitHubAuth {
     constructor(thirdPartyLogin) {
         this.thirdPartyLogin = thirdPartyLogin;
         this.clientId = process.env.GITHUB_CLIENT_ID;
         this.clientSecret = process.env.GITHUB_CLIENT_SECRET;
-        this.redirectURI = null;
-        this.privateKeyPath = process.env.GITHUB_PRIVATE_KEY_PATH;
-        this.appId = process.env.GITHUB_APP_ID;
-        this.serviceName = 'Area-F';
-        this.serviceType = 'oauth';
-    }
-
-    generateJWT() {
-        const privateKey = fs.readFileSync(this.privateKeyPath, 'utf8');
-        const payload = {
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (10 * 60),
-            iss: this.appId,
-        };
-        return jwt.sign(payload, privateKey, { algorithm: 'RS256' });
+        this.redirectURI = null; // Fixed undefined variable
     }
 
     getAuthUrl() {
         const scopes = [
-            'repo', 'repo:status', 'repo_deployment', 'public_repo', 'repo:invite',
-            'admin:org', 'read:org', 'write:org', 'user', 'user:email', 'user:follow',
-            'gist', 'notifications', 'workflow', 'admin:repo_hook', 'admin:org_hook',
-            'read:packages', 'write:packages', 'delete:packages', 'admin:public_key',
-            'admin:gpg_key', 'codespace'
+            'repo', // Full control of private repositories (or use 'public_repo' for public repos only)
+            'admin:repo_hook', // Admin access to repository hooks
         ].join(',');
 
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(process.env.GITHUB_REDIRECT_URI)}&scope=${scopes}`;
-        return authUrl;
+        return `https://github.com/login/oauth/authorize?client_id=${this.clientId}` +
+            `&redirect_uri=${encodeURIComponent(process.env.GITHUB_REDIRECT_URI)}` +
+            `&scope=${scopes}`;
     }
-$
+
     async getGitHubTokens(code) {
         const tokenUrl = 'https://github.com/login/oauth/access_token';
         const params = new URLSearchParams({
             client_id: this.clientId,
             client_secret: this.clientSecret,
             code,
-            redirect_uri: process.env.GITHUB_REDIRECT_URI,
+            redirect_uri: process.env.GITHUB_REDIRECT_URI, // Use redirectURI from constructor
         });
 
-        const response = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json'
-            },
-            body: params
-        });
+        try {
+            const response = await fetch(tokenUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                body: params
+            });
 
-        if (!response.ok) {
-            throw new Error('Failed to retrieve GitHub tokens');
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Failed to retrieve GitHub tokens: ${errorData}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching GitHub tokens:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data;
     }
 
     async getGitHubUser(accessToken) {
         const userUrl = 'https://api.github.com/user';
 
-        const response = await fetch(userUrl, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
+        try {
+            const response = await fetch(userUrl, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Accept': 'application/vnd.github.v3+json' // Ensure compatibility with GitHub's API version
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Failed to retrieve GitHub user information: ${errorData}`);
             }
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to retrieve GitHub user information');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching GitHub user information:', error);
+            throw error;
         }
-
-        const userData = await response.json();
-        return userData;
     }
 }
 

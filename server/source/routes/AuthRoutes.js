@@ -159,6 +159,7 @@ module.exports = (dbConnection) => {
             const redirectUri = githubAuthService.redirectURI || 'http://localhost:8081';
     
             const response = await githubAuthService.getGitHubTokens(code);
+            console.log(response)
             const accessToken = response.access_token;
     
             if (githubAuthService.serviceType === 'action') {
