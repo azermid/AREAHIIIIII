@@ -3,33 +3,6 @@ const TriggerRepository = require('../repositories/TriggerRepository');
 const ActionRepository = require('../repositories/ActionRepository');
 require('dotenv').config();
 
-async function createWebhook(repoName, owner, accessToken) {
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/hooks`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `token ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: 'web',
-            active: true,
-            events: ['push'],
-            config: {
-                url: 'https://yourapp.com/github-webhook',
-                content_type: 'json',
-                secret: 'YOUR_WEBHOOK_SECRET'  // Optional: to verify GitHub webhook payloads
-            }
-        })
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-        console.log('Webhook created:', data);
-    } else {
-        console.error('Error creating webhook:', data);
-    }
-}
-
 class GithubController {
     constructor(dbConnection) {
         // this.pubsub = new PubSub();
@@ -43,43 +16,79 @@ class GithubController {
         const actionId = await this.actionRepository.getIdByName('new_commit');
         const triggers = await this.triggerRepository.getByActionId(actionId);
         for (const trigger of triggers) {
-            try {
-                const response = await fetch(`https://api.github.com/repos/AreaMaster-F/TestArea/hooks`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${trigger.action_service_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: 'web',
-                        active: true,
-                        events: ['push'],
-                        config: {
-                            url: process.env.GITHUB_WEBHOOK_URI,
-                            content_type: 'json',
-                            insecure_ssl: '1',
-                            secret: ''
-                        }
-                    })
-                });
-            
-                const data = await response.json();
-                if (response.ok) {
-                    console.log('Webhook created:', data);
-                } else {
-                    console.error('Error creating webhook:', data);
-                }
-            } catch (error) {
-                console.error('Error registering subscription:', error);
-            }
+            this.createWebhook(trigger);
         }
     }
 
     async watch(req, res) {
         try {
             console.log('Received request:', req.body);
+            res.status(200).send();
         } catch (error) {
             res.status(400).json({ error: error.message });
+        }
+    }
+
+
+    async createWebhook(trigger) {
+        const actionName = await this.actionRepository.getNameById(trigger.action_id);
+        switch (actionName) {
+            case 'new_commit':
+                this.createPushWebhook(trigger);
+                break;
+            default:
+                console.log(`No webhook creation logic for action: ${actionName}`);
+            break;
+        }
+    }
+
+    async createPushWebhook(trigger) {
+        try {
+            // Step 1: Get the authenticated user (owner) using the GitHub token
+            const userResponse = await fetch(`https://api.github.com/user`, {
+                headers: {
+                    'Authorization': `Bearer ${trigger.action_service_token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!userResponse.ok) {
+                const userData = await userResponse.json();
+                throw new Error(`Error fetching user info: ${userData.message}`);
+            }
+    
+            const userData = await userResponse.json();
+            const username = userData.login; // This is the GitHub username
+    
+            // Step 2: Set up the webhook on the repository for that user
+            const repoName = "TestArea"; // TODO: Replace with logic to get repo name from trigger, if needed
+            const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/hooks`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${trigger.action_service_token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'web',
+                    active: true,
+                    events: ['push'],
+                    config: {
+                        url: process.env.GITHUB_WEBHOOK_URI,
+                        content_type: 'json',
+                        insecure_ssl: '0',
+                        secret: '' // Add a webhook secret here if desired
+                    }
+                })
+            });
+    
+            const data = await response.json();
+            if (response.ok) {
+                console.log('Webhook created:', data);
+            } else {
+                console.error('Error creating webhook:', data);
+            }
+        } catch (error) {
+            console.error('Error registering subscription:', error);
         }
     }
 }
