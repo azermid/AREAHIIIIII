@@ -48,13 +48,26 @@ RUN git init && \
 # Copy the entire project
 COPY client/area .
 
+# Create a keystore for signing the APK
+RUN keytool -genkey -v \
+    -keystore ./android/keystore.jks \
+    -keyalg RSA -keysize 2048 -validity 10000 \
+    -alias arealias \
+    -dname "CN=example, OU=Development, O=Epitech, L=City, S=State, C=US" \
+    -storepass password123 \
+    -keypass password123
+
 # Expose necessary ports
 EXPOSE 19000 19001 19002
 
+# Delete previous build files
+RUN rm -rf /usr/src/app/shared/*
+
 # Run the EAS build command to generate the AAB, convert it to APK, and move it to the shared volume
 CMD ["sh", "-c", "eas build -p android --local --non-interactive && \
-    cp build/*.aab /usr/src/app/shared/client.aab && \
+    cp /usr/src/app/build-*.aab /usr/src/app/shared/client.aab && \
     java -jar /usr/local/bin/bundletool.jar build-apks --bundle=/usr/src/app/shared/client.aab \
-    --output=/usr/src/app/shared/output.apks --mode=universal && \
+    --output=/usr/src/app/shared/output.apks --mode=universal \
+    --ks /usr/src/app/android/keystore.jks --ks-pass pass:password123 && \
     unzip /usr/src/app/shared/output.apks -d /usr/src/app/shared && \
     mv /usr/src/app/shared/universal.apk /usr/src/app/shared/client.apk"]
