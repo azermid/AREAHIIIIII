@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         flexBasis: '48%',
-        paddingHorizontal: 10,
+        paddingHorizontal: -10,
         marginBottom: 8,
     },
 });
@@ -283,7 +283,7 @@ export default function WorkspaceScreen() {
                             const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string") {
+                                if (data[key] === "string" || data[key] === "null") {
                                     data[key] = ""; // replace "string" with empty string
                                 }
                             });
