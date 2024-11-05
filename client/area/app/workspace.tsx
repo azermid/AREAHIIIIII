@@ -302,8 +302,10 @@ export default function WorkspaceScreen() {
     };
 
     // @ts-ignore
-    const handleActionChange = (selectedAction) => {
+    const handleActionChange = async (selectedAction) => {
         setAction(selectedAction);
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, actionTitle: selectedAction });
         // @ts-ignore
         const actionDetails = actionOptions.find((act) => act.value === selectedAction);
         if (actionDetails) {
@@ -313,8 +315,10 @@ export default function WorkspaceScreen() {
     };
 
     // @ts-ignore
-    const handleReactionChange = (selectedReaction) => {
+    const handleReactionChange = async (selectedReaction) => {
         setReaction(selectedReaction);
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, reactionTitle: selectedReaction });
         // @ts-ignore
         const reactionDetails = reactionOptions.find((react) => react.value === selectedReaction);
         if (reactionDetails) {
