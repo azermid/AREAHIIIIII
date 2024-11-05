@@ -31,9 +31,7 @@ class GithubController {
 
 
     async createWebhook(trigger) {
-        console.log('Creating webhook for:', trigger);
         const actionName = await this.actionRepository.getNameById(trigger.action_id);
-        console.log('Action name:', actionName);
         switch (actionName) {
             case 'new_commit':
                 this.createPushWebhook(trigger);
