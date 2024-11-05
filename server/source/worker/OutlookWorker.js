@@ -46,10 +46,13 @@ async function pollOutlookForNewEmails(db, interval) {
             console.log("email matches trigger");
             const reactionName = await reactionRepository.getNameById(trigger.reaction_id);
             // console.log("reaction name", reactionName);
-            //send_email_outlook
+            // reaction
             const reaction = require(`../reactions/${reactionName}.js`);
-            await reaction(trigger.reaction_service_token, trigger.reaction_data);
-            //do reaction
+            const newRefreshToken = await reaction(trigger.reaction_service_token, trigger.reaction_service_refresh_token, trigger.reaction_data, email);
+            if (newRefreshToken) {
+                trigger.reaction_service_token = newRefreshToken;
+                await triggerRepository.update(trigger);
+            }
         }
         console.log('Finished processing trigger');
     }

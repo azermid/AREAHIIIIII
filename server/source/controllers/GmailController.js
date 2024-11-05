@@ -73,49 +73,7 @@ class GmailController {
         const actionId = await this.actionRepository.getIdByName('new_email_gmail');
         const triggers = await this.triggerRepository.getByActionId(actionId);
         for (const trigger of triggers) {
-            try {
-                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${trigger.action_service_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        labelIds: ["INBOX"],
-                        topicName: "projects/area-436514/topics/new_email"
-                    })
-                });
-                if (!response.ok) {
-                    throw new Error(`Failed to register: ${response.statusText}`);
-                }
-                const data = await response.json();
-                console.log('Watch response:', data);
-            } catch (error) {
-                console.log('Invalid credentials. Refreshing token...');
-                const refreshToken = trigger.action_service_refresh_token;
-                const response = await fetch('https://oauth2.googleapis.com/token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        client_id: process.env.GOOGLE_CLIENT_ID,
-                        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                        refresh_token: refreshToken,
-                        grant_type: 'refresh_token'
-                    })
-                });
-                if (!response.ok) {
-                    console.error('Failed to refresh token:', response.statusText);
-                    continue;
-                }
-                const data = await response.json();
-                console.log('Refresh token response:', data);
-                trigger.action_service_token = data.access_token;
-                await this.triggerRepository.update(trigger);
-                // TODO: need to re-register the subscription then
-                console.error('Error registering subscription:', error);
-            }
+            this.createMailWebhook(trigger);
         }
     }
 
@@ -138,14 +96,75 @@ class GmailController {
                 // console.log(senderEmail)
                 if (trigger.action_data.from != senderEmail)
                     continue;
-                //TODO call reaction
+                //TODO get email from message.data to give as additionalData to reaction
                 const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
                 const reaction = require(`../reactions/${reactionName}.js`);
-                await reaction(trigger.action_service_token, trigger.reaction_data);
+                const newRefreshToken = await reaction(trigger.action_service_token, trigger.action_service_refresh_token, trigger.reaction_data, message.data);
+                if (newRefreshToken) {
+                    trigger.action_service_token = newRefreshToken;
+                    await this.triggerRepository.update(trigger);
+                }
             }
             res.status(200).send('OK');
         } catch (error) {
             res.status(400).json({ error: error.message });
+        }
+    }
+
+    async createWebhook(trigger) {
+        const actionName = await this.actionRepository.getNameById(trigger.action_id);
+        switch (actionName) {
+            case 'new_email_gmail':
+                break;
+            default:
+                console.log(`No webhook creation logic for action: ${actionName}`);
+            break;
+        }
+    }
+
+    async createMailWebhook(trigger) {
+        try {
+            const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${trigger.action_service_token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    labelIds: ["INBOX"],
+                    topicName: "projects/area-436514/topics/new_email"
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to register: ${response.statusText}`);
+            }
+            const data = await response.json();
+            console.log('Watch response:', data);
+        } catch (error) {
+            console.log('Invalid credentials. Refreshing token...');
+            const refreshToken = trigger.action_service_refresh_token;
+            const response = await fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_id: process.env.GOOGLE_CLIENT_ID,
+                    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                    refresh_token: refreshToken,
+                    grant_type: 'refresh_token'
+                })
+            });
+            if (!response.ok) {
+                console.error('Failed to refresh token:', response.statusText);
+                return;
+            }
+            const data = await response.json();
+            console.log('Refresh token response:', data);
+            trigger.action_service_token = data.access_token;
+            await this.triggerRepository.update(trigger);
+            // TODO: need to re-register the subscription then
+            console.error('Error registering subscription:', error);
         }
     }
 }

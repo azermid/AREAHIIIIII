@@ -13,15 +13,21 @@ export type ThemedDropdownProps = ViewProps & {
         label: string;
         value: string;
     }>;
+    selectedOptionValue?: string;
     onChange: ((value: any) => void) | null;
 };
 
-export function ThemedDropdown({ options, onChange, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
+export function ThemedDropdown({ options, selectedOptionValue, onChange, style, lightColor, darkColor, ...otherProps }: ThemedDropdownProps) {
     const fieldBackgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'fieldBackground');
     const tintColor = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
     const [selected, setSelected] = useState(0);
     const [opened, setOpened] = useState(false);
+
+    if (selectedOptionValue) {
+        setSelected(options.findIndex(option => option.value === selectedOptionValue));
+        console.log(selectedOptionValue);
+    }
 
     const styles = StyleSheet.create({
         container: {
