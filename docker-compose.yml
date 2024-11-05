@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    volumes:
+      - apk-volume:/usr/src/app/shared
     networks:
       - app-network
     depends_on:
@@ -31,6 +33,8 @@ services:
       dockerfile: client_mobile/Dockerfile
     networks:
       - app-network
+    volumes:
+      - apk-volume:/usr/src/app/shared
     depends_on:
       - server
 
@@ -56,6 +60,7 @@ services:
 
 volumes:
   mysql-data:
+  apk-volume:
 
 networks:
   app-network:

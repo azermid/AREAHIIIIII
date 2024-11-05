@@ -47,5 +47,6 @@ COPY client/area .
 # Expose necessary ports
 EXPOSE 19000 19001 19002
 
-# Run the EAS build command to generate the APK
-CMD ["eas", "build", "-p", "android", "--local"]
+# Run the EAS build command to generate the APK and move it to the shared volume
+CMD ["sh", "-c", "eas build -p android --local --non-interactive && cp build/*.apk /usr/src/app/shared/client.apk"]
+
