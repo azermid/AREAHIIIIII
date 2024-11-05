@@ -47,17 +47,18 @@ class GithubController {
                 const response = await fetch(`https://api.github.com/repos/AreaMaster-F/TestArea/hooks`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `token ${trigger.action_service_token}`,
+                        'Authorization': `Bearer ${trigger.action_service_token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: 'test',
+                        name: 'web',
                         active: true,
                         events: ['push'],
                         config: {
                             url: process.env.GITHUB_WEBHOOK_URI,
                             content_type: 'json',
                             insecure_ssl: '1',
+                            secret: ''
                         }
                     })
                 });
@@ -68,25 +69,7 @@ class GithubController {
                 } else {
                     console.error('Error creating webhook:', data);
                 }
-            //     const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
-            //         method: 'POST',
-            //         headers: {
-            //             'Authorization': `Bearer ${trigger.action_service_token}`,
-            //             'Content-Type': 'application/json'
-            //         },
-            //         body: JSON.stringify({
-            //             labelIds: ["INBOX"],
-            //             topicName: "projects/area-436514/topics/new_email"
-            //         })
-            //     });
-            //     if (!response.ok) {
-            //         throw new Error(`Failed to register: ${response.statusText}`);
-            //     }
-            //     const data = await response.json();
-            //     console.log('Watch response:', data);
             } catch (error) {
-                // TODO:
-                // REFRESH TOKEN
                 console.error('Error registering subscription:', error);
             }
         }
