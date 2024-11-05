@@ -25,26 +25,27 @@ async function pollOutlookForNewEmails(db, interval) {
         const data = await response.json();
         if (data.error) {
             console.error('Error:', data.error);
+            // Should refresh token here
             return;
         }
         const processFrom = new Date(Date.now() - interval);
-        // console.log('Process from:', processFrom);
+        console.log('Process from:', processFrom);
 
         for (const email of data.value) {
             // console.log('Processing an email');
             if (email.receivedDateTime < processFrom.toISOString()) {
-                // console.log('Skipping email cause of time');
+                console.log('Skipping email cause of time');
                 continue;
             }
             // console.log('Processing email:', email);
             const action_data = trigger.action_data;
             if (email.from.emailAddress.address !== action_data.from) {
-                // console.log('Skipping email:', email);
+                console.log('Skipping email cause of from');
                 continue;
             }
             console.log("email matches trigger");
             const reactionName = await reactionRepository.getNameById(trigger.reaction_id);
-            console.log("reaction name", reactionName);
+            // console.log("reaction name", reactionName);
             //send_email_outlook
             const reaction = require(`../reactions/${reactionName}.js`);
             await reaction(trigger.reaction_service_token, trigger.reaction_data);

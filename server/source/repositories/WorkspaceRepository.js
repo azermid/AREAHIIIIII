@@ -29,19 +29,9 @@ class WorkspaceRepository {
         return rows;
     }
 
-    // async camelCaseToSnakeCase(obj) {
-    //     const newObj = {};
-    //     for (const key in obj) {
-    //         const newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    //         newObj[newKey] = obj[key];
-    //     }
-    //     return newObj;
-    // }
-
     async update(workspace) {
         let sql = 'UPDATE workspaces SET ';
         const values = [];
-        // const workspaceSnakeCase = await this.camelCaseToSnakeCase(workspace);
         const workspaceSnakeCase = await camelCaseToSnakeCase(workspace);
         for (const key in workspaceSnakeCase) {
             if (workspaceSnakeCase[key]) {

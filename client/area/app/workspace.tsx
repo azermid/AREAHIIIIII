@@ -18,12 +18,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workspaceUpdate } from '@/utils/workspace';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
 import { IconButton } from 'react-native-paper';
+import * as Linking from 'expo-linking';
+import { set } from 'cypress/types/lodash';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
 const redirectUri = AuthSession.makeRedirectUri({
+    // @ts-ignore
     useProxy: Platform.select({ web: false, default: true }),
     native: 'myapp://redirect',
 });
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
 
 export default function WorkspaceScreen() {
     const navigation = useNavigation();
+
     const [workspaceId, setWorkspaceId] = useState(null);
     const [workspaceName, setWorkspaceName] = useState(null);
 
@@ -80,9 +84,11 @@ export default function WorkspaceScreen() {
     useEffect(() => {
         const getInfoFromURL = async () => {
             const workspace = await AsyncStorage.getItem('workspace');
+            let workspaceObj = null;
             let workspaceIdTemp = null;
             if (workspace) {
-                const workspaceObj = JSON.parse(workspace);
+                workspaceObj = JSON.parse(workspace);
+                console.log(workspaceObj);
                 setWorkspaceId(workspaceObj.id);
                 workspaceIdTemp = workspaceObj.id;
                 setWorkspaceName(workspaceObj.name);
@@ -94,21 +100,8 @@ export default function WorkspaceScreen() {
                 setReactionServiceToken(workspaceObj.reaction_service_token);
                 setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
                 setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
-                setActionData(
-                    {
-                        // @ts-ignore
-                        from: "yann.malaret@outlook.fr",
-                        user: "webepitech@gmail.com",
-                    }
-                );
-                setReactionData(
-                    {
-                        // @ts-ignore
-                        to: "yann.malaret@outlook.fr",
-                        subject: "test",
-                        text: "test",
-                    }
-                );
+                setActionData(workspaceObj.action_data);
+                setReactionData(workspaceObj.reaction_data);
             }
             if (Platform.OS === 'web') {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -119,28 +112,37 @@ export default function WorkspaceScreen() {
                 if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setActionServiceToken(actionServiceTokenFromURL);
+                    workspaceObj.action_service_token = actionServiceTokenFromURL;
+                    // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
                 }
                 const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
-                if (actionServiceRefreshTokenFromURL && actionServiceRefreshTokenFromURL != 'undefined') {
+                if (actionServiceRefreshTokenFromURL) {
                     // @ts-ignore
                     setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
+                    workspaceObj.action_service_refresh_token = actionServiceRefreshTokenFromURL;
+                    // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
                 }
                 const reactionServiceTokenFromURL = urlParams.get('reaction_token');
                 if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setReactionServiceToken(reactionServiceTokenFromURL);
+                    workspaceObj.reaction_service_token = reactionServiceTokenFromURL;
+                    // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
                 }
                 const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
-                if (reactionServiceRefreshTokenFromURL && reactionServiceRefreshTokenFromURL != 'undefined') {
+                if (reactionServiceRefreshTokenFromURL) {
                     // @ts-ignore
                     setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
+                    workspaceObj.reaction_service_refresh_token = reactionServiceRefreshTokenFromURL;
+                    // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
                 }
                 //clear url
                 window.history.pushState({}, document.title, "/workspace");
+                await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
             }
         }
         getInfoFromURL();
@@ -172,8 +174,8 @@ export default function WorkspaceScreen() {
             webhook_url: null, // get from action, if type is webhook
             webhook_secret: null, // get from action, if type is webhook
         }
-        console.log('trigger', trigger);
         await triggerCreateOrUpdate(trigger);
+        console.log('trigger created');
     };
 
     const handleConnectActionService = async () => {
@@ -184,6 +186,7 @@ export default function WorkspaceScreen() {
             const backendConnectionUri = `${backendUri}/auth/${actionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=action`;
             const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
             if (result.type === 'success' && result.url) {
+                // @ts-ignore
                 const params = Linking.parse(result.url).queryParams;
                 if (!params) {
                     console.log('No params, no token');
@@ -232,12 +235,14 @@ export default function WorkspaceScreen() {
         setAction(null);
         setActionOptions([]);
         setActionData({});
+        // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
         if (service) {
             try {
                 const newActionOptions = await getActions(service);
                 if (newActionOptions.length > 0) {
                     setActionOptions(
+                        // @ts-ignore
                         newActionOptions.map((action) => {
                             const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
                             // clean up default values
@@ -260,17 +265,20 @@ export default function WorkspaceScreen() {
         }
     };
 
-    const handleReactionServiceChange = async (service) => {
+    const handleReactionServiceChange = async (service: string) => {
+        // @ts-ignore
         setReactionService(service);
         setReaction(null);
         setReactionOptions([]);
         setReactionData({});
+        // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
         if (service) {
             try {
                 const newReactionOptions = await getReactions(service);
                 if (newReactionOptions.length > 0) {
                     setReactionOptions(
+                        // @ts-ignore
                         newReactionOptions.map((reaction) => {
                             const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                             // clean up default values
@@ -293,18 +301,24 @@ export default function WorkspaceScreen() {
         }
     };
 
+    // @ts-ignore
     const handleActionChange = (selectedAction) => {
         setAction(selectedAction);
+        // @ts-ignore
         const actionDetails = actionOptions.find((act) => act.value === selectedAction);
         if (actionDetails) {
+            // @ts-ignore
             setActionData(actionDetails.data || {});
         }
     };
 
+    // @ts-ignore
     const handleReactionChange = (selectedReaction) => {
         setReaction(selectedReaction);
+        // @ts-ignore
         const reactionDetails = reactionOptions.find((react) => react.value === selectedReaction);
         if (reactionDetails) {
+            // @ts-ignore
             setReactionData(reactionDetails.data || {});
         }
     };
@@ -344,6 +358,7 @@ export default function WorkspaceScreen() {
                         <View style={styles.container}>
                             <View style={styles.dropdownContainer}>
                                 <ThemedDropdown
+                                    // @ts-ignore
                                     options={[{ label: "Choose an action", value: null }, ...actionOptions]}
                                     onChange={handleActionChange}
                                 />
@@ -358,6 +373,7 @@ export default function WorkspaceScreen() {
                                 <ThemedField
                                     key={key}
                                     field={key}
+                                    // @ts-ignore
                                     value={actionData[key]}
                                     onChange={(text) => setActionData({ ...actionData, [key]: text })}
                                     style={styles.inputField}
@@ -371,7 +387,7 @@ export default function WorkspaceScreen() {
                         <View style={styles.dropdownContainer}>
                             <ThemedDropdown
                                 options={[
-                                        // @ts-ignore
+                                    // @ts-ignore
                                     { label: "Choose a reaction service", value: null },
                                     ...serviceOptions
                                 ]}
@@ -393,6 +409,7 @@ export default function WorkspaceScreen() {
                         <View style={styles.container}>
                             <View style={styles.dropdownContainer}>
                                 <ThemedDropdown
+                                    // @ts-ignore
                                     options={[{ label: "Choose a reaction", value: null }, ...reactionOptions]}
                                     onChange={handleReactionChange}
                                 />
@@ -407,6 +424,7 @@ export default function WorkspaceScreen() {
                                 <ThemedField
                                     key={key}
                                     field={key}
+                                    // @ts-ignore
                                     value={reactionData[key]}
                                     onChange={(text) => setReactionData({ ...reactionData, [key]: text })}
                                     style={styles.inputField}
