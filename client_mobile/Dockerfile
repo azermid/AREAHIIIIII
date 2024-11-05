@@ -7,6 +7,10 @@ RUN apt-get update && \
     apt-get install -y git wget unzip openjdk-17-jdk && \
     apt-get clean
 
+# Download bundletool to convert aab to apk
+RUN curl -L -o /usr/local/bin/bundletool.jar \
+    https://github.com/google/bundletool/releases/download/1.8.2/bundletool-all-1.8.2.jar
+
 # Set environment variables for Java and Android SDK
 ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH $JAVA_HOME/bin:$PATH
@@ -47,6 +51,10 @@ COPY client/area .
 # Expose necessary ports
 EXPOSE 19000 19001 19002
 
-# Run the EAS build command to generate the APK and move it to the shared volume
-CMD ["sh", "-c", "eas build -p android --local --non-interactive && cp build/*.apk /usr/src/app/shared/client.apk"]
-
+# Run the EAS build command to generate the AAB, convert it to APK, and move it to the shared volume
+CMD ["sh", "-c", "eas build -p android --local --non-interactive && \
+    cp build/*.aab /usr/src/app/shared/client.aab && \
+    java -jar /usr/local/bin/bundletool.jar build-apks --bundle=/usr/src/app/shared/client.aab \
+    --output=/usr/src/app/shared/output.apks --mode=universal && \
+    unzip /usr/src/app/shared/output.apks -d /usr/src/app/shared && \
+    mv /usr/src/app/shared/universal.apk /usr/src/app/shared/client.apk"]
