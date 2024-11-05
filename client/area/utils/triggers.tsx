@@ -46,22 +46,22 @@ const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
 
 // router.get('/add', checkToken, (req, res) => triggerController.add(req, res));
 
-export async function triggerCreateOrUpdate(trigger: any) {
-    try {
-        const token = await getToken();
-        const response = await fetch(`${backendUri}/trigger/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'accept': 'application/json',
-                'authorization': `${token}`,
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify(trigger)
-        });
-        return await response.json();
-    } catch (error) {
-        console.error('Fetch error:', error);
-        return null;
+    export async function triggerCreateOrUpdate(trigger: any) {
+        try {
+            const token = await getToken();
+            const response = await fetch(`${backendUri}/trigger/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': 'application/json',
+                    'authorization': `${token}`,
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify(trigger)
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            return null;
+        }
     }
-}

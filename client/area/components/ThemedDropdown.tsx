@@ -34,14 +34,16 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
+            alignItems: 'center', // this centers the text and chevron vertically
             backgroundColor: fieldBackgroundColor,
-            paddingHorizontal: 10,
-            paddingVertical: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 10, // adjust this to balance top and bottom padding
         },
         label: {
             color: tintColor,
             fontWeight: 'bold',
-            padding: 10,
+            marginHorizontal: 8, // change padding to margin for better control
+            fontSize: 16, // slightly adjust the font size if needed
         },
     });
 
@@ -50,28 +52,27 @@ export function ThemedDropdown({ options, onChange, style, lightColor, darkColor
 
     return (
         <ThemedView style={styles.container}>
-            <Pressable style={styles.mainButton} onPress={() => {setOpened(!opened)}}>
+            <Pressable style={[styles.mainButton, style]} onPress={() => { setOpened(!opened) }}>
                 <ThemedText style={styles.label}>{options[selected].label}</ThemedText>
                 <IconButton
                     icon={opened ? "chevron-up" : "chevron-down"}
                     size={24}
-                    onPress={() => {setOpened(!opened)}}
+                    onPress={() => { setOpened(!opened) }}
                     iconColor={tintColor}
                 />
             </Pressable>
             {opened && options.map((option, index) => {
                 return (
-                    <Pressable style={{backgroundColor: fieldBackgroundColor}} key={index} onPress={() => {
+                    <Pressable style={{ backgroundColor: fieldBackgroundColor, paddingVertical: 8 }} key={index} onPress={() => {
                         if (onChange)
                             onChange(option.value);
                         setSelected(index);
                         setOpened(false);
                     }}>
-                        <ThemedText style={styles.label}>{option.label}</ThemedText>
+                        <ThemedText style={[styles.label, { paddingVertical: 4 }]}>{option.label}</ThemedText>
                     </Pressable>
                 );
             })}
         </ThemedView>
     );
 }
-
