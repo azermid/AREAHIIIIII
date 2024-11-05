@@ -68,6 +68,6 @@ CMD ["sh", "-c", "eas build -p android --local --non-interactive && \
     cp /usr/src/app/build-*.aab /usr/src/app/shared/client.aab && \
     java -jar /usr/local/bin/bundletool.jar build-apks --bundle=/usr/src/app/shared/client.aab \
     --output=/usr/src/app/shared/output.apks --mode=universal \
-    --ks /usr/src/app/android/keystore.jks --ks-pass pass:password123 && \
+    --ks /usr/src/app/android/keystore.jks --ks-key-alias arealias --ks-pass pass:password123 && \
     unzip /usr/src/app/shared/output.apks -d /usr/src/app/shared && \
     mv /usr/src/app/shared/universal.apk /usr/src/app/shared/client.apk"]
