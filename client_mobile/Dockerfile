@@ -57,12 +57,6 @@ RUN keytool -genkey -v \
     -storepass password123 \
     -keypass password123
 
-# Set environment variables for EAS build to use the keystore
-ENV EAS_BUILD_ANDROID_KEYSTORE_PATH=./android/keystore.jks
-ENV EAS_BUILD_ANDROID_KEYSTORE_ALIAS=arealias
-ENV EAS_BUILD_ANDROID_KEYSTORE_PASSWORD=password123
-ENV EAS_BUILD_ANDROID_KEY_PASSWORD=password123
-
 # Expose necessary ports
 EXPOSE 19000 19001 19002
 
