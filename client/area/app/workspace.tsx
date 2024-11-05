@@ -278,14 +278,12 @@ export default function WorkspaceScreen() {
                                 onChange={handleActionServiceChange}
                             />
                         </View>
-                        <View style={{ flex: 1 }}>
-                            <IconButton
-                                icon={'login-variant'}
-                                iconColor='white'
-                                style={{ cursor: 'pointer' }}
-                                onPress={() => handleConnectActionService()}
-                            />
-                        </View>
+                        <IconButton
+                            icon={'login-variant'}
+                            iconColor='white'
+                            style={{ cursor: 'pointer' }}
+                            onPress={() => handleConnectActionService()}
+                        />
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
                         <View style={{ flex: 8, marginRight: 8 }}>
@@ -300,14 +298,12 @@ export default function WorkspaceScreen() {
                                 onChange={handleReactionServiceChange}
                             />
                         </View>
-                        <View style={{ flex: 1 }}>
-                            <IconButton
-                                icon={'login-variant'}
-                                iconColor='white'
-                                style={{ cursor: 'pointer', marginRight: 0 }}
-                                onPress={() => handleConnectReactionService()}
-                            />
-                        </View>
+                        <IconButton
+                            icon={'login-variant'}
+                            iconColor='white'
+                            style={{ cursor: 'pointer', marginRight: 0 }}
+                            onPress={() => handleConnectReactionService()}
+                        />
                     </View>
                     <ThemedDropdown options={actionOptions} onChange={setAction}></ThemedDropdown>
                     <ThemedDropdown options={reactionOptions} onChange={setReaction}></ThemedDropdown>
