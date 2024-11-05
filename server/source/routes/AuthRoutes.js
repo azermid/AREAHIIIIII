@@ -142,7 +142,7 @@ module.exports = (dbConnection) => {
             }
     
             // const redirect = `${redirectUri}&action_token=${spotifyAuthService.action_token}&reaction_token=${spotifyAuthService.reaction_token}`;
-            const redirect = `${redirectUri}?action_token=${spotifyAuthService.action_token}&action_refresh_token=${spotifyAuthService.action_refresh_token}&reaction_token=${spotifyAuthService.reaction_token}&reaction_refresh_token=${spotifyAuthService.reaction_refresh_token}`;
+            const redirect = `${redirectUri}&action_token=${spotifyAuthService.action_token}&action_refresh_token=${spotifyAuthService.action_refresh_token}&reaction_token=${spotifyAuthService.reaction_token}&reaction_refresh_token=${spotifyAuthService.reaction_refresh_token}`;
             return res.redirect(redirect);
         } catch (error) {
             console.error('Error handling Spotify callback:', error);
@@ -175,7 +175,7 @@ module.exports = (dbConnection) => {
             }
     
             // const redirect = `${redirectUri}&action_token=${githubAuthService.action_token}&reaction_token=${githubAuthService.reaction_token}`;
-            const redirect = `${redirectUri}?action_token=${githubAuthService.action_token}&action_refresh_token=${githubAuthService.action_refresh_token}&reaction_token=${githubAuthService.reaction_token}&reaction_refresh_token=${githubAuthService.reaction_refresh_token}`;
+            const redirect = `${redirectUri}&action_token=${githubAuthService.action_token}&action_refresh_token=${githubAuthService.action_refresh_token}&reaction_token=${githubAuthService.reaction_token}&reaction_refresh_token=${githubAuthService.reaction_refresh_token}`;
             return res.redirect(redirect);
         } catch (error) {
             console.error('Error handling GitHub callback:', error);
@@ -207,7 +207,7 @@ module.exports = (dbConnection) => {
             else if (twitchAuthService.serviceType === 'reaction')
                 twitchAuthService.reaction_token = accessToken;
             // const redirect = `${twitchAuthService.redirectURI}?action_token=${twitchAuthService.action_token}&reaction_token=${twitchAuthService.reaction_token}`;
-            const redirect = `${twitchAuthService.redirectURI}?action_token=${twitchAuthService.action_token}&action_refresh_token=${twitchAuthService.action_refresh_token}&reaction_token=${twitchAuthService.reaction_token}&reaction_refresh_token=${twitchAuthService.reaction_refresh_token}`;
+            const redirect = `${twitchAuthService.redirectURI}&action_token=${twitchAuthService.action_token}&action_refresh_token=${twitchAuthService.action_refresh_token}&reaction_token=${twitchAuthService.reaction_token}&reaction_refresh_token=${twitchAuthService.reaction_refresh_token}`;
             return res.redirect(redirect);
         } catch (error) {
             console.error('Error handling Twitch callback:', error);

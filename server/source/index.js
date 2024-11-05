@@ -30,8 +30,8 @@ app.use((req, res, next) => {
     console.log('Database connection established');
 
     startOutlookPollingWorker(60000, dbConnection);
-    startSpotifyPollingWorker(60000, dbConnection);
-    startSpotifyPollingForLikedTracks(30000, dbConnection);
+    startSpotifyPollingWorker(1000, dbConnection);
+    startSpotifyPollingForLikedTracks(1000, dbConnection);
 
 
     // app.use((req, res, next) => {
