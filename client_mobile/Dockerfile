@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 # Install Git, OpenJDK 17, wget, and other dependencies
 RUN apt-get update && \
     apt-get install -y git wget unzip openjdk-17-jdk && \
-    apt-get clean
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Download bundletool to convert aab to apk
 RUN curl -L -o /usr/local/bin/bundletool.jar \
@@ -48,6 +49,9 @@ RUN git init && \
 # Copy the entire project
 COPY client/area .
 
+# Create required directories
+RUN mkdir -p ./android /usr/src/app/shared
+
 # Create a keystore for signing the APK
 RUN keytool -genkey -v \
     -keystore ./android/keystore.jks \
@@ -60,14 +64,13 @@ RUN keytool -genkey -v \
 # Expose necessary ports
 EXPOSE 19000 19001 19002
 
-# Delete previous build files
-RUN rm -rf /usr/src/app/shared/*
-
 # Run the EAS build command to generate the AAB, convert it to APK, and move it to the shared volume
-CMD ["sh", "-c", "eas build -p android --local --non-interactive && \
+CMD ["sh", "-c", "rm -f /usr/src/app/shared/* /usr/src/app/build-*.aab /usr/src/app/shared/output.apks && \
+    eas build -p android --local --non-interactive 2>&1 | tee /usr/src/app/shared/eas_build.log && \
     cp /usr/src/app/build-*.aab /usr/src/app/shared/client.aab && \
     java -jar /usr/local/bin/bundletool.jar build-apks --bundle=/usr/src/app/shared/client.aab \
     --output=/usr/src/app/shared/output.apks --mode=universal \
     --ks /usr/src/app/android/keystore.jks --ks-key-alias arealias --ks-pass pass:password123 && \
-    unzip /usr/src/app/shared/output.apks -d /usr/src/app/shared && \
-    mv /usr/src/app/shared/universal.apk /usr/src/app/shared/client.apk"]
+    unzip -o /usr/src/app/shared/output.apks -d /usr/src/app/shared && \
+    mv /usr/src/app/shared/*universal.apk /usr/src/app/shared/client.apk"]
+
