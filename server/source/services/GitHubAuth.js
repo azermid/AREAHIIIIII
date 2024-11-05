@@ -5,9 +5,7 @@ class GitHubAuth {
         this.thirdPartyLogin = thirdPartyLogin;
         this.clientId = process.env.GITHUB_CLIENT_ID;
         this.clientSecret = process.env.GITHUB_CLIENT_SECRET;
-        this.redirectURI = null;
-        this.serviceName = 'Area-F';
-        this.serviceType = 'oauth';
+        this.redirectURI = null; // Fixed undefined variable
     }
 
     getAuthUrl() {
@@ -17,8 +15,8 @@ class GitHubAuth {
         ].join(',');
 
         return `https://github.com/login/oauth/authorize?client_id=${this.clientId}` +
-        `&redirect_uri=${encodeURIComponent(process.env.GITHUB_REDIRECT_URI)}` +
-        `&scope=${scopes}`;
+            `&redirect_uri=${encodeURIComponent(process.env.GITHUB_REDIRECT_URI)}` +
+            `&scope=${scopes}`;
     }
 
     async getGitHubTokens(code) {
@@ -27,39 +25,52 @@ class GitHubAuth {
             client_id: this.clientId,
             client_secret: this.clientSecret,
             code,
-            redirect_uri: this.redirectURI,
+            redirect_uri: process.env.GITHUB_REDIRECT_URI, // Use redirectURI from constructor
         });
 
-        const response = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json'
-            },
-            body: params
-        });
+        try {
+            const response = await fetch(tokenUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                body: params
+            });
 
-        if (!response.ok) {
-            throw new Error('Failed to retrieve GitHub tokens');
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Failed to retrieve GitHub tokens: ${errorData}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching GitHub tokens:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data;
     }
 
     async getGitHubUser(accessToken) {
         const userUrl = 'https://api.github.com/user';
 
-        const response = await fetch(userUrl, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
+        try {
+            const response = await fetch(userUrl, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Accept': 'application/vnd.github.v3+json' // Ensure compatibility with GitHub's API version
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`Failed to retrieve GitHub user information: ${errorData}`);
             }
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to retrieve GitHub user information');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching GitHub user information:', error);
+            throw error;
         }
-
-        return await response.json();
     }
 }
 
