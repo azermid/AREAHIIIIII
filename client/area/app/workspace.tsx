@@ -72,12 +72,8 @@ export default function WorkspaceScreen() {
                 console.log(workspaceObj.action_service_title);
                 setActionService(workspaceObj.action_service_title);
                 setReactionService(workspaceObj.reaction_service_title);
-                // setAction(workspaceObj.action_title);
-                // @ts-ignore
-                // setAction("new_email"); // placeholder to test
-                // setReaction(workspaceObj.reaction_title);
-                // @ts-ignore
-                // setReaction("send_email"); // placeholder to test
+                setAction(workspaceObj.action_title);
+                setReaction(workspaceObj.reaction_title);
                 setActionServiceToken(workspaceObj.action_service_token);
                 setReactionServiceToken(workspaceObj.reaction_service_token);
                 setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
@@ -86,7 +82,7 @@ export default function WorkspaceScreen() {
                     {
                         // @ts-ignore
                         from: "yann.malaret@outlook.fr",
-                        user: "yann.malaret@outlook.fr"
+                        user: "webepitech@gmail.com",
                     }
                 );
                 setReactionData(
@@ -104,7 +100,7 @@ export default function WorkspaceScreen() {
                     return;
                 }
                 const actionServiceTokenFromURL = urlParams.get('action_token');
-                if (actionServiceTokenFromURL) {
+                if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setActionServiceToken(actionServiceTokenFromURL);
                     console.log('workspaceId', workspaceIdTemp);
@@ -112,28 +108,28 @@ export default function WorkspaceScreen() {
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
                 }
                 const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
-                if (actionServiceRefreshTokenFromURL) {
+                if (actionServiceRefreshTokenFromURL && actionServiceRefreshTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
                 }
                 const reactionServiceTokenFromURL = urlParams.get('reaction_token');
-                if (reactionServiceTokenFromURL) {
+                if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setReactionServiceToken(reactionServiceTokenFromURL);
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
                 }
                 const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
-                if (reactionServiceRefreshTokenFromURL) {
+                if (reactionServiceRefreshTokenFromURL && reactionServiceRefreshTokenFromURL != 'undefined') {
                     // @ts-ignore
                     setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
                 }
                 //clear url
-                window.history.pushState({}, document.title, "/");
+                window.history.pushState({}, document.title, "/workspace");
             }
         }
         getInfoFromURL();
@@ -220,11 +216,10 @@ export default function WorkspaceScreen() {
     }
 
     const handleActionServiceChange = async (service: string) => {
+        // @ts-ignore
         setActionService(service);
         setAction(null); // reset selected action
-        setActionOptions([]); // reset action options to avoid stale options
-        // update workspace
-        //@ts-ignore
+        // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
         if (service) {
             const newActionOptions = await getActions(service);
@@ -249,7 +244,6 @@ export default function WorkspaceScreen() {
         setReaction(null);
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionServiceTitle: service });
-        // setReactionOptions(await getReactions(service, setReaction));
         const newReactionOptions = await getReactions(service);
         if (newReactionOptions.length === 0) {
             console.log('No reactions available for this service');
@@ -263,7 +257,6 @@ export default function WorkspaceScreen() {
                 };
             })
         );
-        // console.log('changed to', service);
     }
 
     return (
@@ -277,6 +270,7 @@ export default function WorkspaceScreen() {
                             <ThemedDropdown
                                 options={
                                     [
+                                        // @ts-ignore
                                         { label: "Choose an action service", value: null },
                                         ...serviceOptions
                                     ]
@@ -298,6 +292,7 @@ export default function WorkspaceScreen() {
                             <ThemedDropdown
                                 options={
                                     [
+                                        // @ts-ignore
                                         { label: "Choose a reaction service", value: null },
                                         ...serviceOptions
                                     ]

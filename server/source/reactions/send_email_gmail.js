@@ -1,6 +1,7 @@
 async function send_email_gmail(token, data) {
     try {
         const { to, text, subject } = data;
+        console.log('token:', token);
 
         // Create raw email content
         const emailContent = [

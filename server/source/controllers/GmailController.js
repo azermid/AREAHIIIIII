@@ -124,6 +124,7 @@ class GmailController {
             // console.log('Received request:', req);
             const message = new Message(req.body.message.data);
             const actionId = await this.actionRepository.getIdByName('new_email_gmail');
+            // console.log('actionId:', actionId);
 
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
                 if (trigger.action_data.user != message.data.emailAddress)

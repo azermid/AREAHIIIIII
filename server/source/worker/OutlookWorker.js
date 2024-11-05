@@ -12,7 +12,7 @@ async function pollOutlookForNewEmails(db, interval) {
     const triggers = await triggerRepository.getByActionId(action_id);
 
     for (const trigger of triggers) {
-        console.log('Processing trigger');
+        // console.log('Processing trigger');
         const response = await fetch(
             "https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages",
             {
@@ -28,17 +28,18 @@ async function pollOutlookForNewEmails(db, interval) {
             return;
         }
         const processFrom = new Date(Date.now() - interval);
-        console.log('Process from:', processFrom);
+        // console.log('Process from:', processFrom);
 
         for (const email of data.value) {
+            // console.log('Processing an email');
             if (email.receivedDateTime < processFrom.toISOString()) {
-                console.log('Skipping email:', email);
+                // console.log('Skipping email cause of time');
                 continue;
             }
             // console.log('Processing email:', email);
             const action_data = trigger.action_data;
             if (email.from.emailAddress.address !== action_data.from) {
-                console.log('Skipping email:', email);
+                // console.log('Skipping email:', email);
                 continue;
             }
             console.log("email matches trigger");
@@ -46,9 +47,10 @@ async function pollOutlookForNewEmails(db, interval) {
             console.log("reaction name", reactionName);
             //send_email_outlook
             const reaction = require(`../reactions/${reactionName}.js`);
-            await reaction(trigger.action_service_token, trigger.reaction_data);
+            await reaction(trigger.reaction_service_token, trigger.reaction_data);
             //do reaction
         }
+        console.log('Finished processing trigger');
     }
 }
 
