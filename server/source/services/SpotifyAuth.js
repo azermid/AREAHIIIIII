@@ -22,9 +22,10 @@ class SpotifyAuthService {
             'user-top-read',
             'user-read-playback-state',
             'user-modify-playback-state',
-            'streaming'
-        ], true);
-    }
+            'streaming',
+            'playlist-modify-public',
+            'playlist-modify-private'
+        ], true);    }
 
     async getSpotifyUser(code) {
         try {
