@@ -12,11 +12,8 @@ class GitHubAuth {
 
     getAuthUrl() {
         const scopes = [
-            'repo', 'repo:status', 'repo_deployment', 'public_repo', 'repo:invite',
-            'admin:org', 'read:org', 'write:org', 'user', 'user:email', 'user:follow',
-            'gist', 'notifications', 'workflow', 'admin:repo_hook', 'admin:org_hook',
-            'read:packages', 'write:packages', 'delete:packages', 'admin:public_key',
-            'admin:gpg_key', 'codespace'
+            'repo', // Full control of private repositories (or use 'public_repo' for public repos only)
+            'admin:repo_hook', // Admin access to repository hooks
         ].join(',');
 
         return `https://github.com/login/oauth/authorize?client_id=${this.clientId}` +

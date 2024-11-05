@@ -74,10 +74,10 @@ export default function WorkspaceScreen() {
                 setReactionService(workspaceObj.reaction_service_title);
                 // setAction(workspaceObj.action_title);
                 // @ts-ignore
-                setAction("new_email"); // placeholder to test
+                // setAction("new_email"); // placeholder to test
                 // setReaction(workspaceObj.reaction_title);
                 // @ts-ignore
-                setReaction("send_email"); // placeholder to test
+                // setReaction("send_email"); // placeholder to test
                 setActionServiceToken(workspaceObj.action_service_token);
                 setReactionServiceToken(workspaceObj.reaction_service_token);
                 setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
@@ -124,7 +124,7 @@ export default function WorkspaceScreen() {
                     setReactionServiceToken(reactionServiceTokenFromURL);
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
-                }    
+                }
                 const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
                 if (reactionServiceRefreshTokenFromURL) {
                     // @ts-ignore
@@ -220,28 +220,28 @@ export default function WorkspaceScreen() {
     }
 
     const handleActionServiceChange = async (service: string) => {
-        // @ts-ignore
         setActionService(service);
-        setAction(null);
-        // @ts-ignore
+        setAction(null); // reset selected action
+        setActionOptions([]); // reset action options to avoid stale options
+        // update workspace
+        //@ts-ignore
         await workspaceUpdate({ id: workspaceId, actionServiceTitle: service });
-        const newActionOptions = await getActions(service);
-        if (newActionOptions.length === 0) {
-            console.log(service);
-            console.log(newActionOptions);
-            console.log('No actions available for this service');
-            return
+        if (service) {
+            const newActionOptions = await getActions(service);
+            if (newActionOptions.length === 0) {
+                console.log('No actions available for this service');
+                return;
+            }
+            setActionOptions(
+                newActionOptions.map((action: any) => {
+                    return {
+                        label: action.description,
+                        value: action.title,
+                    };
+                })
+            );
         }
-        setActionOptions(
-            newActionOptions.map((action: any) => {
-                return {
-                    label: action.description,
-                    value: action.title,
-                };
-            })
-        );
-        // console.log('changed to', service);
-    }
+    };
 
     const handleReactionServiceChange = async (service: string) => {
         // @ts-ignore
@@ -267,19 +267,17 @@ export default function WorkspaceScreen() {
     }
 
     return (
-        //add options to action and reactions
-        <ThemedBackground style={{padding: 0}}>
+        <ThemedBackground style={{ padding: 0 }}>
             <WorkspaceContainer>
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>Workspace name placeholder</ThemedText>
                     <ThemedText>Choose an action service and a reaction service to see the actions/reactions available.</ThemedText>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 8, marginRight: 8 }}>
                             <ThemedDropdown
                                 options={
                                     [
-                                        // @ts-ignore
-                                        {label: "choose a service", value: null, onChange: handleActionServiceChange},
+                                        { label: "Choose an action service", value: null },
                                         ...serviceOptions
                                     ]
                                 }
@@ -287,46 +285,37 @@ export default function WorkspaceScreen() {
                             />
                         </View>
                         <IconButton
-                        icon={'login-variant'}
-                         iconColor='white'
-                        style={{cursor: 'pointer'}}
-                        onPress={() => handleConnectActionService()}
-                        ></IconButton>
+                            icon={'login-variant'}
+                            iconColor='white'
+                            style={{ cursor: 'pointer' }}
+                            onPress={() => handleConnectActionService()}
+                        />
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 8, marginRight: 8 }}>
                             <ThemedDropdown
-                            options={
-                                [
-                                    // @ts-ignore
-                                    // {label: "choose a service", value: null, onChange: handleActionServiceChange},
-                                    // {label: "Gmail", value: "gmail", onChange: handleActionServiceChange},
-                                    // {label: "Outlook", value: "outlook", onChange: handleActionServiceChange},
-                                    {label: "choose a service", value: null},
-                                    ...serviceOptions
-                                ]
-                            }
-                            onChange={handleReactionServiceChange}
+                                options={
+                                    [
+                                        { label: "Choose a reaction service", value: null },
+                                        ...serviceOptions
+                                    ]
+                                }
+                                onChange={handleReactionServiceChange}
                             />
-                            </View>
+                        </View>
                         <IconButton
-                        icon={'login-variant'}
-                        iconColor='white'
-                        style={{cursor: 'pointer', marginRight: 0}}
-                        onPress={() => handleConnectReactionService()}
-                        ></IconButton>
+                            icon={'login-variant'}
+                            iconColor='white'
+                            style={{ cursor: 'pointer', marginRight: 0 }}
+                            onPress={() => handleConnectReactionService()}
+                        />
                     </View>
-                    {/* <ThemedText>Choose an action</ThemedText> */}
                     <ThemedDropdown options={actionOptions} onChange={setAction}></ThemedDropdown>
-                    {/* add action data here */}
-                    {/* <ThemedText>Choose a reaction</ThemedText> */}
                     <ThemedDropdown options={reactionOptions} onChange={setReaction}></ThemedDropdown>
-                    {/* add reaction data here */}
                     <ThemedButton title={"Create"} onPress={() => handleCreate()}></ThemedButton>
                 </ThemedContainer>
-                {/* <ThemedTrigger></ThemedTrigger> */}
-                {/* <ThemedTabContainer tabs={['Actions', 'Reactions']} tabsScreen={[testNode(), null]}/> */}
             </WorkspaceContainer>
         </ThemedBackground>
     );
 }
+
