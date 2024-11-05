@@ -19,11 +19,11 @@ class CrudWorkspace {
         return await this.workspaceRepository.get();
     }
 
-    async update({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId }) {
+    async update({ id, name, userId, actionTitle, reactionTitle, actionData, reactionData, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken }) {
         if (!id) {
             throw new Error('id is required');
         }
-        const workspace = new Workspace({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId });
+        const workspace = new Workspace({ id, name, userId, actionTitle, reactionTitle, actionData, reactionData, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken });
         return await this.workspaceRepository.update(workspace);
     }
 

@@ -29,13 +29,14 @@ CREATE TABLE workspaces (
 	user_id INT,
     action_title VARCHAR(45),
     reaction_title VARCHAR(45),
+    action_data JSON,
+    reaction_data JSON,
     action_service_title VARCHAR(45),
     reaction_service_title VARCHAR(45),
     action_service_token TEXT,
     reaction_service_token TEXT,
     action_service_refresh_token VARCHAR(255),
     reaction_service_refresh_token VARCHAR(255),
-    trigger_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- ALTER TABLE workspaces MODIFY COLUMN action_service_token TEXT;
@@ -67,9 +68,9 @@ CREATE TABLE `reactions` (
     `data` JSON NOT NULL
 );
 
--- DROP TABLE `triggers`;
+-- DROP TABLE triggers;
 CREATE TABLE `triggers` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `workspace_id` INT UNSIGNED NOT NULL,
     `type` enum('polling', 'webhook') NOT NULL,
     `action_id` INT UNSIGNED NOT NULL,
@@ -82,7 +83,6 @@ CREATE TABLE `triggers` (
     `reaction_service_refresh_token` VARCHAR(255),
 	`webhook_url` VARCHAR(255),
     `webhook_secret` VARCHAR(255),
-    PRIMARY KEY (`id`),
     FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`action_id`) REFERENCES `actions` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`reaction_id`) REFERENCES `reactions` (`id`) ON DELETE CASCADE
