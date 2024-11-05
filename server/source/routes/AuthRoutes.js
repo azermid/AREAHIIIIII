@@ -94,15 +94,20 @@ module.exports = (dbConnection) => {
                 const response = await microsoftAuthService.getOutlookTokens(code);
                 // console.log(response);
                 const access_token = response.accessToken;
-                console.log('Access token:', access_token);
+                // console.log('Access token:', access_token);
                 // no refresh token for outlook, it's in cache and will be used automatically by msal
+                let redirect = `${redirectUri}`;
                 if (microsoftAuthService.serviceType == 'action') {
                     microsoftAuthService.action_token = access_token;
+                    redirect += `&action_token=${microsoftAuthService.action_token}`;
+                    redirect += `&action_refresh_token=${microsoftAuthService.action_refresh_token}`;
                 } else if (microsoftAuthService.serviceType == 'reaction') {
                     microsoftAuthService.reaction_token = access_token;
+                    redirect += `&reaction_token=${microsoftAuthService.reaction_token}`;
+                    redirect += `&reaction_refresh_token=${microsoftAuthService.reaction_refresh_token}`;
                 }
-                // const redirect = `${redirectUri}`;
-                const redirect = `${redirectUri}&action_token=${microsoftAuthService.action_token}&action_refresh_token=${microsoftAuthService.action_refresh_token}&reaction_token=${microsoftAuthService.reaction_token}&reaction_refresh_token=${microsoftAuthService.reaction_refresh_token}`;
+                // const redirect = `${redirectUri}&action_token=${microsoftAuthService.action_token}&action_refresh_token=${microsoftAuthService.action_refresh_token}&reaction_token=${microsoftAuthService.reaction_token}&reaction_refresh_token=${microsoftAuthService.reaction_refresh_token}`;
+                console.log('Redirecting to:', redirect);
                 return res.redirect(redirect);
             }
         } catch (error) {
@@ -184,7 +189,7 @@ module.exports = (dbConnection) => {
         const url = twitchAuthService.getAuthUrl();
         return res.redirect(url);
     });
-    
+
     router.get('/twitch/callback', async (req, res) => {
         console.log('Twitch callback');
         try {
@@ -193,13 +198,13 @@ module.exports = (dbConnection) => {
             if (!code) {
                 return res.status(400).send('Code d\'autorisation manquant');
             }
-            const response = await twitchAuthService.getTwitchTokens(code, twitchAuthService.redirectURI);
+            const response = await twitchAuthService.getTwitchTokens(code);
             const accessToken = response.access_token;
             if (twitchAuthService.serviceType === 'action')
                 twitchAuthService.action_token = accessToken;
             else if (twitchAuthService.serviceType === 'reaction')
                 twitchAuthService.reaction_token = accessToken;
-            const redirect = `${twitchAuthService.redirectURI}?action_token=${twitchAuthService.action_token || ''}&reaction_token=${twitchAuthService.reaction_token || ''}`;
+            const redirect = `${twitchAuthService.redirectURI}?action_token=${twitchAuthService.action_token}&reaction_token=${twitchAuthService.reaction_token}`;
             return res.redirect(redirect);
         } catch (error) {
             console.error('Error handling Twitch callback:', error);
