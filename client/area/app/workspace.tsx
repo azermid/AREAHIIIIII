@@ -19,7 +19,6 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
 import { IconButton } from 'react-native-paper';
 import * as Linking from 'expo-linking';
-import { set } from 'cypress/types/lodash';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -302,8 +301,10 @@ export default function WorkspaceScreen() {
     };
 
     // @ts-ignore
-    const handleActionChange = (selectedAction) => {
+    const handleActionChange = async (selectedAction) => {
         setAction(selectedAction);
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, actionTitle: selectedAction });
         // @ts-ignore
         const actionDetails = actionOptions.find((act) => act.value === selectedAction);
         if (actionDetails) {
@@ -313,8 +314,10 @@ export default function WorkspaceScreen() {
     };
 
     // @ts-ignore
-    const handleReactionChange = (selectedReaction) => {
+    const handleReactionChange = async (selectedReaction) => {
         setReaction(selectedReaction);
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, reactionTitle: selectedReaction });
         // @ts-ignore
         const reactionDetails = reactionOptions.find((react) => react.value === selectedReaction);
         if (reactionDetails) {
@@ -367,7 +370,7 @@ export default function WorkspaceScreen() {
                     )}
 
                     {/* Action Data Fields (scalable with multiple rows) */}
-                    {action && (
+                    {action && actionData && (
                         <View style={styles.inputFieldContainer}>
                             {Object.keys(actionData).map((key) => (
                                 <ThemedField
@@ -418,7 +421,7 @@ export default function WorkspaceScreen() {
                     )}
 
                     {/* Reaction Data Fields (scalable with multiple rows) */}
-                    {reaction && (
+                    {reaction && reactionData && (
                         <View style={styles.inputFieldContainer}>
                             {Object.keys(reactionData).map((key) => (
                                 <ThemedField

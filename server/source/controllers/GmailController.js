@@ -96,10 +96,14 @@ class GmailController {
                 // console.log(senderEmail)
                 if (trigger.action_data.from != senderEmail)
                     continue;
-                //TODO call reaction
+                //TODO get email from message.data to give as additionalData to reaction
                 const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
                 const reaction = require(`../reactions/${reactionName}.js`);
-                await reaction(trigger.action_service_token, trigger.reaction_data);
+                const newRefreshToken = await reaction(trigger.action_service_token, trigger.action_service_refresh_token, trigger.reaction_data, message.data);
+                if (newRefreshToken) {
+                    trigger.action_service_token = newRefreshToken;
+                    await this.triggerRepository.update(trigger);
+                }
             }
             res.status(200).send('OK');
         } catch (error) {

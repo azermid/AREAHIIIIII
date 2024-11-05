@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const retryConnection = require('./database');
 const { startOutlookPollingWorker } = require('./worker/OutlookWorker');
+const { startSpotifyPollingWorker, startSpotifyPollingForLikedTracks } = require('./worker/SpotifyWorker');
+
 const app = express();
 
 const backendUri = process.env.BACKEND_URI || 'http://localhost:8080';
@@ -28,6 +30,9 @@ app.use((req, res, next) => {
     console.log('Database connection established');
 
     startOutlookPollingWorker(60000, dbConnection);
+    startSpotifyPollingWorker(60000, dbConnection);
+    startSpotifyPollingForLikedTracks(30000, dbConnection);
+
 
     // app.use((req, res, next) => {
     //   console.log('Headers:', req.headers);
