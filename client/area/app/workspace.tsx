@@ -257,7 +257,7 @@ export default function WorkspaceScreen() {
             window.location.href = backendConnectionUri;
         } else {
             const backendConnectionUri = `${backendUri}/auth/${actionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=action`;
-            const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri);
+            const result = await WebBrowser.openAuthSessionAsync(backendConnectionUri, redirectUri + '/workspace');
             if (result.type === 'success' && result.url) {
                 // @ts-ignore
                 const params = Linking.parse(result.url).queryParams;
@@ -280,6 +280,8 @@ export default function WorkspaceScreen() {
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceId, actionServiceToken: params.action_token, actionServiceRefreshToken: params.action_refresh_token });
                 }
+                // @ts-ignore
+                navigation.navigate('workspace');
             }
         }
     }
@@ -312,6 +314,8 @@ export default function WorkspaceScreen() {
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceId, reactionServiceToken: params.reaction_token, reactionServiceRefreshToken: params.reaction_refresh_token });
                 }
+                // @ts-ignore
+                navigation.navigate('workspace');
             }
         }
     }
