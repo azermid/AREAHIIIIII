@@ -49,7 +49,7 @@ class TwitchController {
 
     async createWebhook(trigger) {
         const actionName = await this.actionRepository.getNameById(trigger.action_id);
-        if (actionName === 'twitch_broadcaster_online') {
+        if (actionName === 'twitch_broadcast') {
             await this.createStreamOnlineWebhook(trigger);
         } else {
             console.log(`No webhook creation logic for action: ${actionName}`);

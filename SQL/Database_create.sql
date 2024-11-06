@@ -42,24 +42,51 @@ CREATE TABLE workspaces (
 -- ALTER TABLE workspaces MODIFY COLUMN action_service_token TEXT;
 -- ALTER TABLE workspaces MODIFY COLUMN reaction_service_token TEXT;
 
--- DROP TABLE IF EXISTS services;
+-- Drop the table if it exists
+DROP TABLE IF EXISTS `services`;
+
+-- Create the table
 CREATE TABLE `services` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
     `description` VARCHAR(455) NULL DEFAULT NULL
 );
 
--- DROP TABLE IF EXISTS actions;
+-- Insert data into the table
+INSERT INTO `services` (`title`, `description`) VALUES
+('gmail', 'Gmail'),
+('outlook', 'Outlook'),
+('github', 'Github'),
+('spotify', 'Spotify'),
+('twitch', 'Twitch');
+
+-- Drop the table if it exists
+DROP TABLE IF EXISTS `actions`;
+
+-- Create the table
 CREATE TABLE `actions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
     `description` VARCHAR(455) NULL DEFAULT NULL,
     `service_id` INT,
-    `type` enum('polling', 'webhook') NOT NULL,
+    `type` ENUM('polling', 'webhook') NOT NULL,
     `data` JSON NOT NULL
 );
 
--- DROP TABLE IF EXISTS reactions;
+-- Insert data into the table
+INSERT INTO `actions` (`title`, `description`, `service_id`, `type`, `data`) VALUES
+('new_email_gmail', 'Mail received', 1, 'webhook', '{"from": "string", "user": "string"}'),
+('new_email_outlook', 'Mail received', 2, 'polling', '{"from": "string", "subject": "string"}'),
+('new_commit', 'New commit', 3, 'webhook', '{}'),
+('new_playlist_spotify', 'Playlist created', 4, 'polling', '{}'),
+('new_liked_music', 'Song liked', 4, 'polling', '{}'),
+('twitch_broadcast', 'Live stream started', 5, 'webhook', '{"name": "string"}');
+
+
+-- Drop the table if it exists
+DROP TABLE IF EXISTS `reactions`;
+
+-- Create the table
 CREATE TABLE `reactions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(45) NOT NULL,
@@ -67,6 +94,14 @@ CREATE TABLE `reactions` (
     `service_id` INT,
     `data` JSON NOT NULL
 );
+
+-- Insert data into the table
+INSERT INTO `reactions` (`title`, `description`, `service_id`, `data`) VALUES
+('send_email_gmail', 'Send an email', 1, '{"to": "string", "string": "string", "subject": "string"}'),
+('send_email_outlook', 'Send an email', 2, '{"to": "string", "string": "string", "subject": "string"}'),
+('create_github_repository', 'Create a repository', 3, '{"name": "string", "description": "string"}'),
+('create_spotify_playlist', 'Create a gist', 4, '{"name": "string", "description": "string", "public": "boolean"}');
+
 
 -- DROP TABLE triggers;
 CREATE TABLE `triggers` (

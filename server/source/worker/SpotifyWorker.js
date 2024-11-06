@@ -52,7 +52,7 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
     const reactionRepository = new ReactionRepository(db);
     const triggerRepository = new TriggerRepository(db);
 
-    const action_id = await actionRepository.getIdByName('new_liked_musique_spotify');
+    const action_id = await actionRepository.getIdByName('new_liked_music_spotify');
     const triggers = await triggerRepository.getByActionId(action_id);
     indice = 0;
     console.log("Polling Spotify for new likes...");
