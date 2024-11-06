@@ -83,6 +83,20 @@ export default function WorkspaceScreen() {
     useFocusEffect(
         useCallback(() => {
             const getInfoFromURL = async () => {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                  // @ts-ignore
+                  navigation.navigate('index');
+                  return;
+                }
+                // @ts-ignore
+                const token_validity = await userVerifyToken(token);
+                if (!token_validity.valid) {
+                  AsyncStorage.removeItem('token');
+                  // @ts-ignore
+                  navigation.navigate('index');
+                  return;
+                }
                 const workspace = await AsyncStorage.getItem('workspace');
                 // @ts-ignore
                 let workspaceObj = null;
