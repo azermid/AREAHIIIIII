@@ -31,7 +31,8 @@ class TwitchController {
             const actionId = await this.actionRepository.getIdByName('twitch_broadcaster_online');
 
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
-
+                if (req.body.event.broadcaster_user_name != trigger.action_data.name)
+                    continue;
                 console.log('Received Twitch event:', req.body);
                 const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
                 const reaction = require(`../reactions/${reactionName}.js`);
