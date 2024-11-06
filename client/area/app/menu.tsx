@@ -12,8 +12,6 @@ import { ThemedText } from '@/components/ThemedText';
 
 import { userVerifyToken } from '@/utils/user';
 import { workspaceGetByUserId, workspaceCreate, workspaceDelete, workspaceUpdate } from '@/utils/workspace';
-import { ThemedHeader } from '@/components/ThemedHeader';
-import { use } from 'chai';
 
 export default function MenuScreen() {
   const [id, setId] = useState('');
@@ -70,15 +68,8 @@ export default function MenuScreen() {
     );
   }
 
-  async function handleLogoutPress() {
-    await AsyncStorage.removeItem('token');
-    // @ts-ignore
-    navigation.navigate('index');
-  }
-
   return (
     <ThemedBackground>
-      <ThemedHeader onLogoutPress={handleLogoutPress} />
       <ThemedContainer border={true} style={styles.container}>
         <ThemedView style={styles.containerLabelContainer}>
           <ThemedText style={styles.containerLabel}>Workspaces</ThemedText>

@@ -19,7 +19,6 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
 import { IconButton } from 'react-native-paper';
 import * as Linking from 'expo-linking';
-import { ThemedHeader } from '@/components/ThemedHeader';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -242,44 +241,6 @@ export default function WorkspaceScreen() {
         console.log('trigger created');
     };
 
-    //     const actionServiceTokenFromURL = urlParams.get('action_token');
-    //     if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
-    //         // @ts-ignore
-    //         setActionServiceToken(actionServiceTokenFromURL);
-    //         workspaceObj.action_service_token = actionServiceTokenFromURL;
-    //         // @ts-ignore
-    //         await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
-    //     }
-
-    //     const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
-    //     if (actionServiceRefreshTokenFromURL) {
-    //         // @ts-ignore
-    //         setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
-    //         workspaceObj.action_service_refresh_token = actionServiceRefreshTokenFromURL;
-    //         // @ts-ignore
-    //         await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
-    //     }
-
-    //     const reactionServiceTokenFromURL = urlParams.get('reaction_token');
-    //     if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
-    //         // @ts-ignore
-    //         setReactionServiceToken(reactionServiceTokenFromURL);
-    //         workspaceObj.reaction_service_token = reactionServiceTokenFromURL;
-    //         // @ts-ignore
-    //         await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
-    //     }
-
-    //     const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
-    //     if (reactionServiceRefreshTokenFromURL) {
-    //         // @ts-ignore
-    //         setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
-    //         workspaceObj.reaction_service_refresh_token = reactionServiceRefreshTokenFromURL;
-    //         // @ts-ignore
-    //         await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
-    //     }
-
-    //     await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
-
     const handleConnectActionService = async () => {
         if (Platform.OS === 'web') {
             const backendConnectionUri = `${backendUri}/auth/${actionService}?redirect_uri=${encodeURIComponent(redirectUri + '/workspace?id=' + workspaceId + '&name=' + workspaceName)}&service_type=action`;
@@ -455,21 +416,9 @@ export default function WorkspaceScreen() {
         await workspaceUpdate({ id: workspaceId, reactionData: { ...reactionData, [field]: value } });
     }
 
-    async function handleLogoutPress() {
-        await AsyncStorage.removeItem('token');
-        // @ts-ignore
-        navigation.navigate('index');
-    }
-
-    async function handleBackPress() {
-        // @ts-ignore
-        navigation.navigate('menu');
-    }
-
     return (
         <ThemedBackground style={{ padding: 0 }}>
             <WorkspaceContainer>
-                <ThemedHeader onLogoutPress={handleLogoutPress} onBackPress={handleBackPress} />
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>{workspaceName}</ThemedText>
 
