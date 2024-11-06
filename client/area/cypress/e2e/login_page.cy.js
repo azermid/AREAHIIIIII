@@ -23,14 +23,14 @@ describe('Login Screen Tests', () => {
     });
   
     it('should show error for incorrect password', () => {
-        cy.get('[data-testid="input-username"]').type('amir');  
+        cy.get('[data-testid="input-username"]').type('test');  
         cy.get('[data-testid="input-password"]').type('wrongPassword');
       cy.contains('-->').click();
       cy.contains('Invalid password').should('be.visible');
     });
 
     it('should login successfully and navigate to menu page', () => {
-        const username = 'amir';
+        const username = 'test';
         const password = '1234';
         cy.get('[data-testid="input-username"]').type(username);
         cy.get('[data-testid="input-password"]').type(password);

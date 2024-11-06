@@ -4,7 +4,7 @@
   "main": "source/index.js",
   "scripts": {
     "start": "node source/index.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand --coverage"
   },
   "keywords": [],
   "author": "",
@@ -17,12 +17,17 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "googleapis": "^144.0.0",
-    "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.3",
     "spotify-web-api-node": "^5.0.2",
     "supertest": "^7.0.0"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3"
+  }
 }

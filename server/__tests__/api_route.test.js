@@ -13,7 +13,7 @@ describe('User Authentication Integration Tests', () => {
         it('should log in successfully with valid credentials', async () => {
             const response = await request(serverUrl)
                 .post('/user/login')
-                .send({ username: 'testuser', password: 'password' });
+                .send({ username: 'test', password: '1234' });
 
             expect(response.statusCode).toBe(200);
             expect(response.body.token).toBeDefined();
@@ -22,7 +22,7 @@ describe('User Authentication Integration Tests', () => {
         it('should return 400 for invalid password', async () => {
             const response = await request(serverUrl)
                 .post('/user/login')
-                .send({ username: 'testuser', password: 'wrongpassword' });
+                .send({ username: 'test', password: 'wrongpassword' });
 
             expect(response.statusCode).toBe(400);
             expect(response.body.error).toBe('Invalid password');
