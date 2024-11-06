@@ -100,6 +100,7 @@ INSERT INTO `reactions` (`title`, `description`, `service_id`, `data`) VALUES
 ('send_email_gmail', 'Send an email', 1, '{"to": "string", "string": "string", "subject": "string"}'),
 ('send_email_outlook', 'Send an email', 2, '{"to": "string", "string": "string", "subject": "string"}'),
 ('create_github_repository', 'Create a repository', 3, '{"name": "string", "description": "string"}'),
+('delete_github_repository', 'Delete a repository', 3, '{"name": "string"}'),
 ('create_spotify_playlist', 'Create a gist', 4, '{"name": "string", "description": "string", "public": "boolean"}');
 
 
