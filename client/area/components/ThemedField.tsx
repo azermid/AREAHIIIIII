@@ -30,7 +30,7 @@
     };
 
     const labelStyle = {
-      top: isFocused || value ? 8 : 15,
+      top: isFocused || value ? 2 : 15,
       left: 10,
       color: tintColor + '80',
       position: 'absolute',
