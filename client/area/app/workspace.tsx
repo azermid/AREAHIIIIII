@@ -280,8 +280,6 @@ export default function WorkspaceScreen() {
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceId, actionServiceToken: params.action_token, actionServiceRefreshToken: params.action_refresh_token });
                 }
-                // @ts-ignore
-                navigation.navigate('workspace');
             }
         }
     }
@@ -314,8 +312,6 @@ export default function WorkspaceScreen() {
                     // @ts-ignore
                     await workspaceUpdate({ id: workspaceId, reactionServiceToken: params.reaction_token, reactionServiceRefreshToken: params.reaction_refresh_token });
                 }
-                // @ts-ignore
-                navigation.navigate('workspace');
             }
         }
     }

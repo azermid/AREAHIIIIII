@@ -46,8 +46,9 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
     const reactionRepository = new ReactionRepository(db);
     const triggerRepository = new TriggerRepository(db);
 
-    const action_id = await actionRepository.getIdByName('new_liked_music_spotify');
+    const action_id = await actionRepository.getIdByName('new_liked_music');
     const triggers = await triggerRepository.getByActionId(action_id);
+
     indice = 0;
     for (const trigger of triggers) {
         const response = await fetch(
@@ -78,7 +79,7 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
             }
             const reactionName = await reactionRepository.getNameById(trigger.reaction_id);
             const reaction = require(`../reactions/${reactionName}.js`);
-            await reaction(trigger.action_service_token, trigger.reaction_data);
+            await reaction(trigger.reaction_service_token, trigger.reaction_service_refresh_token, trigger.reaction_data, null);
         }
     }
 }
