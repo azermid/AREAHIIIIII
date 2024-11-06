@@ -1,7 +1,6 @@
 async function send_email_gmail(token, refreshToken, data, additionalData) {
     try {
         const { to, text, subject } = data;
-        console.log('token:', token);
 
         // Create raw email content
         const emailContent = [
@@ -49,7 +48,6 @@ async function send_email_gmail(token, refreshToken, data, additionalData) {
                 return;
             }
             const data = await response.json();
-            console.log('Refresh token response:', data);
             return data.access_token;
         }
     } catch (error) {

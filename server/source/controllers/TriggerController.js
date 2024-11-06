@@ -64,7 +64,6 @@ class TriggerController {
 
     async add(req, res) {
         try {
-            // console.log('req.body:', req.body);
             const { workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret } = req.body;
             const trigger = await this.crudTrigger.add({ workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret });
             res.json(trigger);

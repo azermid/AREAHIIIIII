@@ -45,7 +45,6 @@ class GmailController {
             // Step 2: Retrieve each message's metadata to find the "From" header
             for (const messageId of messageIds) {
                 if (messageId === this.lastProcessedEmail) {
-                    console.log('Same email as before. doing nothing...');
                     return 'Unknown sender';
                 }
                 this.lastProcessedEmail = messageId;
@@ -79,10 +78,8 @@ class GmailController {
 
     async watch(req, res) {
         try {
-            // console.log('Received request:', req);
             const message = new Message(req.body.message.data);
             const actionId = await this.actionRepository.getIdByName('new_email_gmail');
-            // console.log('actionId:', actionId);
 
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
                 if (trigger.action_data.user != message.data.emailAddress)
@@ -93,7 +90,6 @@ class GmailController {
                 const sender = await this.getSendersOfRecentEmails(authClient);
                 const match = sender.match(/<([^>]+)>/);
                 const senderEmail = match ? match[1] : sender;
-                // console.log(senderEmail)
                 if (trigger.action_data.from != senderEmail)
                     continue;
                 //TODO get email from message.data to give as additionalData to reaction
@@ -139,9 +135,7 @@ class GmailController {
                 throw new Error(`Failed to register: ${response.statusText}`);
             }
             const data = await response.json();
-            console.log('Watch response:', data);
         } catch (error) {
-            console.log('Invalid credentials. Refreshing token...');
             const refreshToken = trigger.action_service_refresh_token;
             const response = await fetch('https://oauth2.googleapis.com/token', {
                 method: 'POST',
@@ -160,7 +154,6 @@ class GmailController {
                 return;
             }
             const data = await response.json();
-            console.log('Refresh token response:', data);
             trigger.action_service_token = data.access_token;
             await this.triggerRepository.update(trigger);
             // TODO: need to re-register the subscription then
