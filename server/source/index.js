@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const retryConnection = require('./database');
 const { startOutlookPollingWorker } = require('./worker/OutlookWorker');
-const { startSpotifyPollingWorker, startSpotifyPollingForLikedTracks } = require('./worker/SpotifyWorker');
+const { startSpotifyPollingWorker } = require('./worker/SpotifyWorker');
 
 const app = express();
 
@@ -31,8 +31,6 @@ app.use((req, res, next) => {
 
     startOutlookPollingWorker(60000, dbConnection);
     startSpotifyPollingWorker(30000, dbConnection);
-    startSpotifyPollingForLikedTracks(30000, dbConnection);
-
 
     // app.use((req, res, next) => {
     //   console.log('Headers:', req.headers);

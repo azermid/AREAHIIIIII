@@ -19,6 +19,7 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
 import { IconButton } from 'react-native-paper';
 import * as Linking from 'expo-linking';
+import { userVerifyToken } from '@/utils/user';
 
 WebBrowser.maybeCompleteAuthSession();
 
