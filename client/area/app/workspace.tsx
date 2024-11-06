@@ -89,7 +89,7 @@ export default function WorkspaceScreen() {
                 let workspaceIdTemp = null;
                 if (workspace) {
                     workspaceObj = JSON.parse(workspace);
-                    console.log(workspaceObj);
+                    // console.log(workspaceObj);
                     setWorkspaceId(workspaceObj.id);
                     workspaceIdTemp = workspaceObj.id;
                     setWorkspaceName(workspaceObj.name);
@@ -111,10 +111,6 @@ export default function WorkspaceScreen() {
                                 const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
                                 // clean up default values
                                 Object.keys(data).forEach((key) => {
-                                    // if (data[key] === "string") {
-                                    //     data[key] = ""; // replace "string" with empty string
-                                    // }
-                                    // if data null or string, replace with empty string
                                     data[key] = "";
                                 });
                                 return {
@@ -143,9 +139,6 @@ export default function WorkspaceScreen() {
                                 const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                                 // clean up default values
                                 Object.keys(data).forEach((key) => {
-                                    // if (data[key] === "string" || data[key] === "null") {
-                                    //     data[key] = ""; // replace "string" with empty string
-                                    // }
                                     data[key] = "";
                                 });
                                 return {
@@ -227,17 +220,17 @@ export default function WorkspaceScreen() {
         console.log('Creating AREA');
         const trigger = {
             workspace_id: workspaceId,
-            type: await actionGetType(action), // get type from action title
-            action_id: await actionGetId(action), // get id from action title
-            reaction_id: await reactionGetId(reaction), // get id from reaction title
+            type: await actionGetType(action),
+            action_id: await actionGetId(action),
+            reaction_id: await reactionGetId(reaction),
             action_data: actionData,
             reaction_data: reactionData,
             action_service_token: actionServiceToken,
             reaction_service_token: reactionServiceToken,
             action_service_refresh_token: actionServiceRefreshToken,
             reaction_service_refresh_token: reactionServiceRefreshToken,
-            webhook_url: null, // get from action, if type is webhook
-            webhook_secret: null, // get from action, if type is webhook
+            webhook_url: null, //useless
+            webhook_secret: null, //useless
         }
         await triggerCreateOrUpdate(trigger);
         console.log('trigger created');
@@ -332,9 +325,7 @@ export default function WorkspaceScreen() {
                             const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                data[key] = "";
                             });
                             return {
                                 label: action.description,
@@ -374,9 +365,7 @@ export default function WorkspaceScreen() {
                             const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string" || data[key] === "null") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                data[key] = "";
                             });
                             return {
                                 label: reaction.description,
@@ -507,7 +496,6 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={actionData[key]}
-                                    // onChange={(text) => setActionData({ ...actionData, [key]: text })}
                                     onChange={(text) => handleActionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
@@ -560,7 +548,6 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={reactionData[key]}
-                                    // onChange={(text) => setReactionData({ ...reactionData, [key]: text })}
                                     onChange={(text) => handleReactionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
