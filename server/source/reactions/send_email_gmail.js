@@ -29,11 +29,7 @@ async function send_email_gmail(token, refreshToken, data, additionalData) {
             const result = await response.json();
             if (!response.ok) {
                 console.error("Failed to send email:", result.error);
-                return result;
             }
-
-            // console.log("Email sent successfully:", result);
-            return result;
         } catch (error) {
             //TODO refresh token
             const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -55,8 +51,6 @@ async function send_email_gmail(token, refreshToken, data, additionalData) {
             const data = await response.json();
             console.log('Refresh token response:', data);
             return data.access_token;
-            // trigger.action_service_token = data.access_token;
-            // await this.triggerRepository.update(trigger);
         }
     } catch (error) {
         console.error("Error sending email:", error);
