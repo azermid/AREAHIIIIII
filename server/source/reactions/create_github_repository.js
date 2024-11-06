@@ -1,6 +1,5 @@
 async function create_github_repository(token, refreshToken, data, additionalData) {
     try {
-        console.log('token:', token);
         // Step 1: Get the authenticated user (owner) using the GitHub token
         const userResponse = await fetch(`https://api.github.com/user`, {
             headers: {
@@ -37,7 +36,6 @@ async function create_github_repository(token, refreshToken, data, additionalDat
         }
 
         const repoData = await repoResponse.json();
-        console.log("Repository created successfully:", repoData);
     } catch (error) {
         console.error("Error creating GitHub repo:", error);
         throw error;

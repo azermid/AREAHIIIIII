@@ -33,7 +33,6 @@ class TwitchController {
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
                 if (req.body.event.broadcaster_user_name != trigger.action_data.name)
                     continue;
-                console.log('Received Twitch event:', req.body);
                 const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
                 const reaction = require(`../reactions/${reactionName}.js`);
                 const newRefreshToken = await reaction(trigger.reaction_service_token, trigger.action_service_refresh_token, trigger.reaction_data, null);
@@ -87,9 +86,7 @@ class TwitchController {
             });
     
             const data = await response.json();
-            if (response.ok) {
-                console.log('Webhook created:', data);
-            } else {
+            if (!response.ok) {
                 console.error('Error creating Twitch webhook:', data);
             }
         } catch (error) {

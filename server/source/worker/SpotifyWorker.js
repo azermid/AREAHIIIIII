@@ -9,7 +9,6 @@ async function pollSpotifyForNewPlaylists(db, interval) {
 
     const action_id = await actionRepository.getIdByName('new_playlist_spotify');
     const triggers = await triggerRepository.getByActionId(action_id);
-    console.log(triggers)
 
     for (const trigger of triggers) {
         const response = await fetch(
@@ -35,7 +34,6 @@ async function pollSpotifyForNewPlaylists(db, interval) {
                 continue;
             }
 
-            console.log("Playlist matches trigger");
             const reactionName = await reactionRepository.getNameById(trigger.reaction_id);
             const reaction = require(`../reactions/${reactionName}.js`);
             await reaction(trigger.action_service_token, trigger.reaction_data);
@@ -57,9 +55,8 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
     const action_id = await actionRepository.getIdByName('new_liked_musique_spotify');
     const triggers = await triggerRepository.getByActionId(action_id);
     indice = 0;
-    console.log("like search");
+    console.log("Polling Spotify for new likes...");
     for (const trigger of triggers) {
-        console.log("like search launch");
         const response = await fetch(
             "https://api.spotify.com/v1/me/tracks",
             {
@@ -86,7 +83,6 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
             if (addedAt < processFrom) {
                 continue;
             }
-            console.log("Track matches trigger");
             const reactionName = await reactionRepository.getNameById(trigger.reaction_id);
             const reaction = require(`../reactions/${reactionName}.js`);
             await reaction(trigger.action_service_token, trigger.reaction_data);

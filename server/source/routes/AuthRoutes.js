@@ -55,7 +55,6 @@ module.exports = (dbConnection) => {
                 return res.redirect(`${redirectUri}?token=${token}`); // Redirect the user back to the app with the token
             } else if (googleAuthService.serviceName === 'gmail') {
                 const tokens = await googleAuthService.getGmailTokens(code);
-                // console.log(tokens);
                 const access_token = tokens.access_token;
                 const refresh_token = tokens.refresh_token;
                 if (googleAuthService.serviceType == 'action') {
@@ -85,16 +84,13 @@ module.exports = (dbConnection) => {
     });
 
     router.get('/microsoft/callback', async (req, res) => {
-        console.log('Microsoft callback');
         try {
             const code = req.query.code;
             const redirectUri = microsoftAuthService.redirectURI || 'http://localhost:8081';
 
             if (microsoftAuthService.serviceName === 'outlook') {
                 const response = await microsoftAuthService.getOutlookTokens(code);
-                // console.log(response);
                 const access_token = response.accessToken;
-                // console.log('Access token:', access_token);
                 // no refresh token for outlook, it's in cache and will be used automatically by msal
                 let redirect = `${redirectUri}`;
                 if (microsoftAuthService.serviceType == 'action') {
@@ -107,7 +103,6 @@ module.exports = (dbConnection) => {
                     redirect += `&reaction_refresh_token=${microsoftAuthService.reaction_refresh_token}`;
                 }
                 // const redirect = `${redirectUri}&action_token=${microsoftAuthService.action_token}&action_refresh_token=${microsoftAuthService.action_refresh_token}&reaction_token=${microsoftAuthService.reaction_token}&reaction_refresh_token=${microsoftAuthService.reaction_refresh_token}`;
-                console.log('Redirecting to:', redirect);
                 return res.redirect(redirect);
             }
         } catch (error) {
@@ -121,19 +116,16 @@ module.exports = (dbConnection) => {
         spotifyAuthService.serviceName = "spotify";
         spotifyAuthService.serviceType = req.query.service_type;
         const url = spotifyAuthService.getAuthUrl();
-        console.log(url)
         return res.redirect(url);
     });
     
     router.get('/spotify/callback', async (req, res) => {
-        console.log('Spotify callback');
         try {
             const code = req.query.code;
             const redirectUri = spotifyAuthService.redirectURI || 'http://localhost:8081';
     
             const response = await spotifyAuthService.getSpotifyTokens(code);
             const access_token = response.accessToken;
-            console.log('Access token:', access_token);
     
             if (spotifyAuthService.serviceType == 'action') {
                 spotifyAuthService.action_token = access_token;
@@ -159,13 +151,11 @@ module.exports = (dbConnection) => {
     });
     
     router.get('/github/callback', async (req, res) => {
-        console.log('GitHub callback');
         try {
             const code = req.query.code;
             const redirectUri = githubAuthService.redirectURI || 'http://localhost:8081';
     
             const response = await githubAuthService.getGitHubTokens(code);
-            console.log(response)
             const accessToken = response.access_token;
     
             if (githubAuthService.serviceType === 'action') {
@@ -193,7 +183,6 @@ module.exports = (dbConnection) => {
     });
 
     router.get('/twitch/callback', async (req, res) => {
-        console.log('Twitch callback');
         try {
             const code = req.query.code;
             

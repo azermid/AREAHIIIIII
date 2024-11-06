@@ -24,7 +24,6 @@ class UserRepository {
     async create(user) {
         const sql = 'INSERT INTO users (username, email, password, oauth_id, oauth_provider) VALUES (?, ?, ?, ?, ?)';
         const values = [user.username, user.email, user.password, user.oauth_id, user.oauth_provider];
-        // console.log('Values: ', values);
         return await this.database.execute(sql, values);
     }
 }
