@@ -12,6 +12,7 @@ class GitHubAuth {
         const scopes = [
             'repo', // Full control of private repositories (or use 'public_repo' for public repos only)
             'admin:repo_hook', // Admin access to repository hooks
+            'delete_repo' // Delete repositories
         ].join(',');
 
         return `https://github.com/login/oauth/authorize?client_id=${this.clientId}` +
