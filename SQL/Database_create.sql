@@ -75,7 +75,7 @@ CREATE TABLE `actions` (
 
 -- Insert data into the table
 INSERT INTO `actions` (`title`, `description`, `service_id`, `type`, `data`) VALUES
-('new_email_gmail', 'Mail received', 1, 'webhook', '{"from": "string", "user": "string"}'),
+('new_email_gmail', 'Mail received', 1, 'webhook', '{"from": "string"}'),
 ('new_email_outlook', 'Mail received', 2, 'polling', '{"from": "string", "subject": "string"}'),
 ('new_commit', 'New commit', 3, 'webhook', '{}'),
 ('new_playlist_spotify', 'Playlist created', 4, 'polling', '{}'),
