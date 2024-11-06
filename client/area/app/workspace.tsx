@@ -142,9 +142,10 @@ export default function WorkspaceScreen() {
                             const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string" || data[key] === "null") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                // if (data[key] === "string" || data[key] === "null") {
+                                //     data[key] = ""; // replace "string" with empty string
+                                // }
+                                data[key] = "";
                             });
                             return {
                                 label: reaction.description,
