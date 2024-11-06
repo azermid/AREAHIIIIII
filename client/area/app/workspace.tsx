@@ -110,9 +110,11 @@ export default function WorkspaceScreen() {
                             const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                // if (data[key] === "string") {
+                                //     data[key] = ""; // replace "string" with empty string
+                                // }
+                                // if data null or string, replace with empty string
+                                data[key] = "";
                             });
                             return {
                                 label: action.description,
@@ -237,6 +239,44 @@ export default function WorkspaceScreen() {
         await triggerCreateOrUpdate(trigger);
         console.log('trigger created');
     };
+
+    //     const actionServiceTokenFromURL = urlParams.get('action_token');
+    //     if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
+    //         // @ts-ignore
+    //         setActionServiceToken(actionServiceTokenFromURL);
+    //         workspaceObj.action_service_token = actionServiceTokenFromURL;
+    //         // @ts-ignore
+    //         await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
+    //     }
+
+    //     const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
+    //     if (actionServiceRefreshTokenFromURL) {
+    //         // @ts-ignore
+    //         setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
+    //         workspaceObj.action_service_refresh_token = actionServiceRefreshTokenFromURL;
+    //         // @ts-ignore
+    //         await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
+    //     }
+
+    //     const reactionServiceTokenFromURL = urlParams.get('reaction_token');
+    //     if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
+    //         // @ts-ignore
+    //         setReactionServiceToken(reactionServiceTokenFromURL);
+    //         workspaceObj.reaction_service_token = reactionServiceTokenFromURL;
+    //         // @ts-ignore
+    //         await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
+    //     }
+
+    //     const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
+    //     if (reactionServiceRefreshTokenFromURL) {
+    //         // @ts-ignore
+    //         setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
+    //         workspaceObj.reaction_service_refresh_token = reactionServiceRefreshTokenFromURL;
+    //         // @ts-ignore
+    //         await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
+    //     }
+
+    //     await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
 
     const handleConnectActionService = async () => {
         if (Platform.OS === 'web') {
