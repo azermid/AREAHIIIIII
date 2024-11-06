@@ -13,10 +13,25 @@ class TwitchController {
     }
 
     async initialize() {
-        const actionId = await this.actionRepository.getIdByName('twitch_broadcaster_online');
-        const triggers = await this.triggerRepository.getByActionId(actionId);
+        // const actionId = await this.actionRepository.getIdByName('twitch_broadcaster_online');
+        // const triggers = await this.triggerRepository.getByActionId(actionId);
+        // for (const trigger of triggers) {
+        //     this.createWebhook(trigger);
+        // }
+        const triggers = await this.triggerRepository.get();
         for (const trigger of triggers) {
             this.createWebhook(trigger);
+        }
+    }
+
+    async createWebhook(trigger) {
+        const actionName = await this.actionRepository.getNameById(trigger.action_id);
+        switch (actionName) {
+            case 'twitch_broadcast':
+                this.createPushWebhook(trigger);
+                break;
+            default:
+                break;
         }
     }
 
@@ -44,15 +59,6 @@ class TwitchController {
             res.status(200).send();
         } else {
             res.status(400).json({ error: 'Invalid request' });
-        }
-    }
-
-    async createWebhook(trigger) {
-        const actionName = await this.actionRepository.getNameById(trigger.action_id);
-        if (actionName === 'twitch_broadcast') {
-            await this.createStreamOnlineWebhook(trigger);
-        } else {
-            console.log(`No webhook creation logic for action: ${actionName}`);
         }
     }
 

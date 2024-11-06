@@ -1,7 +1,8 @@
 const express = require('express');
 const TriggerController = require('../controllers/TriggerController');
 const CrudTrigger = require('../useCases/CrudTrigger');
-const TriggerRepository = require('../repositories/TriggerRepository')
+const TriggerRepository = require('../repositories/TriggerRepository');
+const TriggerRegister = require('../utils/TriggerRegister');
 const checkToken = require('../middleware/CheckToken');
 
 module.exports = (dbConnection) => {
@@ -9,7 +10,8 @@ module.exports = (dbConnection) => {
 
     const triggerRepository = new TriggerRepository(dbConnection);
     const crudTrigger = new CrudTrigger(triggerRepository);
-    const triggerController = new TriggerController(crudTrigger);
+    const triggerRegister = new TriggerRegister(dbConnection);
+    const triggerController = new TriggerController(crudTrigger, triggerRegister);
 
     router.post('/create', checkToken, (req, res) => triggerController.create(req, res));
     router.get('/get', checkToken, (req, res) => triggerController.get(req, res));
