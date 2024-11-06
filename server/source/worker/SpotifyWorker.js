@@ -41,12 +41,6 @@ async function pollSpotifyForNewPlaylists(db, interval) {
     }
 }
 
-function startSpotifyPollingWorker(interval, db) {
-    setInterval(async () => {
-        await pollSpotifyForNewPlaylists(db, interval);
-    }, interval);
-}
-
 async function pollSpotifyForNewLikedTracks(db, interval) {
     const actionRepository = new ActionRepository(db);
     const reactionRepository = new ReactionRepository(db);
@@ -55,7 +49,6 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
     const action_id = await actionRepository.getIdByName('new_liked_music_spotify');
     const triggers = await triggerRepository.getByActionId(action_id);
     indice = 0;
-    console.log("Polling Spotify for new likes...");
     for (const trigger of triggers) {
         const response = await fetch(
             "https://api.spotify.com/v1/me/tracks",
@@ -90,11 +83,12 @@ async function pollSpotifyForNewLikedTracks(db, interval) {
     }
 }
 
-function startSpotifyPollingForLikedTracks(interval, db) {
+function startSpotifyPollingWorker(interval, db) {
     setInterval(async () => {
+        console.log("Polling Spotify for new likes and playlists");
+        await pollSpotifyForNewPlaylists(db, interval);
         await pollSpotifyForNewLikedTracks(db, interval);
     }, interval);
 }
 
-
-module.exports = { startSpotifyPollingWorker, startSpotifyPollingForLikedTracks };
+module.exports = { startSpotifyPollingWorker };
