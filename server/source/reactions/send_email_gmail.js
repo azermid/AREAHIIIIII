@@ -14,6 +14,7 @@ async function trySendEmailGmail(token, encodedEmail) {
         const result = await response.json();
         if (!response.ok) {
             console.error("Failed to send email:", result.error);
+            return false;
         }
     } catch (error) {
         console.error("Error sending email:", error);

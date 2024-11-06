@@ -1,6 +1,7 @@
 class TriggerController {
-    constructor(crudTrigger) {
+    constructor(crudTrigger, triggerRegister) {
         this.crudTrigger = crudTrigger;
+        this.triggerRegister = triggerRegister;
     }
 
     async create(req, res) {
@@ -66,6 +67,7 @@ class TriggerController {
         try {
             const { workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret } = req.body;
             const trigger = await this.crudTrigger.add({ workspace_id, type, action_id, reaction_id, action_data, reaction_data, action_service_token, reaction_service_token, action_service_refresh_token, reaction_service_refresh_token, webhook_url, webhook_secret });
+            this.triggerRegister.registerNewTrigger(trigger);
             res.json(trigger);
         } catch (error) {
             res.status(400).json({ error: error.message });
