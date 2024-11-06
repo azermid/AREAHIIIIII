@@ -1,14 +1,14 @@
 const fetch = require('node-fetch');
 const TriggerRepository = require('../repositories/TriggerRepository');
 const ActionRepository = require('../repositories/ActionRepository');
+const ReactionRepository = require('../repositories/ReactionRepository');
 require('dotenv').config();
 
 class GithubController {
     constructor(dbConnection) {
-        // this.pubsub = new PubSub();
-        // this.subscriptionName = 'projects/area-436514/subscriptions/new_email';
         this.triggerRepository = new TriggerRepository(dbConnection);
         this.actionRepository = new ActionRepository(dbConnection);
+        this.reactionRepository = new ReactionRepository(dbConnection);
         this.initialize();
     }
 
@@ -22,7 +22,44 @@ class GithubController {
 
     async watch(req, res) {
         try {
-            console.log('Received request:', req.body);
+            const actionId = await this.actionRepository.getIdByName('new_commit');
+
+            if (!req.body.commits) {
+                res.status(200).send();
+                return;
+            }
+
+            for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
+                const userResponse = await fetch(`https://api.github.com/user`, {
+                    headers: {
+                        'Authorization': `Bearer ${trigger.action_service_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+        
+                if (!userResponse.ok) {
+                    const userData = await userResponse.json();
+                    throw new Error(`Error fetching user info: ${userData.message}`);
+                }
+        
+                const userData = await userResponse.json();
+                const username = userData.login; // This is the GitHub username
+
+                if (req.body.repository.owner.login != username) {
+                    continue;
+                }
+
+                const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
+                console.log(reactionName);
+                const reaction = require(`../reactions/${reactionName}.js`);
+                const newRefreshToken = await reaction(trigger.reaction_service_token, trigger.action_service_refresh_token, trigger.reaction_data, req.body);
+                
+                if (newRefreshToken) {
+                    trigger.action_service_token = newRefreshToken;
+                    await this.triggerRepository.update(trigger);
+                }
+            }
+
             res.status(200).send();
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -61,7 +98,7 @@ class GithubController {
             const username = userData.login; // This is the GitHub username
     
             // Step 2: Set up the webhook on the repository for that user
-            const repoName = "TestArea"; // TODO: Replace with logic to get repo name from trigger, if needed
+            const repoName = trigger.action_data.repository; // TODO: Replace with logic to get repo name from trigger, if needed
             const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/hooks`, {
                 method: 'POST',
                 headers: {
