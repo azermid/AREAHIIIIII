@@ -1,5 +1,6 @@
 async function create_github_repository(token, refreshToken, data, additionalData) {
     try {
+        console.log('token:', token);
         // Step 1: Get the authenticated user (owner) using the GitHub token
         const userResponse = await fetch(`https://api.github.com/user`, {
             headers: {
