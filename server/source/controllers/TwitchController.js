@@ -1,0 +1,105 @@
+const fetch = require('node-fetch');
+const TriggerRepository = require('../repositories/TriggerRepository');
+const ActionRepository = require('../repositories/ActionRepository');
+require('dotenv').config();
+
+class TwitchController {
+    constructor(dbConnection) {
+        this.triggerRepository = new TriggerRepository(dbConnection);
+        this.actionRepository = new ActionRepository(dbConnection);
+        this.initialize();
+    }
+
+    async initialize() {
+        const actionId = await this.actionRepository.getIdByName('broadcaster_online');
+        const triggers = await this.triggerRepository.getByActionId(actionId);
+        for (const trigger of triggers) {
+            this.createWebhook(trigger);
+        }
+    }
+
+    async watch(req, res) {
+        // Handling Twitch's EventSub verification challenge
+        if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
+            return res.status(200).send(req.body.challenge);
+        }
+
+        // Handling the actual event
+        if (req.body && req.body.subscription && req.body.event) {
+            console.log('Received Twitch event:', req.body.event);
+            res.status(200).send();
+        } else {
+            res.status(400).json({ error: 'Invalid request' });
+        }
+    }
+
+    async createWebhook(trigger) {
+        const actionName = await this.actionRepository.getNameById(trigger.action_id);
+        if (actionName === 'twitch_broadcaster_online') {
+            await this.createStreamOnlineWebhook(trigger);
+        } else {
+            console.log(`No webhook creation logic for action: ${actionName}`);
+        }
+    }
+
+    async createStreamOnlineWebhook(trigger) {
+        try {
+            const broadcasterId = await this.getBroadcasterId(trigger.name, trigger.action_service_token);
+            if (!broadcasterId) throw new Error('Broadcaster ID not found.');
+
+            const response = await fetch('https://api.twitch.tv/helix/eventsub/subscriptions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${trigger.action_service_token}`,
+                    'Client-Id': process.env.TWITCH_CLIENT_ID,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: 'stream.online',
+                    version: '1',
+                    condition: {
+                        broadcaster_user_id: broadcasterId
+                    },
+                    transport: {
+                        method: 'webhook',
+                        callback: process.env.TWITCH_WEBHOOK_URI,
+                        secret: process.env.TWITCH_WEBHOOK_SECRET
+                    }
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log('Webhook created:', data);
+            } else {
+                console.error('Error creating Twitch webhook:', data);
+            }
+        } catch (error) {
+            console.error('Error registering Twitch subscription:', error);
+        }
+    }
+
+    async getBroadcasterId(broadcasterName, token) {
+        try {
+            const response = await fetch(`https://api.twitch.tv/helix/users?login=${broadcasterName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Client-Id': process.env.TWITCH_CLIENT_ID
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.data.length > 0) {
+                return data.data[0].id;
+            } else {
+                console.error('Error fetching broadcaster ID:', data);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error in getBroadcasterId:', error);
+            return null;
+        }
+    }
+}
+
+module.exports = TwitchController;
