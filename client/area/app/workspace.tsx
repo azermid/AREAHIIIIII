@@ -19,6 +19,7 @@ import { workspaceUpdate } from '@/utils/workspace';
 import { triggerCreateOrUpdate } from '@/utils/triggers';
 import { IconButton } from 'react-native-paper';
 import * as Linking from 'expo-linking';
+import { ThemedHeader } from '@/components/ThemedHeader';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -294,6 +295,13 @@ export default function WorkspaceScreen() {
                     return;
                 }
                 if (params.action_token && params.action_refresh_token) {
+                    const workspace = await AsyncStorage.getItem('workspace');
+                    if (workspace) {
+                        const workspaceObj = JSON.parse(workspace);
+                        workspaceObj.action_service_token = params.action_token;
+                        workspaceObj.action_service_refresh_token = params.action_refresh_token;
+                        await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+                    }
                     // @ts-ignore
                     setActionServiceToken(params.action_token);
                     // @ts-ignore
@@ -319,6 +327,13 @@ export default function WorkspaceScreen() {
                     return;
                 }
                 if (params.reaction_token && params.reaction_refresh_token) {
+                    const workspace = await AsyncStorage.getItem('workspace');
+                    if (workspace) {
+                        const workspaceObj = JSON.parse(workspace);
+                        workspaceObj.reaction_service_token = params.reaction_token;
+                        workspaceObj.reaction_service_refresh_token = params.reaction_refresh_token;
+                        await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+                    }
                     // @ts-ignore
                     setReactionServiceToken(params.reaction_token);
                     // @ts-ignore
@@ -440,9 +455,21 @@ export default function WorkspaceScreen() {
         await workspaceUpdate({ id: workspaceId, reactionData: { ...reactionData, [field]: value } });
     }
 
+    async function handleLogoutPress() {
+        await AsyncStorage.removeItem('token');
+        // @ts-ignore
+        navigation.navigate('index');
+    }
+
+    async function handleBackPress() {
+        // @ts-ignore
+        navigation.navigate('menu');
+    }
+
     return (
         <ThemedBackground style={{ padding: 0 }}>
             <WorkspaceContainer>
+                <ThemedHeader onLogoutPress={handleLogoutPress} onBackPress={handleBackPress} />
                 <ThemedContainer border={true} dropShadow={true}>
                     <ThemedText>{workspaceName}</ThemedText>
 
