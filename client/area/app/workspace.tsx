@@ -77,12 +77,13 @@ export default function WorkspaceScreen() {
     const [actionOptions, setActionOptions] = useState([]);
     const [reactionOptions, setReactionOptions] = useState([]);
 
-    const [actionData, setActionData] = useState({}); // initialize with empty object
-    const [reactionData, setReactionData] = useState({}); // initialize with empty object
+    const [actionData, setActionData] = useState({});
+    const [reactionData, setReactionData] = useState({});
 
     useEffect(() => {
         const getInfoFromURL = async () => {
             const workspace = await AsyncStorage.getItem('workspace');
+            // @ts-ignore
             let workspaceObj = null;
             let workspaceIdTemp = null;
             if (workspace) {
@@ -101,6 +102,66 @@ export default function WorkspaceScreen() {
                 setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
                 setActionData(workspaceObj.action_data);
                 setReactionData(workspaceObj.reaction_data);
+                if (workspaceObj.action_service_title) {
+                    const newActionOptions = await getActions(workspaceObj.action_service_title);
+                    if (newActionOptions.length > 0) {
+                        // @ts-ignore
+                        const cleanedActionOptions = newActionOptions.map((action) => {
+                            const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
+                            // clean up default values
+                            Object.keys(data).forEach((key) => {
+                                if (data[key] === "string") {
+                                    data[key] = ""; // replace "string" with empty string
+                                }
+                            });
+                            return {
+                                label: action.description,
+                                value: action.title,
+                                data,
+                            };
+                        });
+                        console.log(cleanedActionOptions);
+                        setActionOptions(cleanedActionOptions);
+                        if (workspaceObj.action_title && !workspaceObj.action_data) {
+                            // @ts-ignore
+                            const actionDetails = cleanedActionOptions.find((act) => act.value === workspaceObj.action_title);
+                            if (actionDetails) {
+                                // @ts-ignore
+                                setActionData(actionDetails.data || {});
+                            }
+                        }
+                    }
+                }
+                if (workspaceObj.reaction_service_title) {
+                    const newReactionOptions = await getReactions(workspaceObj.reaction_service_title);
+                    if (newReactionOptions.length > 0) {
+                        // @ts-ignore
+                        const cleanedReactionOptions = newReactionOptions.map((reaction) => {
+                            const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
+                            // clean up default values
+                            Object.keys(data).forEach((key) => {
+                                if (data[key] === "string" || data[key] === "null") {
+                                    data[key] = ""; // replace "string" with empty string
+                                }
+                            });
+                            return {
+                                label: reaction.description,
+                                value: reaction.title,
+                                data,
+                            };
+                        });
+                        console.log(cleanedReactionOptions);
+                        setReactionOptions(cleanedReactionOptions);
+                        if (workspaceObj.reaction_title && !workspaceObj.reaction_data) {
+                            // @ts-ignore
+                            const reactionDetails = cleanedReactionOptions.find((react) => react.value === workspaceObj.reaction_title);
+                            if (reactionDetails) {
+                                // @ts-ignore
+                                setReactionData(reactionDetails.data || {});
+                            }
+                        }
+                    }
+                }
             }
             if (Platform.OS === 'web') {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -326,6 +387,18 @@ export default function WorkspaceScreen() {
         }
     };
 
+    const handleActionDataChange = async (field: string, value: string) => {
+        setActionData({ ...actionData, [field]: value });
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, actionData: { ...actionData, [field]: value } });
+    }
+
+    const handleReactionDataChange = async (field: string, value: string) => {
+        setReactionData({ ...reactionData, [field]: value });
+        // @ts-ignore
+        await workspaceUpdate({ id: workspaceId, reactionData: { ...reactionData, [field]: value } });
+    }
+
     return (
         <ThemedBackground style={{ padding: 0 }}>
             <WorkspaceContainer>
@@ -338,11 +411,10 @@ export default function WorkspaceScreen() {
                     <View style={styles.container}>
                         <View style={styles.dropdownContainer}>
                             <ThemedDropdown
-                                options={[
-                                        // @ts-ignore
-                                    { label: "Choose an action service", value: null },
-                                    ...serviceOptions
-                                ]}
+                                // @ts-ignore
+                                options={[{ label: "Choose an action service", value: null }, ...serviceOptions]}
+                                // @ts-ignore
+                                selectedOptionValue={actionService}
                                 onChange={handleActionServiceChange}
                             />
                         </View>
@@ -363,6 +435,8 @@ export default function WorkspaceScreen() {
                                 <ThemedDropdown
                                     // @ts-ignore
                                     options={[{ label: "Choose an action", value: null }, ...actionOptions]}
+                                    // @ts-ignore
+                                    selectedOptionValue={action}
                                     onChange={handleActionChange}
                                 />
                             </View>
@@ -378,7 +452,8 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={actionData[key]}
-                                    onChange={(text) => setActionData({ ...actionData, [key]: text })}
+                                    // onChange={(text) => setActionData({ ...actionData, [key]: text })}
+                                    onChange={(text) => handleActionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
                             ))}
@@ -389,11 +464,10 @@ export default function WorkspaceScreen() {
                     <View style={styles.container}>
                         <View style={styles.dropdownContainer}>
                             <ThemedDropdown
-                                options={[
-                                    // @ts-ignore
-                                    { label: "Choose a reaction service", value: null },
-                                    ...serviceOptions
-                                ]}
+                                // @ts-ignore
+                                options={[{ label: "Choose a reaction service", value: null }, ...serviceOptions]}
+                                // @ts-ignore
+                                selectedOptionValue={reactionService}
                                 onChange={handleReactionServiceChange}
                             />
                         </View>
@@ -414,6 +488,8 @@ export default function WorkspaceScreen() {
                                 <ThemedDropdown
                                     // @ts-ignore
                                     options={[{ label: "Choose a reaction", value: null }, ...reactionOptions]}
+                                    // @ts-ignore
+                                    selectedOptionValue={reaction}
                                     onChange={handleReactionChange}
                                 />
                             </View>
@@ -429,7 +505,8 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={reactionData[key]}
-                                    onChange={(text) => setReactionData({ ...reactionData, [key]: text })}
+                                    // onChange={(text) => setReactionData({ ...reactionData, [key]: text })}
+                                    onChange={(text) => handleReactionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
                             ))}
