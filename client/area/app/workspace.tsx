@@ -1,12 +1,12 @@
 import { ThemedBackground } from '@/components/ThemedBackground';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { WorkspaceContainer } from '@/components/WorkspaceContainer';
 import { ThemedContainer } from '@/components/ThemedContainer';
 import { ThemedDropdown } from '@/components/ThemedDropdown';
 import { ThemedButton } from '@/components/ThemedButton';
 import { ThemedField } from '@/components/ThemedField';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Constants from 'expo-constants';
 import { actionGetId, actionGetType, getActions } from '@/utils/actions';
 import { getServices } from '@/utils/services';
@@ -80,141 +80,150 @@ export default function WorkspaceScreen() {
     const [actionData, setActionData] = useState({});
     const [reactionData, setReactionData] = useState({});
 
-    useEffect(() => {
-        const getInfoFromURL = async () => {
-            const workspace = await AsyncStorage.getItem('workspace');
-            // @ts-ignore
-            let workspaceObj = null;
-            let workspaceIdTemp = null;
-            if (workspace) {
-                workspaceObj = JSON.parse(workspace);
-                console.log(workspaceObj);
-                setWorkspaceId(workspaceObj.id);
-                workspaceIdTemp = workspaceObj.id;
-                setWorkspaceName(workspaceObj.name);
-                setActionService(workspaceObj.action_service_title);
-                setReactionService(workspaceObj.reaction_service_title);
-                setAction(workspaceObj.action_title);
-                setReaction(workspaceObj.reaction_title);
-                setActionServiceToken(workspaceObj.action_service_token);
-                setReactionServiceToken(workspaceObj.reaction_service_token);
-                setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
-                setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
-                setActionData(workspaceObj.action_data);
-                setReactionData(workspaceObj.reaction_data);
-                if (workspaceObj.action_service_title) {
-                    const newActionOptions = await getActions(workspaceObj.action_service_title);
-                    if (newActionOptions.length > 0) {
-                        // @ts-ignore
-                        const cleanedActionOptions = newActionOptions.map((action) => {
-                            const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
-                            // clean up default values
-                            Object.keys(data).forEach((key) => {
-                                // if (data[key] === "string") {
-                                //     data[key] = ""; // replace "string" with empty string
-                                // }
-                                // if data null or string, replace with empty string
-                                data[key] = "";
-                            });
-                            return {
-                                label: action.description,
-                                value: action.title,
-                                data,
-                            };
-                        });
-                        console.log(cleanedActionOptions);
-                        setActionOptions(cleanedActionOptions);
-                        if (workspaceObj.action_title && !workspaceObj.action_data) {
+    useFocusEffect(
+        useCallback(() => {
+            const getInfoFromURL = async () => {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                  // @ts-ignore
+                  navigation.navigate('index');
+                  return;
+                }
+                // @ts-ignore
+                const token_validity = await userVerifyToken(token);
+                if (!token_validity.valid) {
+                  AsyncStorage.removeItem('token');
+                  // @ts-ignore
+                  navigation.navigate('index');
+                  return;
+                }
+                const workspace = await AsyncStorage.getItem('workspace');
+                // @ts-ignore
+                let workspaceObj = null;
+                let workspaceIdTemp = null;
+                if (workspace) {
+                    workspaceObj = JSON.parse(workspace);
+                    // console.log(workspaceObj);
+                    setWorkspaceId(workspaceObj.id);
+                    workspaceIdTemp = workspaceObj.id;
+                    setWorkspaceName(workspaceObj.name);
+                    setActionService(workspaceObj.action_service_title);
+                    setReactionService(workspaceObj.reaction_service_title);
+                    setAction(workspaceObj.action_title);
+                    setReaction(workspaceObj.reaction_title);
+                    setActionServiceToken(workspaceObj.action_service_token);
+                    setReactionServiceToken(workspaceObj.reaction_service_token);
+                    setActionServiceRefreshToken(workspaceObj.action_service_refresh_token);
+                    setReactionServiceRefreshToken(workspaceObj.reaction_service_refresh_token);
+                    setActionData(workspaceObj.action_data);
+                    setReactionData(workspaceObj.reaction_data);
+                    if (workspaceObj.action_service_title) {
+                        const newActionOptions = await getActions(workspaceObj.action_service_title);
+                        if (newActionOptions.length > 0) {
                             // @ts-ignore
-                            const actionDetails = cleanedActionOptions.find((act) => act.value === workspaceObj.action_title);
-                            if (actionDetails) {
+                            const cleanedActionOptions = newActionOptions.map((action) => {
+                                const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
+                                // clean up default values
+                                Object.keys(data).forEach((key) => {
+                                    data[key] = "";
+                                });
+                                return {
+                                    label: action.description,
+                                    value: action.title,
+                                    data,
+                                };
+                            });
+                            console.log(cleanedActionOptions);
+                            setActionOptions(cleanedActionOptions);
+                            if (workspaceObj.action_title && !workspaceObj.action_data) {
                                 // @ts-ignore
-                                setActionData(actionDetails.data || {});
+                                const actionDetails = cleanedActionOptions.find((act) => act.value === workspaceObj.action_title);
+                                if (actionDetails) {
+                                    // @ts-ignore
+                                    setActionData(actionDetails.data || {});
+                                }
+                            }
+                        }
+                    }
+                    if (workspaceObj.reaction_service_title) {
+                        const newReactionOptions = await getReactions(workspaceObj.reaction_service_title);
+                        if (newReactionOptions.length > 0) {
+                            // @ts-ignore
+                            const cleanedReactionOptions = newReactionOptions.map((reaction) => {
+                                const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
+                                // clean up default values
+                                Object.keys(data).forEach((key) => {
+                                    data[key] = "";
+                                });
+                                return {
+                                    label: reaction.description,
+                                    value: reaction.title,
+                                    data,
+                                };
+                            });
+                            console.log(cleanedReactionOptions);
+                            setReactionOptions(cleanedReactionOptions);
+                            if (workspaceObj.reaction_title && !workspaceObj.reaction_data) {
+                                // @ts-ignore
+                                const reactionDetails = cleanedReactionOptions.find((react) => react.value === workspaceObj.reaction_title);
+                                if (reactionDetails) {
+                                    // @ts-ignore
+                                    setReactionData(reactionDetails.data || {});
+                                }
                             }
                         }
                     }
                 }
-                if (workspaceObj.reaction_service_title) {
-                    const newReactionOptions = await getReactions(workspaceObj.reaction_service_title);
-                    if (newReactionOptions.length > 0) {
-                        // @ts-ignore
-                        const cleanedReactionOptions = newReactionOptions.map((reaction) => {
-                            const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
-                            // clean up default values
-                            Object.keys(data).forEach((key) => {
-                                // if (data[key] === "string" || data[key] === "null") {
-                                //     data[key] = ""; // replace "string" with empty string
-                                // }
-                                data[key] = "";
-                            });
-                            return {
-                                label: reaction.description,
-                                value: reaction.title,
-                                data,
-                            };
-                        });
-                        console.log(cleanedReactionOptions);
-                        setReactionOptions(cleanedReactionOptions);
-                        if (workspaceObj.reaction_title && !workspaceObj.reaction_data) {
-                            // @ts-ignore
-                            const reactionDetails = cleanedReactionOptions.find((react) => react.value === workspaceObj.reaction_title);
-                            if (reactionDetails) {
-                                // @ts-ignore
-                                setReactionData(reactionDetails.data || {});
-                            }
-                        }
+                if (Platform.OS === 'web') {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (!urlParams) {
+                        return;
                     }
+                    const actionServiceTokenFromURL = urlParams.get('action_token');
+                    if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
+                        // @ts-ignore
+                        setActionServiceToken(actionServiceTokenFromURL);
+                        workspaceObj.action_service_token = actionServiceTokenFromURL;
+                        // @ts-ignore
+                        await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
+                    }
+                    const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
+                    if (actionServiceRefreshTokenFromURL) {
+                        // @ts-ignore
+                        setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
+                        workspaceObj.action_service_refresh_token = actionServiceRefreshTokenFromURL;
+                        // @ts-ignore
+                        await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
+                    }
+                    const reactionServiceTokenFromURL = urlParams.get('reaction_token');
+                    if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
+                        // @ts-ignore
+                        setReactionServiceToken(reactionServiceTokenFromURL);
+                        workspaceObj.reaction_service_token = reactionServiceTokenFromURL;
+                        // @ts-ignore
+                        await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
+                    }
+                    const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
+                    if (reactionServiceRefreshTokenFromURL) {
+                        // @ts-ignore
+                        setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
+                        workspaceObj.reaction_service_refresh_token = reactionServiceRefreshTokenFromURL;
+                        // @ts-ignore
+                        await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
+                    }
+                    //clear url
+                    window.history.pushState({}, document.title, "/workspace");
+                    await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
                 }
             }
-            if (Platform.OS === 'web') {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (!urlParams) {
-                    return;
-                }
-                const actionServiceTokenFromURL = urlParams.get('action_token');
-                if (actionServiceTokenFromURL && actionServiceTokenFromURL != 'undefined') {
-                    // @ts-ignore
-                    setActionServiceToken(actionServiceTokenFromURL);
-                    workspaceObj.action_service_token = actionServiceTokenFromURL;
-                    // @ts-ignore
-                    await workspaceUpdate({ id: workspaceIdTemp, actionServiceToken: actionServiceTokenFromURL });
-                }
-                const actionServiceRefreshTokenFromURL = urlParams.get('action_refresh_token');
-                if (actionServiceRefreshTokenFromURL) {
-                    // @ts-ignore
-                    setActionServiceRefreshToken(actionServiceRefreshTokenFromURL);
-                    workspaceObj.action_service_refresh_token = actionServiceRefreshTokenFromURL;
-                    // @ts-ignore
-                    await workspaceUpdate({ id: workspaceIdTemp, actionServiceRefreshToken: actionServiceRefreshTokenFromURL });
-                }
-                const reactionServiceTokenFromURL = urlParams.get('reaction_token');
-                if (reactionServiceTokenFromURL && reactionServiceTokenFromURL != 'undefined') {
-                    // @ts-ignore
-                    setReactionServiceToken(reactionServiceTokenFromURL);
-                    workspaceObj.reaction_service_token = reactionServiceTokenFromURL;
-                    // @ts-ignore
-                    await workspaceUpdate({ id: workspaceIdTemp, reactionServiceToken: reactionServiceTokenFromURL });
-                }
-                const reactionServiceRefreshTokenFromURL = urlParams.get('reaction_refresh_token');
-                if (reactionServiceRefreshTokenFromURL) {
-                    // @ts-ignore
-                    setReactionServiceRefreshToken(reactionServiceRefreshTokenFromURL);
-                    workspaceObj.reaction_service_refresh_token = reactionServiceRefreshTokenFromURL;
-                    // @ts-ignore
-                    await workspaceUpdate({ id: workspaceIdTemp, reactionServiceRefreshToken: reactionServiceRefreshTokenFromURL });
-                }
-                //clear url
-                window.history.pushState({}, document.title, "/workspace");
-                await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+            getInfoFromURL();
+            const getServicesFromBackend = async () => {
+                const services = await getServices();
+                setServiceOptions(services);
             }
-        }
-        getInfoFromURL();
-        const getServicesFromBackend = async () => {
-            const services = await getServices();
-            setServiceOptions(services);
-        }
-        getServicesFromBackend();
-    }, []);
+            getServicesFromBackend();
+        }, [])
+    );
 
     const handleCreate = async () => {
         if (!actionService || !reactionService || !action || !reaction || !actionServiceToken || !reactionServiceToken) {
@@ -225,17 +234,17 @@ export default function WorkspaceScreen() {
         console.log('Creating AREA');
         const trigger = {
             workspace_id: workspaceId,
-            type: await actionGetType(action), // get type from action title
-            action_id: await actionGetId(action), // get id from action title
-            reaction_id: await reactionGetId(reaction), // get id from reaction title
+            type: await actionGetType(action),
+            action_id: await actionGetId(action),
+            reaction_id: await reactionGetId(reaction),
             action_data: actionData,
             reaction_data: reactionData,
             action_service_token: actionServiceToken,
             reaction_service_token: reactionServiceToken,
             action_service_refresh_token: actionServiceRefreshToken,
             reaction_service_refresh_token: reactionServiceRefreshToken,
-            webhook_url: null, // get from action, if type is webhook
-            webhook_secret: null, // get from action, if type is webhook
+            webhook_url: null, //useless
+            webhook_secret: null, //useless
         }
         await triggerCreateOrUpdate(trigger);
         console.log('trigger created');
@@ -309,6 +318,12 @@ export default function WorkspaceScreen() {
     const handleActionServiceChange = async (service: string) => {
         // @ts-ignore
         setActionService(service);
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.action_service_title = service;
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         setAction(null);
         setActionOptions([]);
         setActionData({});
@@ -324,9 +339,7 @@ export default function WorkspaceScreen() {
                             const data = typeof action.data === 'string' ? JSON.parse(action.data) : action.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                data[key] = "";
                             });
                             return {
                                 label: action.description,
@@ -345,6 +358,12 @@ export default function WorkspaceScreen() {
     const handleReactionServiceChange = async (service: string) => {
         // @ts-ignore
         setReactionService(service);
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.reaction_service_title = service;
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         setReaction(null);
         setReactionOptions([]);
         setReactionData({});
@@ -360,9 +379,7 @@ export default function WorkspaceScreen() {
                             const data = typeof reaction.data === 'string' ? JSON.parse(reaction.data) : reaction.data || {};
                             // clean up default values
                             Object.keys(data).forEach((key) => {
-                                if (data[key] === "string" || data[key] === "null") {
-                                    data[key] = ""; // replace "string" with empty string
-                                }
+                                data[key] = "";
                             });
                             return {
                                 label: reaction.description,
@@ -381,6 +398,12 @@ export default function WorkspaceScreen() {
     // @ts-ignore
     const handleActionChange = async (selectedAction) => {
         setAction(selectedAction);
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.action_title = selectedAction;
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionTitle: selectedAction });
         // @ts-ignore
@@ -394,6 +417,12 @@ export default function WorkspaceScreen() {
     // @ts-ignore
     const handleReactionChange = async (selectedReaction) => {
         setReaction(selectedReaction);
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.reaction_title = selectedReaction;
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionTitle: selectedReaction });
         // @ts-ignore
@@ -406,12 +435,24 @@ export default function WorkspaceScreen() {
 
     const handleActionDataChange = async (field: string, value: string) => {
         setActionData({ ...actionData, [field]: value });
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.action_data = { ...actionData, [field]: value };
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, actionData: { ...actionData, [field]: value } });
     }
 
     const handleReactionDataChange = async (field: string, value: string) => {
         setReactionData({ ...reactionData, [field]: value });
+        const workspace = await AsyncStorage.getItem('workspace');
+        if (workspace) {
+            const workspaceObj = JSON.parse(workspace);
+            workspaceObj.reaction_data = { ...reactionData, [field]: value };
+            await AsyncStorage.setItem('workspace', JSON.stringify(workspaceObj));
+        }
         // @ts-ignore
         await workspaceUpdate({ id: workspaceId, reactionData: { ...reactionData, [field]: value } });
     }
@@ -469,7 +510,6 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={actionData[key]}
-                                    // onChange={(text) => setActionData({ ...actionData, [key]: text })}
                                     onChange={(text) => handleActionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
@@ -522,7 +562,6 @@ export default function WorkspaceScreen() {
                                     field={key}
                                     // @ts-ignore
                                     value={reactionData[key]}
-                                    // onChange={(text) => setReactionData({ ...reactionData, [key]: text })}
                                     onChange={(text) => handleReactionDataChange(key, text)}
                                     style={styles.inputField}
                                 />
