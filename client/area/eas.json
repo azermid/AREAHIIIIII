@@ -12,6 +12,9 @@
       "production": {
         "android": {
           "buildType": "app-bundle"
+        },
+        "env": {
+          "BACKEND_URI": "https://barnacle-select-hedgehog.ngrok-free.app"
         }
       }
     },

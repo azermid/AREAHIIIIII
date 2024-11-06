@@ -2,7 +2,6 @@ const fetch = require('node-fetch');
 
 async function createSpotifyPlaylist(token, data) {
     const { name, description, isPublic } = data;
-    console.log('Creating Spotify playlist with name:', name);
 
     const response = await fetch(
         "https://api.spotify.com/v1/me/playlists",
@@ -27,7 +26,6 @@ async function createSpotifyPlaylist(token, data) {
     }
 
     const playlistData = await response.json();
-    console.log('Playlist created with ID:', playlistData.id);
     return playlistData;
 }
 

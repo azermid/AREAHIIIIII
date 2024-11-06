@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const retryConnection = require('./database');
 const { startOutlookPollingWorker } = require('./worker/OutlookWorker');
-const { startSpotifyPollingWorker, startSpotifyPollingForLikedTracks } = require('./worker/SpotifyWorker');
+const { startSpotifyPollingWorker } = require('./worker/SpotifyWorker');
 
 const app = express();
 
@@ -30,9 +30,7 @@ app.use((req, res, next) => {
     console.log('Database connection established');
 
     startOutlookPollingWorker(60000, dbConnection);
-    startSpotifyPollingWorker(1000, dbConnection);
-    startSpotifyPollingForLikedTracks(1000, dbConnection);
-
+    startSpotifyPollingWorker(30000, dbConnection);
 
     // app.use((req, res, next) => {
     //   console.log('Headers:', req.headers);
@@ -47,7 +45,7 @@ app.use((req, res, next) => {
     app.use('/user', userRoutes);
 
     const apkRoutes = require('./routes/ApkRoute')(dbConnection);
-    app.use('/client.apk', apkRoutes);
+    app.use('/', apkRoutes);
 
     const workspaceRoutes = require('./routes/WorkspaceRoutes')(dbConnection);
     app.use('/workspace', workspaceRoutes);

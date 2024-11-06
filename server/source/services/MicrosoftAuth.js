@@ -33,7 +33,6 @@ class MicrosoftAuth {
         };
 
         const response = await this.cca.acquireTokenByCode(tokenRequest);
-        // console.log(response);
         return response;
     }
 }

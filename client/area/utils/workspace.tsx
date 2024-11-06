@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getToken } from './asyncStorage';
 
-const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI || Constants.manifest?.extra?.BACKEND_URI;
 
 export async function workspaceCreate(name: string, userId: string) {
     try {
@@ -113,10 +113,9 @@ export async function workspaceGetByUserId(user_id: string) {
 // }
 
 // @ts-ignore
-export async function workspaceUpdate({ id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId }) {
+export async function workspaceUpdate({ id, name, userId, actionTitle, reactionTitle, actionData, reactionData, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken }) {
     try {
         const token = await getToken();
-        // console.log("params", id, name, userId, actionTitle, reactionTitle, actionServiceTitle, reactionServiceTitle, actionServiceToken, reactionServiceToken, actionServiceRefreshToken, reactionServiceRefreshToken, triggerId);
         const response = await fetch(`${backendUri}/workspace/update`, {
             method: "PATCH",
             headers: {
@@ -131,13 +130,14 @@ export async function workspaceUpdate({ id, name, userId, actionTitle, reactionT
                 userId: userId,
                 actionTitle: actionTitle,
                 reactionTitle: reactionTitle,
+                actionData: actionData,
+                reactionData: reactionData,
                 actionServiceTitle: actionServiceTitle,
                 reactionServiceTitle: reactionServiceTitle,
                 actionServiceToken: actionServiceToken,
                 reactionServiceToken: reactionServiceToken,
                 actionServiceRefreshToken: actionServiceRefreshToken,
                 reactionServiceRefreshToken: reactionServiceRefreshToken,
-                triggerId: triggerId
             })
         });
         const data = await response.json();

@@ -1,8 +1,5 @@
 async function send_email_outlook(token, refreshToken, data, additionalData) {
     const { to, text, subject } = data;
-    console.log('Sending email to:', to);
-    console.log('Email subject:', subject);
-    console.log('Email text:', text);
     const response = await fetch(
         "https://graph.microsoft.com/v1.0/me/sendMail",
         {

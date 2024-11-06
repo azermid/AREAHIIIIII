@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-gesture-handler';
 
@@ -18,46 +18,48 @@ export default function MenuScreen() {
   const [workspaces, setWorkspaces] = useState([]);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const checkForToken = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
+  useFocusEffect(
+    useCallback(() => {
+      const checkForToken = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+            // @ts-ignore
+            navigation.navigate('index');
+            return;
+          }
           // @ts-ignore
-          navigation.navigate('index');
-          return;
-        }
-        // @ts-ignore
-        const token_validity = await userVerifyToken(token);
-        if (!token_validity.valid) {
-          AsyncStorage.removeItem('token');
+          const token_validity = await userVerifyToken(token);
+          if (!token_validity.valid) {
+            AsyncStorage.removeItem('token');
+            // @ts-ignore
+            navigation.navigate('index');
+            return;
+          }
           // @ts-ignore
-          navigation.navigate('index');
-          return;
-        }
-        // @ts-ignore
-        // const id = await userGetId(token);
-        const id = token_validity.decoded.id;
-        // console.log('Id', id);
-        if (!id) {
-          // @ts-ignore
-          navigation.navigate('index');
-          return;
-        }
-        setId(id);
+          // const id = await userGetId(token);
+          const id = token_validity.decoded.id;
+          // console.log('Id', id);
+          if (!id) {
+            // @ts-ignore
+            navigation.navigate('index');
+            return;
+          }
+          setId(id);
 
-        const workspaces = await workspaceGetByUserId(id);
-        // console.log('Workspaces', workspaces);
-        if (!workspaces) {
-          return;
+          const workspaces = await workspaceGetByUserId(id);
+          // console.log('Workspaces', workspaces);
+          if (!workspaces) {
+            return;
+          }
+          setWorkspaces(workspaces);
+        } catch (error) {
+          console.log('Error checking for token:', error);
         }
-        setWorkspaces(workspaces);
-      } catch (error) {
-        console.log('Error checking for token:', error);
-      }
-    };
-    checkForToken();
-  }, []);
+      };
+      checkForToken();
+    }, [])
+  );
 
   async function createWorkspace() {
     workspaceCreate('Test Workspace', id).then(
@@ -95,6 +97,7 @@ export default function MenuScreen() {
                   workspace.name = text;
                 }}
                 onBlur={() => {
+                  // @ts-ignore
                   workspaceUpdate({ id: workspace.id, name: workspace.name });
                 }}
               />

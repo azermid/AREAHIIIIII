@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI || Constants.manifest?.extra?.BACKEND_URI;
 
 export async function userLogin(username: string, password: string) {
     try {

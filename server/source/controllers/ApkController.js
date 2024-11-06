@@ -8,9 +8,10 @@ class ApkController {
             const apkPath = await this.downloadApk.getApkPath();
             res.download(apkPath, 'client.apk', (err) => {
                 if (err) {
-                    res.status(500).json({ error: 'Could not download the APK' });
+                    res.status(500).json({ error: 'Could not download the APK: ', err });
                 }
             });
+            res.status(200);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
