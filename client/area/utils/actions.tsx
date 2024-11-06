@@ -1,7 +1,7 @@
 import { getToken } from './asyncStorage';
 import Constants from "expo-constants";
 
-const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI || Constants.manifest?.extra?.BACKEND_URI;
 
 export async function getActions(service: string) {
     if (service == null) {

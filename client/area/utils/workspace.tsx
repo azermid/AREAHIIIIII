@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getToken } from './asyncStorage';
 
-const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI || Constants.manifest?.extra?.BACKEND_URI;
 
 export async function workspaceCreate(name: string, userId: string) {
     try {

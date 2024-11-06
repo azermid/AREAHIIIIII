@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { getToken } from './asyncStorage';
 
-const backendUri = Constants.expoConfig?.extra?.BACKEND_URI;
+const backendUri = Constants.expoConfig?.extra?.BACKEND_URI || Constants.manifest?.extra?.BACKEND_URI;
 
 
 // async update(trigger) {

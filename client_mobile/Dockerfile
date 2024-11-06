@@ -65,7 +65,7 @@ RUN keytool -genkey -v \
 EXPOSE 19000 19001 19002
 
 # Run the EAS build command to generate the AAB, convert it to APK, and move it to the shared volume
-CMD ["sh", "-c", "rm -f /usr/src/app/shared/* /usr/src/app/build-*.aab /usr/src/app/shared/output.apks && \
+CMD ["sh", "-c", "rm -f /usr/src/app/build-*.aab /usr/src/app/shared/output.apks && \
     eas build -p android --local --non-interactive 2>&1 | tee /usr/src/app/shared/eas_build.log && \
     cp /usr/src/app/build-*.aab /usr/src/app/shared/client.aab && \
     java -jar /usr/local/bin/bundletool.jar build-apks --bundle=/usr/src/app/shared/client.aab \

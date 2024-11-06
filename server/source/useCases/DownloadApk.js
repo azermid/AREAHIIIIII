@@ -4,7 +4,7 @@ class DownloadApk {
     }
 
     async getApkPath() {
-        const apkPath = "/usr/src/app/builds/client.apk";
+        const apkPath = "/usr/src/app/shared/client.apk";
         return apkPath;
     }
 }
