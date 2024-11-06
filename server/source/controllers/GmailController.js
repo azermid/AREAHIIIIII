@@ -29,6 +29,27 @@ class GmailController {
         this.initialize();
     }
 
+    async refreshAccessToken(refreshToken) {
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                refresh_token: refreshToken,
+                grant_type: 'refresh_token'
+            })
+        });
+        if (!response.ok) {
+            console.error('Failed to refresh token:', response.statusText);
+            return;
+        }
+        const data = await response.json();
+        return data.access_token;
+    }
+
     async getSendersOfRecentEmails(auth) {
         try {
             // Step 1: Get the list of recent messages from the inbox
@@ -76,29 +97,64 @@ class GmailController {
         }
     }
 
+    async tryWatch(trigger, message) {
+        try {
+            //get self email from token
+            const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${trigger.action_service_token}`
+                }
+            });
+            if (!response.ok) {
+                return false;
+            }
+            const data = await response.json();
+            // if (trigger.action_data.user != message.data.emailAddress) {
+            if (data.emailAddress != message.data.emailAddress) {
+                console.log('Email not for this user');
+                return true;
+            }
+            authClient.setCredentials({
+                access_token: trigger.action_service_token,
+            });
+            const sender = await this.getSendersOfRecentEmails(authClient);
+            const match = sender.match(/<([^>]+)>/);
+            const senderEmail = match ? match[1] : sender;
+            if (trigger.action_data.from != senderEmail) {
+                console.log('Email not from the right sender or reproccesed');
+                return true;
+            }
+            //TODO get email from message.data to give as additionalData to reaction
+            const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
+            const reaction = require(`../reactions/${reactionName}.js`);
+            const newRefreshToken = await reaction(trigger.reaction_service_token, trigger.action_service_refresh_token, trigger.reaction_data, message.data);
+            if (newRefreshToken) {
+                trigger.reaction_service_token = newRefreshToken;
+                await this.triggerRepository.update(trigger);
+            }
+            console.log('Email processed successfully');
+        } catch (error) {
+            console.error('Error:', error);
+            return false;
+        }
+        return true;
+    }
+
     async watch(req, res) {
         try {
             const message = new Message(req.body.message.data);
             const actionId = await this.actionRepository.getIdByName('new_email_gmail');
 
+            console.log('Gmail: watch triggered');
             for (const trigger of await this.triggerRepository.getByActionId(actionId)) {
-                if (trigger.action_data.user != message.data.emailAddress)
-                    continue;
-                authClient.setCredentials({
-                    access_token: trigger.action_service_token,
-                });
-                const sender = await this.getSendersOfRecentEmails(authClient);
-                const match = sender.match(/<([^>]+)>/);
-                const senderEmail = match ? match[1] : sender;
-                if (trigger.action_data.from != senderEmail)
-                    continue;
-                //TODO get email from message.data to give as additionalData to reaction
-                const reactionName = await this.reactionRepository.getNameById(trigger.reaction_id);
-                const reaction = require(`../reactions/${reactionName}.js`);
-                const newRefreshToken = await reaction(trigger.reaction_service_token, trigger.action_service_refresh_token, trigger.reaction_data, message.data);
-                if (newRefreshToken) {
-                    trigger.action_service_token = newRefreshToken;
+                if (!await this.tryWatch(trigger, message)) {
+                    const refreshToken = trigger.action_service_refresh_token;
+                    trigger.action_service_token = await this.refreshAccessToken(refreshToken);
                     await this.triggerRepository.update(trigger);
+                    if (!await this.tryWatch(trigger, message)) {
+                        console.error('Error processing email');
+                    }
                 }
             }
             res.status(200).send('OK');
@@ -118,8 +174,9 @@ class GmailController {
         }
     }
 
-    async createMailWebhook(trigger) {
+    async tryCreateWebhook(trigger) {
         try {
+            console.log('Trying to register gmail webhook');
             const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
                 method: 'POST',
                 headers: {
@@ -136,29 +193,24 @@ class GmailController {
             }
             const data = await response.json();
         } catch (error) {
+            console.error('Error:', error);
+            return false;
+        }
+        return true;
+    }
+
+    async createMailWebhook(trigger) {
+        if (!await this.tryCreateWebhook(trigger)) {
             const refreshToken = trigger.action_service_refresh_token;
-            const response = await fetch('https://oauth2.googleapis.com/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    client_id: process.env.GOOGLE_CLIENT_ID,
-                    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                    refresh_token: refreshToken,
-                    grant_type: 'refresh_token'
-                })
-            });
-            if (!response.ok) {
-                console.error('Failed to refresh token:', response.statusText);
+            trigger.action_service_token = await this.refreshAccessToken(refreshToken);
+            await this.triggerRepository.update(trigger);
+            if (!await this.tryCreateWebhook(trigger)) {
+                console.error('Error registering subscription');
                 return;
             }
-            const data = await response.json();
-            trigger.action_service_token = data.access_token;
-            await this.triggerRepository.update(trigger);
-            // TODO: need to re-register the subscription then
-            console.error('Error registering subscription:', error);
+            console.log('Webhook registered after token refresh');
         }
+        console.log('Webhook registered');
     }
 }
 
