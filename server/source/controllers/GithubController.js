@@ -13,10 +13,25 @@ class GithubController {
     }
 
     async initialize() {
-        const actionId = await this.actionRepository.getIdByName('new_commit');
-        const triggers = await this.triggerRepository.getByActionId(actionId);
+        // const actionId = await this.actionRepository.getIdByName('new_commit');
+        // const triggers = await this.triggerRepository.getByActionId(actionId);
+        // for (const trigger of triggers) {
+        //     this.createWebhook(trigger);
+        // }
+        const triggers = await this.triggerRepository.get();
         for (const trigger of triggers) {
             this.createWebhook(trigger);
+        }
+    }
+
+    async createWebhook(trigger) {
+        const actionName = await this.actionRepository.getNameById(trigger.action_id);
+        switch (actionName) {
+            case 'new_commit':
+                this.createPushWebhook(trigger);
+                break;
+            default:
+                break;
         }
     }
 
@@ -26,19 +41,6 @@ class GithubController {
             res.status(200).send();
         } catch (error) {
             res.status(400).json({ error: error.message });
-        }
-    }
-
-
-    async createWebhook(trigger) {
-        const actionName = await this.actionRepository.getNameById(trigger.action_id);
-        switch (actionName) {
-            case 'new_commit':
-                this.createPushWebhook(trigger);
-                break;
-            default:
-                console.log(`No webhook creation logic for action: ${actionName}`);
-            break;
         }
     }
 
